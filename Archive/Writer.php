@@ -44,7 +44,7 @@ class File_Archive_Writer
      */
     function newFile($filename, $stat, $mime = "application/octet-stream")
     {
-        return PEAR::raiseError("Abstract function call");
+        return PEAR::raiseError("Writer abstract function call (newFile)");
     }
 
     /**
@@ -54,7 +54,7 @@ class File_Archive_Writer
      */
     function writeData($data)
     {
-        return PEAR::raiseError("Abstract function call");
+        return PEAR::raiseError("Writer abstract function call (writeData)");
     }
 
     /**

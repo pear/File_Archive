@@ -48,7 +48,7 @@ class File_Archive_Predicate
      * @param File_Archive_Reader $source Reader which current file is to be examined
      * @return bool False iif the current file must be filtered out
      */
-    function isTrue(&$source) { return PEAR::raiseError("Abstract function call"); }
+    function isTrue(&$source) { return PEAR::raiseError("Predicat abstract function call"); }
 }
 
 ?>

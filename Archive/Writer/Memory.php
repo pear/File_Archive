@@ -45,6 +45,11 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
     function writeData($d) { $this->data .= $d; }
 
     /**
+     * @see File_Archive_Writer::newFile
+     */
+    function newFile() {}
+
+    /**
      * Retrieve the concatenated data
      * The value is returned by reference for performance problems, but you should
      * not manually modify it

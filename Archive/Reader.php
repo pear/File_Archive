@@ -47,7 +47,7 @@ class File_Archive_Reader
      */
     function next()
     {
-        return PEAR::raiseError("Abstract function call");
+        return PEAR::raiseError("Reader abstract function call (next)");
     }
 
     /**
@@ -94,7 +94,7 @@ class File_Archive_Reader
      *
      * @return string Name of the current file
      */
-    function getFilename() { return PEAR::raiseError("Abstract function call"); }
+    function getFilename() { return PEAR::raiseError("Reader abstract function call (getFilename)"); }
 
     /**
      * Returns an array of statistics about the file
@@ -133,7 +133,7 @@ class File_Archive_Reader
      * If $length is not specified, reads up to the end of the file
      * If $length is specified reads up to $length
      */
-    function getData($length = -1) { return PEAR::raiseError("Abstract function call"); }
+    function getData($length = -1) { return PEAR::raiseError("Reader abstract function call (getData)"); }
 
     /**
      * Skip some data and returns how many bytes have been skipped
@@ -147,7 +147,7 @@ class File_Archive_Reader
      * Put back the reader in the state it was before the first call
      * to next()
      */
-    function close() { return PEAR::raiseError("Abstract function call"); }
+    function close() { return PEAR::raiseError("Reader abstract function call (close)"); }
 
     /**
      * Sends the current file to the Writer $writer
