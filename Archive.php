@@ -304,7 +304,11 @@ class File_Archive
         $result = new File_Archive_Reader_Multi();
         foreach($sources as $index => $foo) {
             if(is_string($sources[index])) {
-                $result->addSource(File_Archive::read($sources[index]));
+                $URLreader = File_Archive::read($sources[index]);
+                if(PEAR::isError($URLreader)) {
+                    return $URLreader;
+                }
+                $result->addSource(URLreader);
             } else {
                 $result->addSource($sources[$index]);
             }

@@ -61,18 +61,23 @@ class File_Archive_Reader
         $std = $this->getStandardURL($filename);
 
         //TODO: not very efficient: close and re open the archive to start from the begining
-        $this->close();
-        while($this->next()) {
+        $error = $this->close();
+        if(PEAR::isError($error)) {
+            return $error;
+        }
+        while(($error = $this->next()) === true) {
             if($this->getFilename() == $std)
                 return true;
         }
-        return false;
+        return $error;
     }
 
     /**
      * Returns the standard path
      * Changes \ to /
      * Removes the .. and . from the URL
+     * @param string $path a valid URL that may contain . or .. and \
+     * @static
      */
     function getStandardURL($path)
     {
@@ -157,10 +162,20 @@ class File_Archive_Reader
     {
         $filename = $this->getDataFilename();
         if($filename !== NULL) {
-            $writer->writeFile($filename);
+            $error = $writer->writeFile($filename);
+            if(PEAR::isError($error)) {
+                return $error;
+            }
         } else {
-            while(($data = $this->getData($bufferSize)) !== null)
-                $writer->writeData($data);
+            while(($data = $this->getData($bufferSize)) !== null) {
+                if(PEAR::isError($data)) {
+                    return $data;
+                }
+                $error = $writer->writeData($data);
+                if(PEAR::isError($error) {
+                    return $error;
+                }
+            }
         }
     }
 
@@ -175,12 +190,18 @@ class File_Archive_Reader
             $filename = $this->getFilename();
             $stat = $this->getStat();
 
-            $writer->newFile(
+            $error = $writer->newFile(
                 $this->getFilename(),
                 $this->getStat(),
                 $this->getMime()
             );
-            $this->sendData($writer, $bufferSize);
+            if(PEAR::isError($error)) {
+                return $error;
+            }
+            $error = $this->sendData($writer, $bufferSize);
+            if(PEAR::isError($error)) {
+                return $error;
+            }
         }
         $this->close();
         if($autoClose) {

@@ -64,8 +64,8 @@ class File_Archive_Reader_Archive extends File_Archive_Reader
      */
     function next()
     {
-        if(!$this->sourceOpened && !$this->source->next()) {
-            return false;
+        if(!$this->sourceOpened && ($error = $this->source->next()) !== true) {
+            return $error;
         }
 
         $this->sourceOpened = true;
