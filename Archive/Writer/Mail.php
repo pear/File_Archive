@@ -138,15 +138,19 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
             return;
         }
 
-        $this->mime->addAttachment($this->currentData, $this->currentMime, $this->currentFilename, false);
+        $error = $this->mime->addAttachment($this->currentData, $this->currentMime, $this->currentFilename, false);
         $this->currentData = "";
+        return $error;
     }
     /**
      * @see File_Archive_Writer::newFile
      */
     function newFile($filename, $stat, $mime="application/octet-stream")
     {
-        $this->addCurrentData();
+        $error = $this->addCurrentData();
+        uf(PEAR::isError($error)) {
+            return $error;
+        }
 
         $this->currentFilename = $filename;
         $this->currentMime = $mime;
@@ -157,8 +161,14 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
      */
     function close()
     {
-        parent::close();
-        $this->addCurrentData();
+        $error = parent::close();
+        if(PEAR::isError($error)) {
+            return $error;
+        }
+        $error = $this->addCurrentData();
+        if(PEAR::isError($error)) {
+            return $error;
+        }
 
         $body = $this->mime->get();
         $headers = $this->mime->headers($this->headers);

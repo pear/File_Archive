@@ -66,8 +66,9 @@ class File_Archive_Reader
             return $error;
         }
         while(($error = $this->next()) === true) {
-            if($this->getFilename() == $std)
+            if($this->getFilename() == $std) {
                 return true;
+            }
         }
         return $error;
     }
@@ -146,7 +147,15 @@ class File_Archive_Reader
      *  return strlen(getData($length))
      * But could be far more efficient
      */
-    function skip($length) { return strlen($this->getData($length)); }
+    function skip($length)
+    {
+        $data = $this->getData($length);
+        if(PEAR::isError($data)) {
+            return $data;
+        } else {
+            return strlen($data);
+        }
+    }
 
     /**
      * Put back the reader in the state it was before the first call
@@ -218,14 +227,21 @@ class File_Archive_Reader
      */
     function extractFile($filename, &$writer, $autoClose = true, $bufferSize = 102400)
     {
-        if($this->select($filename)) {
-            $this->sendData($writer, $bufferSize);
-            $result = true;
-        } else {
+        if(($error = $this->select($filename)) === true) {
+            $result = $this->sendData($writer, $bufferSize);
+            if(!PEAR::isError($result)) {
+                $result = true;
+            }
+        } else if($error === false) {
             $result = PEAR::raiseError("File $filename not found");
+        } else {
+            $result = $error;
         }
         if($autoClose) {
-            $writer->close();
+            $error = $writer->close();
+            if(PEAR::isError($error)) {
+                return $error;
+            }
         }
         return $result;
     }

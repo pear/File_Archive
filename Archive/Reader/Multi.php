@@ -64,11 +64,14 @@ class File_Archive_Reader_Multi extends File_Archive_Reader_Relay
         while(array_key_exists($this->currentIndex, $this->sources)) {
             $this->source =& $this->sources[$this->currentIndex];
 
-            if($this->source->next()) {
-                return true;
-            } else {
-                $this->source->close();
+            if(($error = $this->source->next()) === false) {
+                $error = $this->source->close();
+                if(PEAR::isError($error)) {
+                    return $error;
+                }
                 $this->currentIndex++;
+            } else {
+                return $error;
             }
         }
         return false;

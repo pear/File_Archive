@@ -53,7 +53,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         $this->compLength = 0;
         $this->data = null;
 
-        parent::close();
+        return parent::close();
     }
 
     /**
@@ -75,18 +75,29 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         //Skip the data and the footer if they haven't been uncompressed
         if($this->header != null && $this->data == null) {
             $toSkip = $this->header['CLen'];
-            $this->source->skip($toSkip);
+            $error = $this->source->skip($toSkip);
+            if(PEAR::isError($error)) {
+                return $error;
+            }
         }
 
         $this->offset = 0;
         $this->data = null;
 
         //Read the header
-        if($this->source->getData(4) == "\x50\x4b\x03\x04") {
+        $header = $this->source->getData(4);
+        if(PEAR::isError($header)) {
+            return $header;
+        }
+        if($header == "\x50\x4b\x03\x04") {
             //New entry
+            $header = $this->source->getData(26);
+            if(PEAR::isError($header)) {
+                return $header;
+            }
             $this->header = unpack(
                 "vVersion/vFlag/vMethod/vTime/vDate/VCRC/VCLen/VNLen/vFile/vExtra",
-                $this->source->getData(26));
+                $header);
 
             //Check the compression method
             if($this->header['Method'] != 0 &&
@@ -120,7 +131,10 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
 
             $this->currentFilename = $this->source->getData($this->header['File']);
 
-            $this->source->skip($this->header['Extra']);
+            $error = $this->source->skip($this->header['Extra']);
+            if(PEAR::isError($error)) {
+                return $error;
+            }
 
             return true;
         } else {
@@ -185,6 +199,9 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             return;
 
         $this->data = $this->source->getData($this->header['CLen']);
+        if(PEAR::isError($this->data)) {
+            return $this->data;
+        }
         if($this->header['Method'] == 8) {
             $this->data = gzinflate($this->data);
         }

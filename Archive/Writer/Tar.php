@@ -134,9 +134,18 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
     {
         $stat = stat($dataFilename);
 
-        $this->innerWriter->writeData($this->tarHeader($filename, $stat));
+        $error = $this->innerWriter->writeData($this->tarHeader($filename, $stat));
+        if(PEAR::isError($error)) {
+            return $error;
+        }
         $this->innerWriter->writeFile($dataFilename);
+        if(PEAR::isError($error)) {
+            return $error;
+        }
         $this->innerWriter->writeData($this->tarFooter($stat));
+        if(PEAR::isError($error)) {
+            return $error;
+        }
     }
     /**
      * @see File_Archive_Writer_MemoryArchive::appendFileData
@@ -147,9 +156,18 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         $size = strlen($data);
         $stat[7] = $size;
 
-        $this->innerWriter->writeData($this->tarHeader($filename, $stat));
-        $this->innerWriter->writeData($data);
-        $this->innerWriter->writeData($this->tarFooter($stat));
+        $error = $this->innerWriter->writeData($this->tarHeader($filename, $stat));
+        if(PEAR::isError($error)) {
+            return $error;
+        }
+        $error = $this->innerWriter->writeData($data);
+        if(PEAR::isError($error)) {
+            return $error;
+        }
+        $error = $this->innerWriter->writeData($this->tarFooter($stat));
+        if(PEAR::isError($error)) {
+            return $error;
+        }
     }
     /**
      * @see File_Archive_Writer_MemoryArchive::sendFooter
@@ -157,7 +175,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
      */
     function sendFooter()
     {
-        $this->innerWriter->writeData(pack("a1024", ""));
+        return $this->innerWriter->writeData(pack("a1024", ""));
     }
     /**
      * @see File_Archive_Writer::getMime

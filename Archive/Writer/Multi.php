@@ -54,8 +54,15 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
      */
     function newFile($filename, $stat, $mime="application/octet-stream")
     {
-        $this->a->newFile($filename, $stat, $mime);
-        $this->b->newFile($filename, $stat, $mime);
+        $errorA = $this->a->newFile($filename, $stat, $mime);
+        $errorB = $this->b->newFile($filename, $stat, $mime);
+
+        if(PEAR::isError($errorA)) {
+            return $errorA;
+        }
+        if(PEAR::isError($errorB)) {
+            return $errorB;
+        }
     }
 
     /**
@@ -63,8 +70,15 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
      */
     function writeData($data)
     {
-        $this->a->writeData($data);
-        $this->b->writeData($data);
+        $errorA = $this->a->writeData($data);
+        $errorB = $this->b->writeData($data);
+
+        if(PEAR::isError($errorA)) {
+            return $errorA;
+        }
+        if(PEAR::isError($errorB)) {
+            return $errorB;
+        }
     }
 
     /**
@@ -72,8 +86,15 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
      */
     function writeFile($filename)
     {
-        $this->a->writeFile($filename);
-        $this->b->writeFile($filename);
+        $errorA = $this->a->writeFile($filename);
+        $errorB = $this->b->writeFile($filename);
+
+        if(PEAR::isError($errorA)) {
+            return $errorA;
+        }
+        if(PEAR::isError($errorB)) {
+            return $errorB;
+        }
     }
 
     /**
@@ -81,8 +102,15 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
      */
     function close()
     {
-        $this->a->close();
-        $this->b->close();
+        $errorA = $this->a->close();
+        $errorB = $this->b->close();
+
+        if(PEAR::isError($errorA)) {
+            return $errorA;
+        }
+        if(PEAR::isError($errorB)) {
+            return $errorB;
+        }
     }
 }
 ?>

@@ -66,7 +66,7 @@ class File_Archive_Writer
     function writeFile($filename)
     {
         $handle = fopen($filename, "r");
-        if(!is_ressource($handle)) {
+        if(!is_resource($handle)) {
             return PEAR::raiseError("Unable to write to $filename");
         }
         while(!feof($handle)) {

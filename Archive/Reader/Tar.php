@@ -101,8 +101,11 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
 
         $this->source->skip($this->leftLength + $this->footerLength);
         $rawHeader = $this->source->getData(512);
+        if(PEAR::isError($rawHeader)) {
+            return $rawHeader;
+        }
         if(strlen($rawHeader)<512 || $rawHeader == pack("a512", "")) {
-            return FALSE;
+            return false;
         }
 
         $header = unpack(

@@ -79,9 +79,15 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
     function newFile($filename, $stat=array(), $mime = "application/octet-stream")
     {
         if($this->nbFiles == 0) {
-            $this->sendHeader();
+            $error = $this->sendHeader();
+            if(PEAR::isError($error)) {
+                return $error;
+            }
         } else {
-            $this->flush();
+            $error = $this->flush();
+            if(PEAR::isError($error)) {
+                return $error;
+            }
         }
 
         $this->nbFiles++;
@@ -96,10 +102,16 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
      */
     function close()
     {
-        $this->flush();
-        $this->sendFooter();
+        $error = $this->flush();
+        if(PEAR::isError($error)) {
+            return $error;
+        }
+        $error = $this->sendFooter();
+        if(PEAR::isError($error)) {
+            return $error;
+        }
 
-        parent::close();
+        return parent::close();
     }
     /**
      * Indicate that all the data have been read from the current file
@@ -111,13 +123,17 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
     function flush()
     {
         if($this->currentFilename !== null) {
-            if($this->currentDataFile !== null)
-                $this->appendFile($this->currentFilename,
+            if($this->currentDataFile !== null) {
+                $error = $this->appendFile($this->currentFilename,
                                   $this->currentDataFile);
-            else
-                $this->appendFileData($this->currentFilename,
+            } else {
+                $error = $this->appendFileData($this->currentFilename,
                                  $this->currentStat,
                                  $this->memoryWriter->getData());
+            }
+            if(PEAR::isError($error)) {
+                return $error;
+            }
 
             $this->currentFilename = null;
             $this->currentDataFile = null;
@@ -127,7 +143,7 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
     /**
      * @see File_Archive_Writer::writeData
      */
-    function writeData($data) { $this->memoryWriter->writeData($data); }
+    function writeData($data) { return $this->memoryWriter->writeData($data); }
     /**
      * @see File_Archive_Writer::writeFile
      */
@@ -136,7 +152,7 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
         if($this->currentDataFile == null && $this->memoryWriter->isEmpty()) {
             $this->currentDataFile = $filename;
         } else {
-            $this->memoryWriter->writeFile($filename);
+            return $this->memoryWriter->writeFile($filename);
         }
     }
 
@@ -174,7 +190,7 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
      */
     function appendFile($filename, $dataFilename)
     {
-        $this->appendFileData($filename, stat($dataFilename), file_get_contents($dataFilename));
+        return $this->appendFileData($filename, stat($dataFilename), file_get_contents($dataFilename));
     }
 }
 

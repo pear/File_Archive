@@ -83,8 +83,12 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
      */
     function next()
     {
-        if($this->directoryHandle == null)
+        if($this->directoryHandle == null) {
             $this->directoryHandle = opendir($this->directory);
+            if(!is_resource($this->directoryHandle)) {
+                return PEAR::raiseError("Directory {$this->directory} not found");
+            }
+        }
 
         while($this->source == null ||
              !$this->source->next()) {

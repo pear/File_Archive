@@ -175,17 +175,19 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         while(true) {
             //Remove the readers we have completly read from the stack
             do {
-                while(! $this->source->next()) {
+                while(($error = $this->source->next()) === false) {
                     if(empty($this->readers)) {
                         return false;
                     }
                     $this->source =& $this->readers[count($this->readers)-1];
                     unset($this->readers[count($this->readers)-1]);
                 }
+                if(PEAR::isError($error)) {
+                    return $error;
+                }
                 $currentFilename = $this->source->getFilename();
 
-                if(strlen($currentFilename)<strlen($this->baseDir))
-                {
+                if(strlen($currentFilename)<strlen($this->baseDir)) {
                     $goodFile =(strncmp($this->baseDir, $currentFilename, strlen($currentFilename))==0 &&
                                 $this->baseDir{strlen($currentFilename)} == '/');
                 } else if(strlen($currentFilename)>strlen($this->baseDir)) {
@@ -195,8 +197,6 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
                 } else {
                     $goodFile =(strcmp($this->baseDir, $currentFilename) == 0);
                 }
-
-//                echo "baseDir = {$this->baseDir}, file = $currentFilename, accepted = ".($goodFile ? 'true':'false')."<br/>\n";
 
             } while(!$goodFile);
 
@@ -220,8 +220,11 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         $this->baseDirUncompressionLevel = null;
         $this->baseDir = $baseDir;
 
-        if(! $this->next()) {
+        $error = $this->next();
+        if($error === false) {
             return PEAR::raiseError("No directory $baseDir in inner reader");
+        } else if(PEAR::isError($error)) {
+            return $error;
         }
         $this->currentFileDisplayed = false;
         return strlen($this->getFilename())>strlen($baseDir);
@@ -233,9 +236,12 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     {
         $std = $this->getStandardURL($filename);
 
-        $this->close();
+        $error = $this->close();
+        if(PEAR::isError($error)) {
+            return $error;
+        }
 
-        while($this->source->next()) {
+        while(($error = $this->source->next()) === true) {
             $currentFilename = $this->source->getFilename().'/';
             $compLength = min(strlen($currentFilename), strlen($filename));
             if( strncmp($currentFilename, $std, $compLength) == 0 ) {
@@ -246,6 +252,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
                 }
             }
         }
+        if(PEAR::isError($error)) {
+            return $error;
+        }
         return false;
     }
 
@@ -255,8 +264,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     function close()
     {
         $this->readers = array();
-        parent::close();
+        $error = parent::close();
         $this->source =& $this->startReader;
+        return $error;
     }
 }
 

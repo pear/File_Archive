@@ -86,8 +86,11 @@ class File_Archive_Reader_Archive extends File_Archive_Reader
     function close()
     {
         if(!$this->sourceInitiallyOpened && $this->sourceOpened) {
-            $this->source->close();
+            $error = $this->source->close();
             $this->sourceOpened = false;
+            if(PEAR::isError($error)) {
+                return $error;
+            }
         }
     }
 }

@@ -103,7 +103,10 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
                    $filename.
                    $data;
 
-        $this->innerWriter->writeData($zipData);
+        $error = $this->innerWriter->writeData($zipData);
+        if(PEAR::isError($error)) {
+            return $error;
+        }
 
         $this->central .= "\x50\x4b\x01\x02\x00\x00\x14\x00\x00\x00\x08\x00".
                    $mtime.
@@ -122,7 +125,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
      */
     function sendFooter()
     {
-        $this->innerWriter->writeData(
+        return $this->innerWriter->writeData(
             $this->central.
             "\x50\x4b\x05\x06\x00\x00\x00\x00".
             pack("vvVVv",

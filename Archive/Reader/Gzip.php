@@ -71,6 +71,9 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         $this->alreadyRead = true;
 
         $header = $this->source->getData(10);
+        if(PEAR::isError($header)) {
+            return $header;
+        }
 
         $id = unpack("H2id1/H2id2/C1tmp/C1flags",substr($header,0,4));
         if($id['id1'] != "1f" || $id['id2'] != "8b") {
@@ -87,6 +90,9 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
                 if($char === null) {
                     return PEAR::raiseError("Not valid gz file (unexpected end of archive reading filename)");
                 }
+                if(PEAR::isError($char)) {
+                    return $char;
+                }
                 $this->name .= $char;
             }
             $this->name = $this->getStandardURL($this->name);
@@ -97,11 +103,17 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
                 if($char === null) {
                     return PEAR::raiseError("Not valid gz file (unexpected end of archive reading comment)");
                 }
+                if(PEAR::isError($char)) {
+                    return $char;
+                }
                 $this->comment .= $char;
             }
         }
 
         $this->data = $this->source->getData();
+        if(PEAR::isError($this->data)) {
+            return $this->data;
+        }
 
         $temp = unpack("Vcrc32/Visize",substr($this->data,-8));
         $crc32 = $temp['crc32'];

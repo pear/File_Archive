@@ -75,7 +75,7 @@ class File_Archive_Writer_Archive extends File_Archive_Writer
     function close()
     {
         if($this->autoClose) {
-            $this->innerWriter->close();
+            return $this->innerWriter->close();
         }
     }
 //  function writeData($data)

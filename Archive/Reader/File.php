@@ -105,6 +105,9 @@ class File_Archive_Reader_File extends File_Archive_Reader
             return false;
         }
         $this->handle = fopen($this->filename, "r");
+        if(!is_resource($this->handle)) {
+            return PEAR::raiseError("Can't open {$this->filename} for reading");
+        }
         $this->memory = null;
         if($this->handle === false) {
             return PEAR::raiseError("File {$this->filename} not found");

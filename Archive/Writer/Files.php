@@ -50,24 +50,23 @@ class File_Archive_Writer_Files extends File_Archive_Writer
     {
         // Check if directory already exists
         if (is_dir($pathname) || empty($pathname)) {
-            return true;
+            return;
         }
 
         // Ensure a file does not already exist with the same name
         if (is_file($pathname)) {
-            trigger_error('mkdirr() File exists', E_USER_WARNING);
-            return false;
+            return PEAR::raiseError("File $pathname exists, unable to create directory");
         }
 
         // Crawl up the directory tree
         $next_pathname = substr($pathname, 0, strrpos($pathname, DIRECTORY_SEPARATOR));
-        if ($this->mkdirr($next_pathname)) {
-            if (!file_exists($pathname)) {
-                return mkdir($pathname);
+        if (($error = $this->mkdirr($next_pathname)) === true) {
+            if (!mkdir($pathname)) {
+                return PEAR::raiseError("Unable to create directory $pathname");
             }
+        } else {
+            return $error;
         }
-
-        return false;
     }
 
     /**
@@ -75,15 +74,20 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      */
     function newFile($filename, $stat, $mime="application/octet-stream")
     {
-        if($this->handle !== NULL) {
+        if($this->handle !== null) {
             fclose($this->handle);
         }
 
         $pos = strrpos($filename, "/");
         if($pos !== false) {
-            $this->mkdirr(substr($filename, 0, $pos));
+            $error = $this->mkdirr(substr($filename, 0, $pos));
+            if(PEAR::isError($error)) {
+                return $error;
+            }
         }
         $this->handle = fopen($filename, "w");
+        if(!is_resource($this->handle)) {
+            return PEAR::raiseError("Unable to write to file $filename");
     }
     /**
      * @see File_Archive_Writer::writeData

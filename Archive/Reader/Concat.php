@@ -52,11 +52,13 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
 
         //Compute the total length
         $this->stat[7] = 0;
-        while($source->next()) {
+        while(($error = $source->next()) === true) {
             $sourceStat = $source->getStat();
             $this->stat[7] += $sourceStat[7];
         }
-        $source->close();
+        if(PEAR::isError($error) || PEAR::isError($source->close())) {
+            die("Error in File_Archive_Reader_Concat constructor ({$error->getMessage()}), cannot continue");
+        }
     }
 
     /**
@@ -65,9 +67,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
     function next()
     {
         if(!$this->opened) {
-            $this->opened = true;
-            $this->source->next();
-            return true;
+            return $this->opened = $this->source->next();
         } else {
             return false;
         }
@@ -135,8 +135,12 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
      */
     function close()
     {
-        $this->source->close();
+        $error = $this->source->close();
         $this->opened = false;
+
+        if(PEAR::isError($error)) {
+            return $error;
+        }
     }
 
 }

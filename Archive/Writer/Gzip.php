@@ -64,7 +64,7 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer_MemoryArchive
         $flags = bindec("000".(!empty($this->comment)? "1" : "0").(!empty($filename)? "1" : "0")."000");
         $mtime = isset($stat[9]) ? $stat[9] : time();
 
-        $this->innerWriter->writeData(
+        return $this->innerWriter->writeData(
             pack("C1C1C1C1VC1C1",0x1f,0x8b,8,$flags,$mtime,2,0xFF).
             (empty($filename) ? "" : $filename."\0").
             (empty($this->comment) ? "" : $this->comment."\0").
