@@ -99,7 +99,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     {
         return $extension == 'tar' ||
                $extension == 'zip' ||
-               $extension == 'gz' ||
+               $extension == 'gz'  ||
                $extension == 'tgz' ||
                $extension == 'tbz' ||
                $extension == 'bz2';
@@ -125,12 +125,16 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
 
         // Check the extension of the file (maybe we need to uncompress it?)
         $filename  = $this->source->getFilename();
-        $extensions = explode('.', strtolower($filename));
+
+        $shortcuts = array("tgz"   , "tbz"    );
+        $reals     = array("tar.gz", "tar.bz2");
+
+        $extensions = explode('.', str_replace($shortcuts, $reals, strtolower($filename)));
 
         $reader =& $this->source;
         $nbUncompressions = 0;
 
-        while(($extension = array_pop($extensions)) !== null) {
+        while (($extension = array_pop($extensions)) !== null) {
             $nbUncompressions++;
             unset($next);
             switch($extension) {
@@ -156,18 +160,12 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
                 $next = new File_Archive_Reader_Bzip2($reader, $nbUncompressions == 1);
                 unset($reader); $reader =& $next;
                 break;
-            case "tgz":
-                array_push($extensions, "tar", "gz");
-                break;
-            case "tbz":
-                array_push($extensions, "tar", "bz2");
-                break;
             default:
                 $extensions = array();
                 break;
             }
         }
-        if($nbUncompressions == 1) {
+        if ($nbUncompressions == 1) {
             return false;
         } else {
             $this->readers[count($this->readers)] =& $this->source;
@@ -252,7 +250,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     {
         $std = $this->getStandardURL($filename);
 
-        if($close) {
+        if ($close) {
             $error = $this->close();
             if (PEAR::isError($error)) {
                 return $error;

@@ -62,7 +62,7 @@ class File_Archive_Reader
     {
         $std = $this->getStandardURL($filename);
 
-        if($close) {
+        if ($close) {
             $error = $this->close();
             if (PEAR::isError($error)) {
                 return $error;
@@ -94,7 +94,7 @@ class File_Archive_Reader
      */
     function getStandardURL($path)
     {
-        if($path == '.') {
+        if ($path == '.') {
             return '';
         }
         $std = str_replace("\\", "/", $path);

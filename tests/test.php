@@ -222,7 +222,7 @@ class Test extends PHPUnit_TestCase
         $this->assertFalse($predicate->isTrue($source));
     }
 
-    //TODO: test the toMail, toFiles
+    //TODO: test the toMail
     function testToMemory()
     {
         $source = File_Archive::read('test.php');
@@ -246,7 +246,11 @@ class Test extends PHPUnit_TestCase
 
         require_once "File/Archive/Reader/Uncompress.php";
 
-        $source = File_Archive::read('.', null, -1, -1, $compressed->makeReader());
+        $source = File_Archive::read("$filename/test.php", null, -1, -1, $compressed->makeReader());
+        while ($source->next()) {
+            echo $source->getFilename()."\n";
+        }
+        $source->close();
         $source->extract(File_Archive::toMemory($uncompressed));
 
         $this->assertEquals(file_get_contents('test.php'), $uncompressed);
@@ -255,11 +259,11 @@ class Test extends PHPUnit_TestCase
     function testZip() { $this->_testArchive('zip'); }
     function testGzip() { $this->_testArchive('gz'); }
     function testTgz() { $this->_testArchive('tgz'); }
-    function testBzip2() { $this->_testArchive('bz2');}
-    function testWriteZip()
+    function testTbz() { $this->_testArchive('tbz');}
+    function testWriteBZip2()
     {
         //Build the writer
-        $writer = File_Archive::toArchive('example1.tar.bz2');
+        $writer = File_Archive::toArchive('example1.tbz');
 
         //Write the list of even number in [0..999]
         $writer->newFile("even.txt");

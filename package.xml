@@ -7,8 +7,8 @@
  <description>
   File_Archive will let you manipulate easily the tar, gz and zip files.
   This library is strongly object oriented. It makes it very easy to use, writing simple code, yet the library is very powerfull.
-  File_Archive is made of two objects : readers and writers. Are currently implemented readers from file, directory, tar, gz and zip archives.
-  You can write to file(s), send mails with files attached, or create tar, gz or zip archives.
+  File_Archive is made of two objects : readers and writers. Are currently implemented readers from file, directory, tar, gz, zip and bzip2 archives.
+  You can write to file(s), send mails with files attached, or create tar, gz, zip, bzip2 archives.
  </description>
  <license>LGPL</license>
  <maintainers>
@@ -25,9 +25,7 @@
   <date>2005-02-24</date>
   <state>beta</state>
   <notes>
-   + Add a MIME predicate
-   + Change the toArchive function to detect the compression format using the extension of the file
-     (Warning: this is not backward compatible since the order of the arguments have changed)
+   + Add BZip2 reader and writer
   </notes>
   <filelist>
    <dir name="File" role="php">
@@ -53,6 +51,7 @@
      </dir>
      <dir name="Reader" role="php">
       <file>Archive.php</file>
+      <file>Bzip2.php</file>
       <file>ChangeName.php</file>
       <file>Concat.php</file>
       <file>Directory.php</file>
@@ -70,6 +69,7 @@
      </dir>
      <dir name="Writer" role="php">
       <file>Archive.php</file>
+      <file>Bzip2.php</file>
       <file>Files.php</file>
       <file>Gzip.php</file>
       <file>Mail.php</file>
@@ -100,6 +100,16 @@
  </release>
  
  <changelog>
+   <version>0.2.0</version>
+   <date>2005-02-24</date>
+   <state>beta</state>
+   <notes>
+    + Add a MIME predicate
+    + Change the toArchive function to detect the compression format using the extension of the file
+      (Warning: this is not backward compatible since the order of the arguments have changed)
+   </notes> 
+  </release>
+  
   <release>
    <version>0.1.0</version>
    <state>alpha</state>

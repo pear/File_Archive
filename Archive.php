@@ -228,7 +228,7 @@ class File_Archive
             // (to manage URLs like archive.tar/directory/file)
             $pos = 0;
             do {
-                if($pos+1<strlen($realPath)) {
+                if ($pos+1<strlen($realPath)) {
                     $pos = strpos($realPath, '/', $pos+1);
                 } else {
                     $pos = false;
@@ -278,7 +278,7 @@ class File_Archive
             }
 
             //If we are reading from the file system
-            if($source == null) {
+            if ($source == null) {
                 //Create a file reader
                 $result = new File_Archive_Reader_Uncompress(
                             new File_Archive_Reader_File($file),
@@ -666,39 +666,36 @@ class File_Archive
     function toArchive($filename, &$innerWriter = null, $type = null,
                        $stat = array(), $autoClose = true)
     {
-        if($type == null) {
-            $extensions = explode('.', strtolower($filename));
+        $shortcuts = array("tgz"   , "tbz"    );
+        $reals     = array("tar.gz", "tar.bz2");
+
+        if ($type == null) {
+            $extensions = strtolower($filename);
         } else {
-            $extensions = explode('.', strtolower($type));
+            $extensions = strtolower($type);
         }
-        if($innerWriter != null) {
+        $extensions = explode('.', str_replace($shortcuts, $reals, $extensions));
+        if ($innerWriter != null) {
             $writer =& $innerWriter;
         } else {
             $writer = File_Archive::toFiles();
         }
         $nbCompressions = 0;
-        while(($extension = array_pop($extensions)) !== null) {
+        $currentFilename = $filename;
+        while (($extension = array_pop($extensions)) !== null) {
             unset($next);
             switch($extension) {
-            case "tgz":
-                array_push($extensions, "tar", "gz");
-                break;
-            case "tbz":
-                array_push($extensions, "tar", "bzip2");
-                break;
             case "tar":
                 require_once "File/Archive/Writer/Tar.php";
                 $next = new File_Archive_Writer_Tar(
-                    implode(".", $extensions).".$extension",
-                    $writer, $stat, $autoClose
+                    $currentFilename, $writer, $stat, $autoClose
                 );
                 unset($writer); $writer =& $next;
                 break;
             case "zip":
                 require_once "File/Archive/Writer/Zip.php";
                 $next = new File_Archive_Writer_Zip(
-                    implode(".", $extensions).".$extension",
-                    $writer, $stat, $autoClose
+                    $currentFilename, $writer, $stat, $autoClose
                 );
                 unset($writer); $writer =& $next;
                 break;
@@ -706,8 +703,7 @@ class File_Archive
             case "gzip":
                 require_once "File/Archive/Writer/Gzip.php";
                 $next = new File_Archive_Writer_Gzip(
-                    implode(".", $extensions).".$extension",
-                    $writer, $stat, $autoClose
+                    $currentFilename, $writer, $stat, $autoClose
                 );
                 unset($writer); $writer =& $next;
                 break;
@@ -715,19 +711,19 @@ class File_Archive
             case "bzip2":
                 require_once "File/Archive/Writer/Bzip2.php";
                 $next = new File_Archive_Writer_Bzip2(
-                    implode(".", $extensions).".$extension",
-                    $writer, $stat, $autoClose
+                    $currentFilename, $writer, $stat, $autoClose
                 );
                 unset($writer); $writer =& $next;
                 break;
             default:
-                if($type !== null || $nbCompressions == 0) {
+                if ($type !== null || $nbCompressions == 0) {
                     return PEAR::raiseError("Archive $extension unknown");
                 }
                 break;
             }
             $nbCompressions ++;
             $autoClose = true;
+            $currentFilename = implode(".", $extensions);
         }
         return $writer;
     }
