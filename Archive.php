@@ -142,6 +142,9 @@ class File_Archive
      * myBaseDir/dir2/g.txt
      * </pre>
      *
+     * You can use the source parameter to create a reader that reads the given URL from
+     * a specific reader instead of reading from system files.
+     *
      * To read a single file, you can do read('a.txt', 'public_name.txt')
      * If no public name is provided, the default one is the name of the file
      * read('dir2/g.txt') contains the single file named 'g.txt'
