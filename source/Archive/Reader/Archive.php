@@ -53,6 +53,7 @@ class File_Archive_Reader_Archive extends File_Archive_Reader
     {
         $this->source =& $source;
         $this->sourceOpened = $sourceOpened;
+        $this->source->next();
     }
     function close()
     {

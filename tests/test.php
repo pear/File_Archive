@@ -14,10 +14,10 @@ class Test extends PHPUnit_TestCase
         $reader = File_Archive::readMemory("ABCDEFGH", "Memory");
 
         $this->assertTrue($reader->next());
-        $this->assertEquals($reader->getFilename(), "Memory");
-        $this->assertEquals($reader->getData(1), "A");
-        $this->assertEquals($reader->getData(2), "BC");
-        $this->assertEquals($reader->getData(), "DEFGH");
+        $this->assertEquals("Memory", $reader->getFilename());
+        $this->assertEquals("A", $reader->getData(1));
+        $this->assertEquals("BC", $reader->getData(2));
+        $this->assertEquals("DEFGH", $reader->getData());
         $this->assertFalse($reader->next());
         $reader->close();
     }
@@ -26,7 +26,7 @@ class Test extends PHPUnit_TestCase
         $reader = File_Archive::read("test.php", "test.php");
 
         $this->assertTrue($reader->next());
-        $this->assertEquals($reader->getData(), file_get_contents("test.php"));
+        $this->assertEquals(file_get_contents("test.php"), $reader->getData());
         $this->assertFalse($reader->next());
         $reader->close();
     }
@@ -38,9 +38,9 @@ class Test extends PHPUnit_TestCase
         $reader->addSource(File_Archive::readMemory("A", "A.txt"));
 
         $this->assertTrue($reader->next());
-        $this->assertEquals($reader->getFilename(), "test.php");
+        $this->assertEquals("test.php", $reader->getFilename());
         $this->assertTrue($reader->next());
-        $this->assertEquals($reader->getFilename(), "A.txt");
+        $this->assertEquals("A.txt", $reader->getFilename());
         $this->assertFalse($reader->next());
 
         $reader->close();
@@ -165,6 +165,43 @@ class Test extends PHPUnit_TestCase
     }
 
     //TODO: test the writers
+    function testToMemory()
+    {
+        $source = File_Archive::read('test.php');
+        $dest = File_Archive::toMemory();
+
+        $source->extract($dest);
+        $this->assertEquals(file_get_contents('test.php'), $dest->getData());
+    }
+    function _testArchive($archiveFormat, $extension)
+    {
+        $filename = "test.$extension";
+
+        $source = File_Archive::read('test.php', 'test.php');
+        $compressed = File_Archive::toMemory();
+        $source->extract(
+            File_Archive::toArchive(
+                $archiveFormat,
+                'test.php',
+                $compressed
+            )
+        );
+
+        require_once "File/Archive/Reader/Uncompress.php";
+
+        $source = new File_Archive_Reader_Uncompress(
+            File_Archive::readMemory($compressed->getData(), $filename)
+        );
+
+        $uncompressed = File_Archive::toMemory();
+        $source->extract($uncompressed);
+
+        $this->assertEquals(file_get_contents('test.php'), $uncompressed->getData());
+    }
+    function testTar() { $this->_testArchive('tar', 'tar'); }
+//    function testZip() { $this->_testArchive('zip', 'zip'); }
+    function testGzip() { $this->_testArchive('gzip', 'gz'); }
+    function testTgz() { $this->_testArchive('tgz', 'tgz'); }
 }
 
 $test = new PHPUnit_TestSuite("Test");
