@@ -240,6 +240,7 @@ class Test extends PHPUnit_TestCase
                 File_Archive::toFiles()
             )
         );
+        $source->close();
     }
 
     function testMultiWriter()

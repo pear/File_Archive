@@ -66,14 +66,12 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     function getStat() { return $this->currentStat; }
 
     /**
+     * Go to next entry in ZIP archive
+     * This function may stop on a folder, so it does not comply to the File_Archive_Reader::next specs
      * @see File_Archive_Reader::next()
      */
-    function next()
+    function nextWithFolders()
     {
-        if(!parent::next()) {
-            return false;
-        }
-
         //Skip the data and the footer if they haven't been uncompressed
         if($this->header != null && $this->data == null) {
             $toSkip = $this->header['CLen'];
@@ -121,6 +119,28 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             return false;
         }
     }
+    /**
+     * Go to next file entry in ZIP archive
+     * This function will not stop on a folder entry
+     * @see File_Archive_Reader::next()
+     */
+    function next()
+    {
+        if(!parent::next()) {
+            return false;
+        }
+
+        do
+        {
+            $result = $this->nextWithFolders();
+            if($result !== true) {
+                return $result;
+            }
+        } while(substr($this->getFilename(), -1) == '/');
+
+        return true;
+    }
+
     /**
      * @see File_Archive_Reader::getData()
      */

@@ -193,7 +193,7 @@ class File_Archive
                 unset($result);
                 $result =& $tmp;
             }
-        } else if(is_file($URL)) {
+        } else if(is_file($URL) && substr($URL, -1)!='/') {
             require_once "File/Archive/Reader/File.php";
             return new File_Archive_Reader_File($URL, $realSymbolic);
         } else {
