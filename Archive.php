@@ -295,12 +295,23 @@ class File_Archive
         return new File_Archive_Reader_Memory($memory, $filename, $stat, $mime);
     }
     /**
-     * @see File_Archive_Reader_Multi
+     * @param array $sources Array of strings or readers that will be added to the multi reader
+     *        If the parameter is a string, a reader will be built thanks to the read function
+     * @see File_Archive_Reader_Multi File_Archive::read
      */
-    function readMulti()
+    function readMulti(&$sources = array())
     {
         require_once "File/Archive/Reader/Multi.php";
-        return new File_Archive_Reader_Multi();
+        $result = new File_Archive_Reader_Multi();
+        foreach($sources as $index => $foo)
+        {
+            if(is_string($sources[index])) {
+                $result->addSource(File_Archive::read($sources[index]));
+            } else {
+                $result->addSource($sources[$index]);
+            }
+        }
+        return $result;
     }
     /**
      * @see File_Archive_Reader_Concat

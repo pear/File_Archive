@@ -49,6 +49,7 @@ class File_Archive_Reader_Multi extends File_Archive_Reader_Relay
 
     /**
      * Add a new reader to the list of readers
+     * @param File_Archive_Reader $source The source to add
      */
     function addSource(&$source)
     {

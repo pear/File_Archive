@@ -42,21 +42,23 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
      */
     var $data = "";
     /**
-     * Informations about the file being written into this writer
+     * Information about the file being written into this writer
+     * @access private
      */
     var $filename;
     var $stat;
     var $mime;
 
+    /**
+     * @param reference $data If provided, the data will be output in this variable
+     *        Any existent data in $data will be overwritten by the actual data of the writer
+     *        You should not modify manually this variable while using this writer (you can
+     *        safely use all the functions of the archive, like clear for example)
+     */
     function File_Archive_Writer_Memory(&$data = null)
     {
         $this->data =& $data;
         $this->data = '';
-    }
-
-    function test()
-    {
-        $this->data = 'foo';
     }
 
     function writeData($d) { $this->data .= $d; }
@@ -91,7 +93,8 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
     function isEmpty() { return empty($this->data); }
 
     /**
-     * Creates a reader from this writer
+     * Create a reader from this writer
+     *
      * @param string $filename Name of the file provided by the reader
      * @param array $stat Statistics of the file provided by the reader
      * @param string $mime Mime type of the file provided by the reader
