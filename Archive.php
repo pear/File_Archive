@@ -204,7 +204,7 @@ class File_Archive
                 $dotPos = strrpos($file, '.');
                 $extension = '';
                 if($dotPos !== false) {
-                    $extension = substr($file, $pos+1);
+                    $extension = substr($file, $dotPos+1);
                 }
             } while(!File_Archive_Reader_Uncompress::isKnownExtension($extension) || is_dir($file));
 
@@ -213,7 +213,7 @@ class File_Archive
 
             //Rebuild the real URL with the smaller path
             if(isset($parsedURL['scheme'])) {
-                $file .= $parsedURL['scheme'].'//';
+                $file .= $parsedURL['scheme'].'://';
             }
             if(isset($parsedURL['user'])) {
                 $file .= $parsedURL['user'];
@@ -222,8 +222,8 @@ class File_Archive
                 }
                 $file .= '@';
             }
-            if(isset($parsedURL['hostname'])) {
-                $file .= $parsedURL['hostname'];
+            if(isset($parsedURL['host'])) {
+                $file .= $parsedURL['host'];
             }
             if(isset($parsedURL['port'])) {
                 $file .= ':'.$parsedURL['port'];

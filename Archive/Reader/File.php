@@ -106,7 +106,6 @@ class File_Archive_Reader_File extends File_Archive_Reader
         $this->handle = fopen($this->filename, "r");
         $this->memory = null;
         if($this->handle === false) {
-            $this->handle = null;
             return PEAR::raiseError("File {$this->filename} not found");
         } else {
             return true;
@@ -167,7 +166,11 @@ class File_Archive_Reader_File extends File_Archive_Reader
             }
             return $contents;
         } else {
-            return fread($this->handle, $length);
+            if($length == 0) {
+                return "";
+            } else {
+                return fread($this->handle, $length);
+            }
         }
     }
     /**
@@ -180,8 +183,11 @@ class File_Archive_Reader_File extends File_Archive_Reader
         }
 
         $before = ftell($this->handle);
-        fseek($this->handle, $length, SEEK_CUR);
-        return ftell($this->handle) - $before;
+        if(@fseek($this->handle, $length, SEEK_CUR) === -1) {
+            return parent::skip($length);
+        } else {
+            return ftell($this->handle) - $before;
+        }
     }
 }
 

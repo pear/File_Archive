@@ -39,6 +39,16 @@ class Test extends PHPUnit_TestCase
         $data = $reader->getData();
         $this->assertFalse(empty($data));
     }
+    function testAdvancedURLReader()
+    {
+        $reader = File_Archive::read("http://poocl.la-grotte.org/downloads/PEAR2/poocl.tar/");
+        $nbFiles = '';
+        while($reader->next())
+        {
+            $nbFiles++;
+        }
+        $this->assertEquals(39, $nbFiles);
+    }
     function testMultiReader()
     {
         $reader = File_Archive::readMulti();

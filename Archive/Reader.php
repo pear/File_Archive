@@ -141,7 +141,7 @@ class File_Archive_Reader
      *  return strlen(getData($length))
      * But could be far more efficient
      */
-    function skip($length) { return strlen(getData($length)); }
+    function skip($length) { return strlen($this->getData($length)); }
 
     /**
      * Put back the reader in the state it was before the first call
