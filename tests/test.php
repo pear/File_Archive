@@ -245,7 +245,7 @@ class Test extends PHPUnit_TestCase
 
         require_once "File/Archive/Reader/Uncompress.php";
 
-        $source = new File_Archive_Reader_Uncompress($compressed->makeReader());
+        $source = File_Archive::read('.', null, -1, -1, $compressed->makeReader());
         $source->extract(File_Archive::toMemory($uncompressed));
 
         $this->assertEquals(file_get_contents('test.php'), $uncompressed);

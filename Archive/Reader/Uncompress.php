@@ -210,7 +210,6 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
                 } else {
                     $goodFile = (strcmp($this->baseDir, $currentFilename) == 0);
                 }
-
             } while (!$goodFile);
 
             if ($this->baseDirCompressionLevel === null &&

@@ -154,19 +154,23 @@ class File_Archive
      *       URLs containing folders which name ends with such an extension
      */
     function read($URL, $symbolic = null,
-                  $uncompression = 0, $directoryDepth = -1)
+                  $uncompression = 0, $directoryDepth = -1,
+                  &$source=null)
     {
         require_once "File/Archive/Reader/Uncompress.php";
         require_once "File/Archive/Reader/ChangeName.php";
 
+        //No need to un compress more than $directoryDepth
+        //That's not perfect, and some archives will still be uncompressed just //to be filtered out :(
         if ($directoryDepth >= 0) {
             $uncompressionLevel = min($uncompression, $directoryDepth);
         } else {
             $uncompressionLevel = $uncompression;
         }
 
-        //Find the first file in $directory
         $std = File_Archive_Reader::getStandardURL($URL);
+
+        //Modify the symbolic name if necessary
         if ($symbolic == null) {
             $slashPos = strrpos($std, '/');
             if ($slashPos === false) {
@@ -178,7 +182,7 @@ class File_Archive
             $realSymbolic = $symbolic;
         }
 
-        if (is_dir($URL)) {
+        if (empty($URL) || is_dir($URL) && $source == null) {
             require_once "File/Archive/Reader/Directory.php";
 
             $result = new File_Archive_Reader_Uncompress(
@@ -203,7 +207,7 @@ class File_Archive
                 unset($result);
                 $result =& $tmp;
             }
-        } else if (is_file($URL) && substr($URL, -1)!='/') {
+        } else if (is_file($URL) && substr($URL, -1)!='/' && $source == null) {
             require_once "File/Archive/Reader/File.php";
             return new File_Archive_Reader_File($URL, $realSymbolic);
         } else {
@@ -215,7 +219,13 @@ class File_Archive
             $pos = 0;
             do {
                 if ($pos == strlen($realPath)) {
-                    return new File_Archive_Reader_File($std, $realSymbolic);
+                    if($source == null) {
+                        return new File_Archive_Reader_File(
+                                            $std, $realSymbolic);
+                    } else {
+                        $file = ($realPath == '.' ? '' : $realPath);
+                        break;
+                    }
                 }
 
                 $pos = strpos($realPath, '/', $pos+1);
@@ -231,7 +241,7 @@ class File_Archive
                 }
             } while (
                 !File_Archive_Reader_Uncompress::isKnownExtension($extension) ||
-                 is_dir($file));
+                (is_dir($file) && $source==null));
 
             $parsedURL['path'] = $file;
             $file = '';
@@ -262,10 +272,22 @@ class File_Archive
             }
 
             // Build the reader
-            $result = new File_Archive_Reader_Uncompress(
-                new File_Archive_Reader_File($file),
-                $uncompressionLevel
-            );
+            if($source == null) {
+                $result = new File_Archive_Reader_Uncompress(
+                            new File_Archive_Reader_File($file),
+                            $uncompressionLevel
+                          );
+            } else {
+                require_once "File/Archive/Reader/Filter.php";
+                require_once "File/Archive/Predicate/Select.php";
+                $result = new File_Archive_Reader_Uncompress(
+                            new File_Archive_Reader_Filter(
+                              new File_Archive_Predicate_Select($file),
+                              $source
+                            ),
+                            $uncompressionLevel
+                          );
+            }
             $isDir = $result->setBaseDir($std);
             if (PEAR::isError($isDir)) {
                 return PEAR::raiseError("File $URL not found");

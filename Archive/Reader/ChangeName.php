@@ -85,18 +85,12 @@ class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
         parent::File_Archive_Reader_Relay($source);
         $this->oldBaseName = $this->getStandardURL($oldBaseName);
         if (substr($this->oldBaseName, -1) == '/') {
-            $this->oldBaseName = substr(
-                        $this->oldBaseName,
-                        0, strlen($this->oldBaseName)-1
-                   );
+            $this->oldBaseName = substr($this->oldBaseName, 0, -1);
         }
 
         $this->newBaseName = $this->getStandardURL($newBaseName);
         if (substr($this->newBaseName, -1) == '/') {
-            $this->newBaseName = substr(
-                        $this->newBaseName, 0,
-                        strlen($this->newBaseName)-1
-                   );
+            $this->newBaseName = substr($this->newBaseName, 0, -1);
         }
     }
 

@@ -83,6 +83,9 @@ class File_Archive_Reader
      */
     function getStandardURL($path)
     {
+        if($path == '.') {
+            return '';
+        }
         $std = str_replace("\\", "/", $path);
         while ($std != ($std = preg_replace("/[^\/:?]+\/\.\.\//", "", $std))) ;
         $std = str_replace("/./", "", $std);
