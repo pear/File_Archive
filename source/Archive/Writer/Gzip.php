@@ -35,9 +35,25 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer_MemoryArchive
     var $comment = "";
     var $compressionLevel = 9;
 
+    /**
+      * The Gzip file format allows a comment to be put at the end of the file
+      * By default, no comments are put there
+      * You can change this by calling setComment
+      *
+      * @param string $comment
+      */
     function setComment($comment) { $this->comment = $comment; }
+
+    /**
+      * Set the compression level
+      *
+      * @param int $compressionLevel From 0 (no compression) to 9 (best compression)
+      */
     function setCompressionLevel($compressionLevel) { $this->compressionLevel = $compressionLevel; }
 
+    /**
+      * @see File_Archive_Writer_MemoryArchive::appendFileData
+      */
     function appendFileData($filename, $stat, $data)
     {
         $flags = bindec("000".(!empty($this->comment)? "1" : "0").(!empty($filename)? "1" : "0")."000");

@@ -39,14 +39,16 @@ class File_Archive_Predicate_MinTime extends File_Archive_Predicate
     var $minTime = 0;
 
     /**
-      * $minTime is the Unix timestamp of the minimal modification date of the files
-      * $source is the filtered source
+      * @param int $minTime Unix timestamp of the minimal modification date of the files
       */
     function File_Archive_Predicate_MinTime($minTime)
     {
         $this->minTime = $minTime;
 
     }
+    /**
+      * @see File_Archive_Predicate::isTrue
+      */
     function isTrue(&$source)
     {
         $stat = $source->getStat();

@@ -36,7 +36,7 @@ require_once "File/Archive/Writer.php";
 class File_Archive_Writer_Memory extends File_Archive_Writer
 {
     /**
-      * @var String $data The buffer
+      * @var string $data The buffer
       */
     var $data = "";
 
@@ -44,6 +44,8 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
 
     /**
       * Retrieve the concatenated data
+      *
+      * @return string buffer
       */
     function getData() { return $this->data; }
 

@@ -63,6 +63,9 @@ class File_Archive_Reader_DBFile extends File_Archive_Reader_Relay
     {
         $this->res = $res;
     }
+    /**
+      * @see File_Archive_Reader::close()
+      */
     function close()
     {
         parent::close();
@@ -70,6 +73,9 @@ class File_Archive_Reader_DBFile extends File_Archive_Reader_Relay
         $this->currentRow = 0;
         $this->source = null;
     }
+    /**
+      * @see File_Archive_Reader::next()
+      */
     function next()
     {
         $row = $this->res->fetchRow(DB_FETCHMODE_ORDERED, $this->currentRowPos);

@@ -54,6 +54,9 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
       */
     var $footerLength = 0;
 
+    /**
+      * @see File_Archive_Reader::skip()
+      */
     function skip($length)
     {
         $actualLength = min($this->leftLength, $length);
@@ -61,6 +64,9 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
         $length -= $actualLength;
     }
 
+    /**
+      * @see File_Archive_Reader::close()
+      */
     function close()
     {
         $this->leftLength = 0;
@@ -69,11 +75,24 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
         parent::close();
     }
 
+    /**
+      * @see File_Archive_Reader::getFilename()
+      */
     function getFilename() { return $this->currentFilename; }
+    /**
+      * @see File_Archive_Reader::getStat()
+      */
     function getStat() { return $this->currentStat; }
 
+    /**
+      * @see File_Archive_Reader::next()
+      */
     function next()
     {
+        if(!parent::next()) {
+            return false;
+        }
+
         $this->source->skip($this->leftLength + $this->footerLength);
         $rawHeader = $this->source->getData(512);
         if(strlen($rawHeader)<512 || $rawHeader == pack("a512", "")) {
@@ -111,8 +130,11 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
             die('Checksum error on entry '.$this->currentFilename);
         }
 
-        return TRUE;
+        return true;
     }
+    /**
+      * @see File_Archive_Reader::getData()
+      */
     function getData($length = -1)
     {
         if($length == -1) {

@@ -46,24 +46,36 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
         $this->b =& $b;
     }
 
+    /**
+      * @see File_Archive_Writer::newFile
+      */
     function newFile($filename, $stat, $mime="application/octet-stream")
     {
         $this->a->newFile($filename, $stat, $mime);
         $this->b->newFile($filename, $stat, $mime);
     }
 
+    /**
+      * @see File_Archive_Writer::writeData
+      */
     function writeData($data)
     {
         $this->a->writeData($data);
         $this->b->writeData($data);
     }
 
+    /**
+      * @see File_Archive_Writer::writeFile
+      */
     function writeFile($filename)
     {
         $this->a->writeFile($filename);
         $this->b->writeFile($filename);
     }
 
+    /**
+      * @see File_Archive_Writer::close
+      */
     function close()
     {
         $this->a->close();

@@ -95,19 +95,35 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
         $this->headers = $headers;
     }
 
+    /**
+      * @see Mail_Mime::setHTMLBody
+      */
     function setHTMLBody($data, $isfile = false)
     {
         return $this->mime->setHTMLBody($data, $isfile);
     }
+    /**
+      * @see Mail_Mime::addHTMLImage
+      */
     function addHTMLImage($file, $c_type='application/octet-stream', $name='', $isfile=true)
     {
         return $this->mime->addHTMLImage($file, $c_type, $name, $isfile);
     }
 
+    /**
+      * @see File_Archive_Writer::writeData
+      *
+      * This function just put the data in $currentData until the end of file
+      * At that time, addCurrentData is called to attach $currentData to the mail
+      * and to clear $currentData for a new file
+      */
     function writeData($data)
     {
         $this->currentData .= $data;
     }
+    /**
+      * Called when a file is finished and must be added as attachment to the mail
+      */
     function addCurrentData()
     {
         if($this->currentFilename == null) {
@@ -117,6 +133,9 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
         $this->mime->addAttachment($this->currentData, $this->currentMime, $this->currentFilename, false);
         $this->currentData = "";
     }
+    /**
+      * @see File_Archive_Writer::newFile
+      */
     function newFile($filename, $stat, $mime="application/octet-stream")
     {
         $this->addCurrentData();
@@ -125,6 +144,9 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
         $this->currentMime = $mime;
     }
 
+    /**
+      * @see File_Archive_Writer::close
+      */
     function close()
     {
         parent::close();

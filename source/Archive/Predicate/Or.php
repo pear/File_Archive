@@ -37,15 +37,35 @@ require_once "File/Archive/Predicate.php";
   */
 class File_Archive_Predicate_Or extends File_Archive_Predicate
 {
+    /**
+      * @var Array List of File_Archive_Predicate objects given as an argument
+      */
     var $preds;
-    function File_Archive_Predicate_Or()
+
+    /**
+      * Build the predicate using the optional File_Archive_Predicates given as arguments
+      *
+      * Example:
+      *   new File_Archive_Predicate_And($pred1, $pred2, $pred3)
+      */
+    function File_Archive_Predicate_And()
     {
         $this->preds = func_get_args();
     }
+
+    /**
+      * Add a new predicate to the list
+      *
+      * @param File_Archive_Predicate The predicate to add
+      */
     function addPredicate($pred)
     {
         $this->preds[] = $pred;
     }
+
+    /**
+      * @see File_Archive_Predicate::isTrue
+      */
     function isTrue(&$source)
     {
         foreach($this->preds as $p)

@@ -43,6 +43,12 @@ class File_Archive_Predicate_Custom extends File_Archive_Predicate
 {
     var $expression;
 
+    /**
+      * @param string $expression PHP code that evaluates too a boolean
+      *        It can use the $source variable
+      *        If return is ommited, it will be added to the begining of the expression
+      *        A ; will also be added at the end so that you don't need to write it
+      */
     function File_Archive_Predicate_Custom($expression)
     {
         $this->expression = $expression.";";
@@ -51,6 +57,9 @@ class File_Archive_Predicate_Custom extends File_Archive_Predicate
         }
 
     }
+    /**
+      * @see File_Archive_Predicate::isTrue
+      */
     function isTrue(&$source)
     {
         return eval($this->expression);

@@ -73,6 +73,7 @@ class File_Archive_Writer
 
     /**
       * Close the writer, eventually flush the data, write the footer...
+      * This function must be called before the end of the script
       */
     function close() { }
 }

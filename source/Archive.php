@@ -198,32 +198,50 @@ class File_Archive
         }
         return $result;
     }
+    /**
+      * @see File_Archive_Reader_Memory
+      */
     function readMemory($memory, $filename, $stat=array(), $mime="application/octet-stream")
     {
         require_once "File/Archive/Reader/Memory.php";
         return new File_Archive_Reader_Memory($memory, $filename, $stat, $mime);
     }
+    /**
+      * @see File_Archive_Reader_Multi
+      */
     function readMulti()
     {
         require_once "File/Archive/Reader/Multi.php";
         return new File_Archive_Reader_Multi();
     }
 
+    /**
+      * @see File_Archive_Reader_Filter
+      */
     function filter($predicate, $source)
     {
         require_once "File/Archive/Reader/Filter.php";
         return new File_Archive_Reader_Filter($predicate, $source);
     }
+    /**
+      * @see File_Archive_Predicat_True
+      */
     function predTrue()
     {
         require_once "File/Archive/Predicate/True.php";
         return new File_Archive_Predicate_True();
     }
+    /**
+      * @see File_Archive_Predicat_False
+      */
     function predFalse()
     {
         require_once "File/Archive/Predicate/False.php";
         return new File_Archive_Predicate_False();
     }
+    /**
+      * @see File_Archive_Predicat_And
+      */
     function predAnd()
     {
         require_once "File/Archive/Predicate/And.php";
@@ -233,6 +251,9 @@ class File_Archive
             $pred->addPredicate($p);
         return $pred;
     }
+    /**
+      * @see File_Archive_Predicat_Or
+      */
     function predOr()
     {
         require_once "File/Archive/Predicate/Or.php";
@@ -242,67 +263,106 @@ class File_Archive
             $pred->addPredicate($p);
         return $pred;
     }
+    /**
+      * @see File_Archive_Predicat_Not
+      */
     function predNot($pred)
     {
         require_once "File/Archive/Predicate/Not.php";
         return new File_Archive_Predicate_Not($pred);
     }
+    /**
+      * @see File_Archive_Predicat_MinSize
+      */
     function predMinSize($size)
     {
         require_once "File/Archive/Predicate/MinSize.php";
         return new File_Archive_Predicate_MinSize($size);
     }
+    /**
+      * @see File_Archive_Predicat_MinTime
+      */
     function predMinTime($time)
     {
         require_once "File/Archive/Predicate/MinTime.php";
         return new File_Archive_Predicate_MinTime($time);
     }
+    /**
+      * @see File_Archive_Predicat_MaxDepth
+      */
     function predMaxDepth($depth)
     {
         require_once "File/Archive/Predicate/MaxDepth.php";
         return new File_Archive_Predicate_MaxDepth($depth);
     }
+    /**
+      * @see File_Archive_Predicat_Extension
+      */
     function predExtension($list)
     {
         require_once "File/Archive/Predicate/Extension.php";
         return new File_Archive_Predicate_Extension($list);
     }
+    /**
+      * @see File_Archive_Predicat_Ereg
+      */
     function predEreg($ereg)
     {
         require_once "File/Archive/Predicate/Ereg.php";
         return new File_Archive_Predicate_Ereg($ereg);
     }
+    /**
+      * @see File_Archive_Predicat_Eregi
+      */
     function predEregi($ereg)
     {
         require_once "File/Archive/Predicate/Eregi.php";
         return new File_Archive_Predicate_Eregi($ereg);
     }
+    /**
+      * @see File_Archive_Predicat_Custom
+      */
     function predCustom($expression)
     {
         require_once "File/Archive/Predicate/Custom.php";
         return new File_Archive_Predicate_Custom($expression);
     }
 
+    /**
+      * @see File_Archive_Writer_Mail
+      */
     function toMail($to, $headers, $message, &$mail = null)
     {
         require_once "File/Archive/Writer/Mail.php";
         return new File_Archive_Writer_Mail($to, $headers, $message, $mail);
     }
+    /**
+      * @see File_Archive_Writer_Files
+      */
     function toFiles($baseDir = "")
     {
         require_once "File/Archive/Writer/Files.php";
         return new File_Archive_Writer_Files($baseDir);
     }
+    /**
+      * @see File_Archive_Writer_Memory
+      */
     function toMemory()
     {
         require_once "File/Archive/Writer/Memory.php";
         return new File_Archive_Writer_Memory();
     }
+    /**
+      * @see File_Archive_Writer_Multi
+      */
     function toMulti(&$a, &$b)
     {
         require_once "File/Archive/Writer/Multi.php";
         return new File_Archive_Writer_Multi($a, $b);
     }
+    /**
+      * @see File_Archive_Writer_Output
+      */
     function toOutput($sendHeaders = true)
     {
         require_once "File/Archive/Writer/Output.php";

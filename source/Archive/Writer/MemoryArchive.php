@@ -65,6 +65,9 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
         $this->memoryWriter = new File_Archive_Writer_Memory();
         parent::File_Archive_Writer_Archive($filename, $t, $stat, $autoClose);
     }
+    /**
+      * @see File_Archive_Writer::newFile
+      */
     function newFile($filename, $stat, $mime = "application/octet-stream")
     {
         if($this->nbFiles == 0) {
@@ -80,6 +83,9 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
 
         return true;
     }
+    /**
+      * @see File_Archive_Writer::close
+      */
     function close()
     {
         $this->flush();
@@ -108,7 +114,13 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
             $this->memoryWriter->clear();
         }
     }
+    /**
+      * @see File_Archive_Writer::writeData
+      */
     function writeData($data) { $this->memoryWriter->writeData($data); }
+    /**
+      * @see File_Archive_Writer::writeFile
+      */
     function writeFile($filename)
     {
         if($this->currentDataFile == null && $this->memoryWriter->isEmpty()) {

@@ -29,6 +29,17 @@
 
 require_once "Relay.php";
 
+/**
+  * Add a directory to the public name of all the files of a reader
+  *
+  * Example:
+  *  If archive.tar is a file archive containing files a.txt and foo/b.txt
+  *  new File_Archive_Reader_AddBaseName('bar',
+  *     new File_Archive_Reader_Tar(
+  *         new File_Archive_Reader_File('archive.tar')
+  *     )
+  *  ) is a reader containing files bar/a.txt and bar/foo/b.txt
+  */
 class File_Archive_Reader_AddBaseName extends File_Archive_Reader_Relay
 {
     var $baseName;
@@ -38,6 +49,9 @@ class File_Archive_Reader_AddBaseName extends File_Archive_Reader_Relay
         $this->baseName = $this->getStandardURL($baseName);
     }
 
+    /**
+      * @see File_Archive_Reader::getFilename()
+      */
     function getFilename()
     {
         $name = parent::getFilename();
@@ -47,6 +61,17 @@ class File_Archive_Reader_AddBaseName extends File_Archive_Reader_Relay
     }
 }
 
+/**
+  * Change a directory name to another
+  *
+  * Example:
+  *  If archive.tar is a file archive containing files a.txt and foo/b.txt
+  *  new File_Archive_Reader_ChangeBaseName('foo', 'bar'
+  *     new File_Archive_Reader_Tar(
+  *         new File_Archive_Reader_File('archive.tar')
+  *     )
+  *  ) is a reader containing files a.txt and bar/b.txt
+  */
 class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
 {
     var $oldBaseName;
@@ -64,12 +89,20 @@ class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
             $this->newBaseName = substr($this->newBaseName, 0, strlen($this->newBaseName)-1);
     }
 
+    /**
+      * @see File_Archive_Reader::getFilename()
+      */
     function getFilename()
     {
         $name = parent::getFilename();
-        return $this->newBaseName.
-               (empty($this->newBaseName) || strlen($name)<=strlen($this->oldBaseName)+1 ?'':'/').
-               substr($name, strlen($this->oldBaseName)+1);
+        if(empty($this->oldBaseName) ||
+           strncmp($name, $this->oldBaseName.'/', strlen($this->oldBaseName)+1)==0) {
+            return $this->newBaseName.
+                   (empty($this->newBaseName)?'':'/').
+                   substr($name, strlen($this->oldBaseName)+1);
+        } else {
+            return $name;
+        }
     }
 }
 

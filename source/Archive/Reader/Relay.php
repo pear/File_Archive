@@ -46,13 +46,37 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
         $this->source =& $source;
     }
 
+    /**
+      * @see File_Archive_Reader::next()
+      */
     function next() { return $this->source->next(); }
+    /**
+      * @see File_Archive_Reader::getFilename()
+      */
     function getFilename() { return $this->source->getFilename(); }
+    /**
+      * @see File_Archive_Reader::getStat()
+      */
     function getStat() { return $this->source->getStat(); }
+    /**
+      * @see File_Archive_Reader::getMime()
+      */
     function getMime() { return $this->source->getMime(); }
+    /**
+      * @see File_Archive_Reader::getDataFilename()
+      */
     function getDataFilename() { return $this->source->getDataFilename(); }
+    /**
+      * @see File_Archive_Reader::getData()
+      */
     function getData($length = -1) { return $this->source->getData($length); }
+    /**
+      * @see File_Archive_Reader::skip()
+      */
     function skip($length) { return $this->source->skip($length); }
+    /**
+      * @see File_Archive_Reader::close()
+      */
     function close()
     {
         if($this->source != null) {

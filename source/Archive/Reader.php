@@ -39,7 +39,7 @@ class File_Archive_Reader
     /**
       * Move to the next file in the reader
       *
-      * @return boolean true iif no more files are available
+      * @return bool true iif no more files are available
       */
     function next()
     {
@@ -49,8 +49,8 @@ class File_Archive_Reader
     /**
       * Move to the next file whose name is $filename
       *
-      * @param String $filename Name of the file to find in the archive
-      * @return Bool whether the file was found in the archive or not
+      * @param string $filename Name of the file to find in the archive
+      * @return bool whether the file was found in the archive or not
       */
     function select($filename)
     {
@@ -88,7 +88,7 @@ class File_Archive_Reader
       * Warning: undefined behaviour if no call to next have been
       * done or if last call to next has returned false
       *
-      * @return String Name of the current file
+      * @return string Name of the current file
       */
     function getFilename() { return PEAR::raiseError("Abstract function call"); }
 
@@ -115,9 +115,9 @@ class File_Archive_Reader
 
     /**
       * If the current file of the archive is a physical file,
-      * returns the name of this file (this can then be used in
-      * a more efficient way than calling the reader s functions)
-      * Else returns NULL
+      *
+      * @return the name of the physical file containing the data
+      *         or null if no such file exists
       *
       * The data filename may not be the same as the filename.
       */

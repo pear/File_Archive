@@ -85,10 +85,22 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
         }
     }
 
+    /**
+      * @see File_Archive_Reader::getFilename()
+      */
     function getFilename() { return $this->filename; }
+    /**
+      * @see File_Archive_Reader::getStat()
+      */
     function getStat() { return $this->stat; }
+    /**
+      * @see File_Archive_Reader::getMime()
+      */
     function getMime() { return $this->mime; }
 
+    /**
+      * @see File_Archive_Reader::getData()
+      */
     function getData($length = -1)
     {
         if($this->offset == strlen($this->memory)) {
@@ -103,12 +115,18 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
         $this->offset += $actualLength;
         return $result;
     }
+    /**
+      * @see File_Archive_Reader::skip()
+      */
     function skip($length)
     {
         $actualLength = min($length, strlen($this->memory) - $this->offset);
         $this->offset += $actualLength;
         return $actualLength;
     }
+    /**
+      * @see File_Archive_Reader::close()
+      */
     function close()
     {
         $this->offset = 0;

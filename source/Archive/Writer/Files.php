@@ -66,6 +66,9 @@ class File_Archive_Writer_Files extends File_Archive_Writer
         return false;
     }
 
+    /**
+      * @see File_Archive_Writer::newFile
+      */
     function newFile($filename, $stat, $mime="application/octet-stream")
     {
         if($this->handle !== NULL) {
@@ -78,7 +81,13 @@ class File_Archive_Writer_Files extends File_Archive_Writer
         }
         $this->handle = fopen($filename, "w");
     }
+    /**
+      * @see File_Archive_Writer::writeData
+      */
     function writeData($data) { fwrite($this->handle, $data); }
+    /**
+      * @see File_Archive_Writer::close
+      */
     function close()
     {
         if($this->handle !== null) {

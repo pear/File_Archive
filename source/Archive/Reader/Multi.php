@@ -53,6 +53,9 @@ class File_Archive_Reader_Multi extends File_Archive_Reader_Relay
         $this->sources[] =& $source;
     }
 
+    /**
+      * @see File_Archive_Reader::next()
+      */
     function next()
     {
         while(array_key_exists($this->currentIndex, $this->sources))
@@ -68,6 +71,9 @@ class File_Archive_Reader_Multi extends File_Archive_Reader_Relay
         }
         return false;
     }
+    /**
+      * @see File_Archive_Reader::close()
+      */
     function close()
     {
         parent::close();

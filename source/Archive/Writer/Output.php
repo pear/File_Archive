@@ -49,6 +49,9 @@ class File_Archive_Writer_Output extends File_Archive_Writer
     {
         $this->sendHeaders = $sendHeaders;
     }
+    /**
+      * @see File_Archive_Writer::newFile
+      */
     function newFile($filename, $stat, $mime="application/octet-stream")
     {
         if($this->sendHeaders) {
@@ -57,7 +60,13 @@ class File_Archive_Writer_Output extends File_Archive_Writer
             $this->sendHeaders = FALSE;
         }
     }
+    /**
+      * @see File_Archive_Writer::writeData
+      */
     function writeData($data) { echo $data; }
+    /**
+      * @see File_Archive_Writer::writeFile
+      */
     function writeFile($filename) { readfile($filename); }
 }
 

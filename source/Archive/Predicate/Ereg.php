@@ -39,13 +39,15 @@ class File_Archive_Predicate_Ereg extends File_Archive_Predicate
     var $ereg;
 
     /**
-      * $ereg is the regular expression
-      * $source is the filtered source
+      * @param string $ereg is the regular expression
       */
     function File_Archive_Predicate_Ereg($ereg)
     {
         $this->ereg = $ereg;
     }
+    /**
+      * @see File_Archive_Predicate::isTrue
+      */
     function isTrue(&$source)
     {
         return ereg($this->ereg, $source->getFilename());

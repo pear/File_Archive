@@ -64,6 +64,9 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
         $this->symbolic = $this->getStandardURL($symbolic);
         $this->maxRecurs = $maxRecurs;
     }
+    /**
+      * @see File_Archive_Reader::close()
+      */
     function close()
     {
         parent::close();
@@ -71,6 +74,9 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
         $this->directoryHandle = null;
         $this->source = null;
     }
+    /**
+      * @see File_Archive_Reader::next()
+      */
     function next()
     {
         if($this->directoryHandle == null)
@@ -98,6 +104,9 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
 
         return true;
     }
+    /**
+      * @see File_Archive_Reader::getFilename()
+      */
     function getFilename() { return $this->symbolic . parent::getFilename(); }
 }
 

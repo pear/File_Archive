@@ -34,10 +34,22 @@ require_once "File/Archive/Reader.php";
   */
 class File_Archive_Reader_Archive extends File_Archive_Reader
 {
+    /**
+      * @var File_Archive_Reader Single file source that contains the archive to uncompress
+      */
     var $source = null;
+
+    /**
+      * @var bool Inidicate whether the $source is currently opened
+      */
     var $sourceOpened = false;
 
 //ABSTRACT
+    /**
+      * @see File_Archive_Reader::next()
+      *
+      * Open the source if necessary
+      */
     function next()
     {
         if(!$this->sourceOpened && !$this->source->next()) {
@@ -53,8 +65,10 @@ class File_Archive_Reader_Archive extends File_Archive_Reader
     {
         $this->source =& $source;
         $this->sourceOpened = $sourceOpened;
-        $this->source->next();
     }
+    /**
+      * @see File_Archive_Reader::close()
+      */
     function close()
     {
         $this->source->close();

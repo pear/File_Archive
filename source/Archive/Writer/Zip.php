@@ -73,6 +73,9 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
       */
     function setComment($comment) { $this->comment = $comment; }
 
+    /**
+      * @see File_Archive_Writer_MemoryArchive::appendFileData
+      */
     function appendFileData($filename, $stat, $data)
     {
         $filename = preg_replace("/^(\.{1,2}(\/|\\\))+/","",$filename);
@@ -107,6 +110,9 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
         $this->offset += strlen($zipData);
 
     }
+    /**
+      * @see File_Archive_Writer_MemoryArchive::sendFooter
+      */
     function sendFooter()
     {
         $this->innerWriter->writeData(
@@ -119,6 +125,9 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
             $this->comment
         );
     }
+    /**
+      * @see File_Archive_Writer::getMime
+      */
     function getMime() { return "application/zip"; }
 }
 

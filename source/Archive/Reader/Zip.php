@@ -41,6 +41,9 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     var $offset = 0;
     var $data = NULL;
 
+    /**
+      * @see File_Archive_Reader::close()
+      */
     function close()
     {
         $this->currentFilename = NULL;
@@ -51,11 +54,24 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         parent::close();
     }
 
+    /**
+      * @see File_Archive_Reader::getFilename()
+      */
     function getFilename() { return $this->currentFilename; }
+    /**
+      * @see File_Archive_Reader::getStat()
+      */
     function getStat() { return $this->currentStat; }
 
+    /**
+      * @see File_Archive_Reader::next()
+      */
     function next()
     {
+        if(!parent::next()) {
+            return false;
+        }
+
         //Skip the data if they haven't been uncompressed and the footer
         if($this->currentStat != NULL && $this->data == NULL)
             $this->source->skip($this->compLength);
@@ -85,6 +101,9 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             die("Not valid zip file");
         }
     }
+    /**
+      * @see File_Archive_Reader::getData()
+      */
     function getData($length = -1)
     {
         if($this->offset >= $this->currentStat[7])
@@ -101,19 +120,13 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         $this->offset += $actualLength;
         return $result;*/
     }
+    /**
+      * @see File_Archive_Reader::skip()
+      */
     function skip($length)
     {
         $this->offset = min($this->offset + $length, $this->currentStat[7]);
     }
-    function uncompressData()
-    {
-        if($this->data == NULL)
-            return;
 
-        $this->data = $this->source->getData($this->compLength);
-        $this->data = gzinflate($this->data);
-
-        //TODO: check that the length and CRC are OK
-    }
 }
 ?>

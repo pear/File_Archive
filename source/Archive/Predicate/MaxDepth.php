@@ -39,13 +39,16 @@ class File_Archive_Predicate_MaxDepth extends File_Archive_Predicate
     var $maxDepth;
 
     /**
-      * $ereg is the regular expression
-      * $source is the filtered source
+      * @param int $maxDepth Maximal number of folders before the actual file in $source->getFilename()
+      *        '1/2/3/4/foo.txt' will be accepted with $maxDepth == 4 and rejected with $maxDepth == 5
       */
     function File_Archive_Predicate_MaxDepth($maxDepth)
     {
         $this->maxDepth = $maxDepth;
     }
+    /**
+      * @see File_Archive_Predicate::isTrue
+      */
     function isTrue(&$source)
     {
         $url = parse_url($source->getFilename());

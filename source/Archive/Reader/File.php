@@ -61,6 +61,9 @@ class File_Archive_Reader_File extends File_Archive_Reader
             $this->symbolic = $this->getStandardURL($symbolic);
         }
     }
+    /**
+      * @see File_Archive_Reader::close()
+      */
     function close()
     {
         if($this->handle != null) {
@@ -68,6 +71,9 @@ class File_Archive_Reader_File extends File_Archive_Reader
             $this->handle = null;
         }
     }
+    /**
+      * @see File_Archive_Reader::next()
+      */
     function next()
     {
         if($this->handle != null) {
@@ -80,13 +86,25 @@ class File_Archive_Reader_File extends File_Archive_Reader
             return true;
         }
     }
+    /**
+      * @see File_Archive_Reader::getFilename()
+      */
     function getFilename() { return $this->symbolic; }
+    /**
+      * @see File_Archive_Reader::getDataFilename()
+      */
     function getDataFilename() { return $this->filename; }
+    /**
+      * @see File_Archive_Reader::getStat()
+      */
     function getStat() { return stat($this->filename); }
 
     //TODO: use the PEAR library to find the MIME extension of the file
     // function getMime()
 
+    /**
+      * @see File_Archive_Reader::getData()
+      */
     function getData($length = -1)
     {
         if(feof($this->handle)) {
@@ -99,6 +117,9 @@ class File_Archive_Reader_File extends File_Archive_Reader
             return fread($this->handle, $length);
         }
     }
+    /**
+      * @see File_Archive_Reader::Skip()
+      */
     function skip($length)
     {
         $before = ftell($this->handle);

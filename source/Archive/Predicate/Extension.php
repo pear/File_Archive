@@ -49,6 +49,9 @@ class File_Archive_Predicate_Extension extends File_Archive_Predicate
             $this->extensions = $extensions;
         }
     }
+    /**
+      * @see File_Archive_Predicate::isTrue
+      */
     function isTrue(&$source)
     {
         $filename = $source->getFilename();

@@ -39,13 +39,15 @@ class File_Archive_Predicate_MinSize extends File_Archive_Predicate
     var $minSize = 0;
 
     /**
-      * $minSize is the minimal size of the file (in Bytes)
-      * $source is the filtered source
+      * @param int $minSize minimal size of the file (in Bytes)
       */
     function File_Archive_Predicate_MinSize($minSize)
     {
         $this->minSize = $minSize;
     }
+    /**
+      * @see File_Archive_Predicate::isTrue
+      */
     function isTrue(&$source)
     {
         $stat = $source->getStat();

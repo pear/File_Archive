@@ -41,6 +41,9 @@ class File_Archive_Predicate_Not extends File_Archive_Predicate
     {
         $this->pred = $pred;
     }
+    /**
+      * @see File_Archive_Predicate::isTrue
+      */
     function isTrue(&$source)
     {
         return !$this->pred->isTrue($source);

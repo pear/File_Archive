@@ -73,6 +73,15 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         $this->startReader =& $innerReader;
         $this->uncompressionLevel = $uncompressionLevel;
     }
+
+    /**
+      * Attempt to change the current source (if the current file is an archive)
+      * If this is the case, push the current source onto the stack and make the good archive reader
+      * the current source
+      * A file is considered as an archive if its extension is one of tar, gz, zip, tgz
+      *
+      * @return bool whether the source has been pushed or not
+      */
     function push()
     {
         if($this->uncompressionLevel>=0 && ($this->baseDirCompressionLevel !== null) &&
@@ -129,6 +138,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         $this->source = $next;
         return true;
     }
+    /**
+      * @see File_Archive_Reader::close()
+      */
     function next()
     {
         if(!$this->currentFileDisplayed) {
@@ -162,6 +174,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
                 return true;
         }
     }
+    /**
+      * Efficiently filter out the files which URL does not start with $baseDir
+      */
     function setBaseDir($baseDir)
     {
         $this->baseDirUncompressionLevel = null;
@@ -172,6 +187,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         }
         $this->currentFileDisplayed = false;
     }
+    /**
+      * @see File_Archive_Reader::select()
+      */
     function select($filename)
     {
         $std = $this->getStandardURL($filename);
@@ -193,6 +211,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         return false;
     }
 
+    /**
+      * @see File_Archive_Reader::close()
+      */
     function close()
     {
         $this->readers = array();

@@ -34,6 +34,13 @@ require_once "MemoryArchive.php";
   */
 class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
 {
+    /**
+      * Creates the TAR header for a file
+      *
+      * @param string $filename name of the file
+      * @param array $stat statistics of the file
+      * @return string A 512 byte header for the file
+      */
     function tarHeader($filename, $stat)
     {
         $mode = $stat[2];
@@ -96,6 +103,13 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
 
         return $blockbeg . $checksum . $blockend;
     }
+    /**
+      * Creates the TAR footer for a file
+      *
+      * @param array $stat the statistics of the file
+      * @return string A string made of less than 512 characteres to fill the last
+      *                512 byte long block
+      */
     function tarFooter($stat)
     {
         $size = $stat[7];
@@ -106,6 +120,9 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         }
     }
 
+    /**
+      * @see File_Archive_Writer_MemoryArchive::appendFile
+      */
     function appendFile($filename, $dataFilename)
     {
         $stat = stat($dataFilename);
@@ -114,6 +131,9 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         $this->innerWriter->writeFile($dataFilename);
         $this->innerWriter->writeData($this->tarFooter($stat));
     }
+    /**
+      * @see File_Archive_Writer_MemoryArchive::appendFileData
+      */
     function appendFileData($filename, $stat, $data)
     {
         $size = strlen($data);
@@ -123,10 +143,16 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         $this->innerWriter->writeData($data);
         $this->innerWriter->writeData($this->tarFooter($stat));
     }
+    /**
+      * @see File_Archive_Writer_MemoryArchive::sendFooter
+      */
     function sendFooter()
     {
         $this->innerWriter->writeData(pack("a1024", ""));
     }
+    /**
+      * @see File_Archive_Writer::appendFile
+      */
     function getMime() { return "application/x-tar"; }
 }
 
@@ -134,6 +160,8 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
 /**
   * A tar archive cannot contain files with name of folders longer than 100 chars
   * This filter removes them
+  *
+  * @see File_Archive_Predicate File_Archive_Reader_Filter
   */
 require_once "File/Archive/Predicate.php";
 class File_Archive_Predicate_TARCompatible extends File_Archive_Predicate
