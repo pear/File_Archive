@@ -30,28 +30,28 @@
 require_once "File/Archive/Reader.php";
 
 /**
-  * Reader that represents a single file
-  */
+ * Reader that represents a single file
+ */
 class File_Archive_Reader_File extends File_Archive_Reader
 {
     /**
-      * @var Object Handle to the file being read
-      */
+     * @var Object Handle to the file being read
+     */
     var $handle = null;
     /**
-      * @var String Name of the physical file being read
-      */
+     * @var String Name of the physical file being read
+     */
     var $filename;
     /**
-      * @var String Name of the file returned by the reader
-      */
+     * @var String Name of the file returned by the reader
+     */
     var $symbolic;
 
     /**
-      * $filename is the physical file to read
-      * $symbolic is the name declared by the reader
-      * If $symbolic is not specified, $filename is assumed
-      */
+     * $filename is the physical file to read
+     * $symbolic is the name declared by the reader
+     * If $symbolic is not specified, $filename is assumed
+     */
     function File_Archive_Reader_File($filename, $symbolic = null)
     {
         $this->filename = $filename;
@@ -62,8 +62,10 @@ class File_Archive_Reader_File extends File_Archive_Reader
         }
     }
     /**
-      * @see File_Archive_Reader::close()
-      */
+     * @see File_Archive_Reader::close()
+     *
+     * Close the file handle
+     */
     function close()
     {
         if($this->handle != null) {
@@ -72,8 +74,12 @@ class File_Archive_Reader_File extends File_Archive_Reader
         }
     }
     /**
-      * @see File_Archive_Reader::next()
-      */
+     * @see File_Archive_Reader::next()
+     *
+     * The first time next is called, it will open the file handle and return true
+     * Then if will return false
+     * Raise an error if the file does not exist
+     */
     function next()
     {
         if($this->handle != null) {
@@ -87,24 +93,26 @@ class File_Archive_Reader_File extends File_Archive_Reader
         }
     }
     /**
-      * @see File_Archive_Reader::getFilename()
-      */
+     * @see File_Archive_Reader::getFilename()
+     */
     function getFilename() { return $this->symbolic; }
     /**
-      * @see File_Archive_Reader::getDataFilename()
-      */
+     * @see File_Archive_Reader::getDataFilename()
+     *
+     * Return the name of the file
+     */
     function getDataFilename() { return $this->filename; }
     /**
-      * @see File_Archive_Reader::getStat()
-      */
+     * @see File_Archive_Reader::getStat() stat()
+     */
     function getStat() { return stat($this->filename); }
 
     //TODO: use the PEAR library to find the MIME extension of the file
     // function getMime()
 
     /**
-      * @see File_Archive_Reader::getData()
-      */
+     * @see File_Archive_Reader::getData()
+     */
     function getData($length = -1)
     {
         if(feof($this->handle)) {
@@ -118,8 +126,8 @@ class File_Archive_Reader_File extends File_Archive_Reader
         }
     }
     /**
-      * @see File_Archive_Reader::Skip()
-      */
+     * @see File_Archive_Reader::Skip()
+     */
     function skip($length)
     {
         $before = ftell($this->handle);

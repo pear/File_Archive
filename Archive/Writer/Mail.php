@@ -32,52 +32,51 @@ require_once "Mail.php";
 require_once "Mail/mime.php";
 
 /**
-  * Send the files attached to a mail.
-  */
+ * Send the files attached to a mail.
+ */
 class File_Archive_Writer_Mail extends File_Archive_Writer
 {
     /**
-      * @var Mail_mime object
-      */
+     * @var Mail_mime object
+     */
     var $mime;
 
     /**
-      * @var Mail object used to send email (built thanks to the factory)
-      */
+     * @var Mail object used to send email (built thanks to the factory)
+     */
     var $mail;
 
     /**
-      * @var Array or String An array or a string with comma separated recipients
-      */
+     * @var Array or String An array or a string with comma separated recipients
+     */
     var $to;
 
     /**
-      * @var Array The headers that will be passed to the Mail_mime object
-      */
+     * @var Array The headers that will be passed to the Mail_mime object
+     */
     var $headers;
 
     /**
-      * @var String Data read from the current file so far
-      */
+     * @var String Data read from the current file so far
+     */
     var $currentData = null;
 
     /**
-      * @var String Name of the file being attached
-      */
+     * @var String Name of the file being attached
+     */
     var $currentFilename = null;
 
     /**
-      * @var String MIME of the file being attached
-      */
+     * @var String MIME of the file being attached
+     */
     var $currentMime = null;
 
     /**
-      * @param Mail $mail Object used to send mail (see Mail::factory)
-      * @param Array or String $to An array or a string with comma separated recipients
-      * @param Array $headers The headers that will be passed to the Mail_mime object
-      * @param String $message Text body of the mail
-      * @param String $htmlMessage HTML body of the mail
-      */
+     * @param Mail $mail Object used to send mail (see Mail::factory)
+     * @param Array or String $to An array or a string with comma separated recipients
+     * @param Array $headers The headers that will be passed to the Mail_mime object
+     * @param String $message Text body of the mail
+     */
     function File_Archive_Writer_Mail($to, $headers, $message, &$mail = null)
     {
         $this->mime = new Mail_mime();
@@ -96,34 +95,34 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
     }
 
     /**
-      * @see Mail_Mime::setHTMLBody
-      */
+     * @see Mail_Mime::setHTMLBody
+     */
     function setHTMLBody($data, $isfile = false)
     {
         return $this->mime->setHTMLBody($data, $isfile);
     }
     /**
-      * @see Mail_Mime::addHTMLImage
-      */
+     * @see Mail_Mime::addHTMLImage
+     */
     function addHTMLImage($file, $c_type='application/octet-stream', $name='', $isfile=true)
     {
         return $this->mime->addHTMLImage($file, $c_type, $name, $isfile);
     }
 
     /**
-      * @see File_Archive_Writer::writeData
-      *
-      * This function just put the data in $currentData until the end of file
-      * At that time, addCurrentData is called to attach $currentData to the mail
-      * and to clear $currentData for a new file
-      */
+     * @see File_Archive_Writer::writeData
+     *
+     * This function just put the data in $currentData until the end of file
+     * At that time, addCurrentData is called to attach $currentData to the mail
+     * and to clear $currentData for a new file
+     */
     function writeData($data)
     {
         $this->currentData .= $data;
     }
     /**
-      * Called when a file is finished and must be added as attachment to the mail
-      */
+     * Called when a file is finished and must be added as attachment to the mail
+     */
     function addCurrentData()
     {
         if($this->currentFilename == null) {
@@ -134,8 +133,8 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
         $this->currentData = "";
     }
     /**
-      * @see File_Archive_Writer::newFile
-      */
+     * @see File_Archive_Writer::newFile
+     */
     function newFile($filename, $stat, $mime="application/octet-stream")
     {
         $this->addCurrentData();
@@ -145,8 +144,8 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
     }
 
     /**
-      * @see File_Archive_Writer::close
-      */
+     * @see File_Archive_Writer::close
+     */
     function close()
     {
         parent::close();

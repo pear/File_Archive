@@ -30,33 +30,33 @@
 require_once "Archive.php";
 
 /**
-  * Read a tar archive
-  */
+ * Read a tar archive
+ */
 class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
 {
     /**
-      * @var String Name of the file being read
-      */
+     * @var String Name of the file being read
+     */
     var $currentFilename = NULL;
     /**
-      * @var Array Stats of the file being read
-      * In TAR reader, indexes 2, 4, 5, 7, 9 are set
-      */
+     * @var Array Stats of the file being read
+     * In TAR reader, indexes 2, 4, 5, 7, 9 are set
+     */
     var $currentStat = NULL;
     /**
-      * @var Integer Number of bytes that still have to be read before the end of file
-      */
+     * @var Integer Number of bytes that still have to be read before the end of file
+     */
     var $leftLength = 0;
     /**
-      * @var Integer Size of the footer
-      * A TAR file is made of chunks of 512 bytes. If 512 does not divide the file size a footer
-      * is added ([header][512 byte chunk]...[512 byte chunk][end of data|footer])
-      */
+     * @var Integer Size of the footer
+     * A TAR file is made of chunks of 512 bytes. If 512 does not divide the file size a footer
+     * is added ([header][512 byte chunk]...[512 byte chunk][end of data|footer])
+     */
     var $footerLength = 0;
 
     /**
-      * @see File_Archive_Reader::skip()
-      */
+     * @see File_Archive_Reader::skip()
+     */
     function skip($length)
     {
         $actualLength = min($this->leftLength, $length);
@@ -65,8 +65,8 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     }
 
     /**
-      * @see File_Archive_Reader::close()
-      */
+     * @see File_Archive_Reader::close()
+     */
     function close()
     {
         $this->leftLength = 0;
@@ -76,17 +76,17 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     }
 
     /**
-      * @see File_Archive_Reader::getFilename()
-      */
+     * @see File_Archive_Reader::getFilename()
+     */
     function getFilename() { return $this->currentFilename; }
     /**
-      * @see File_Archive_Reader::getStat()
-      */
+     * @see File_Archive_Reader::getStat()
+     */
     function getStat() { return $this->currentStat; }
 
     /**
-      * @see File_Archive_Reader::next()
-      */
+     * @see File_Archive_Reader::next()
+     */
     function next()
     {
         if(!parent::next()) {
@@ -133,8 +133,8 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
         return true;
     }
     /**
-      * @see File_Archive_Reader::getData()
-      */
+     * @see File_Archive_Reader::getData()
+     */
     function getData($length = -1)
     {
         if($length == -1) {

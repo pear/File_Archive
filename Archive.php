@@ -27,86 +27,112 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
+/**
+ * To have access to PEAR::isError and PEAR::raiseError
+ * We should probably use lazy include and remove this inclusion...
+ */
 require_once "PEAR.php";
 
+/**
+ * Factory to access the most common File_Archive features
+ * It uses lazy include, so you don't have to include the files from File/Archive/* directories
+ */
 class File_Archive
 {
     /**
-      * Returns a reader to read the URL $directory
-      * If the URL is a directory, it will recursively read that directory
-      * If $uncompressionLevel is not null, the archives (files with extension tar, zip, gz or tgz) will
-      *  be considered as directories (up to a depth of $uncompressionLevel if $uncompressionLevel > 0)
-      * The reader will only read files with a directory depth of $directoryDepth
-      * The reader will replace the given URL ($directory) with $symbolic in the public filenames
-      *
-      * Examples:
-      * Considere the following file system
-      * a.txt
-      * b.tar (archive that contains the following files)
-      *     c.txt
-      *     d.tgz (archive that contains the following files)
-      *         e.txt
-      *         dir1/
-      *             f.txt
-      * dir2/
-      *     g.txt
-      *     dir3/
-      *         h.tar (archive that contains the following files)
-      *             i.txt
-      *
-      * read('.') will return a reader that gives access to following files (recursively read current dir):
-      * a.txt
-      * b.tar
-      * dir2/g.txt
-      * dir2/dir3/h.tar
-      *
-      * read('.', 'myBaseDir') will return the following reader:
-      * myBaseDir/a.txt
-      * myBaseDir/b.tar
-      * myBaseDir/dir2/g.txt
-      * myBaseDir/dir2/dir3/h.tar
-      *
-      * read('.', '', -1) will return the following reader (uncompress everything)
-      * a.txt
-      * b.tar/c.txt
-      * b.tar/d.tgz/e.txt
-      * b.tar/d.tgz/dir1/f.txt
-      * dir2/g.txt
-      * dir2/dir3/h.tar/i.txt
-      *
-      * read('.', '', 1) will uncompress only one level (so d.tgz will not be uncompressed):
-      * a.txt
-      * b.tar/c.txt
-      * b.tar/d.tgz
-      * dir2/g.txt
-      * dir2/dir3/h.tar/i.txt
-      *
-      * read('.', '', 0, 0) will not recurse into subdirectories
-      * a.txt
-      * b.tar
-      *
-      * read('.', '', 0, 1) will recurse only one level in subdirectories
-      * a.txt
-      * b.tar
-      * dir2/g.txt
-      *
-      * read('.', '', -1, 2) will uncompress everything and recurse in only 2 levels in subdirectories
-      * or archives
-      * a.txt
-      * b.tar/c.txt
-      * b.tar/d.tgz/e.txt
-      * dir2/g.txt
-      *
-      * The recursion level is determined by the real path, not the symbolic one. So
-      * read('.', 'myBaseDir', -1, 2) will result to the same files:
-      * myBaseDir/a.txt
-      * myBaseDir/b.tar/c.txt
-      * myBaseDir/b.tar/d.tgz/e.txt (the public name is depth 3, but the real one is 2, so it is accepted)
-      * myBaseDir/dir2/g.txt
-      *
-      * To read a single file, you can do read("a.txt", "public_name.txt")
-      * Take care that if no public name is provided, the default one is empty
-      */
+     * Returns a reader to read the URL $directory
+     * If the URL is a directory, it will recursively read that directory
+     * If $uncompressionLevel is not null, the archives (files with extension tar, zip, gz or tgz) will
+     *  be considered as directories (up to a depth of $uncompressionLevel if $uncompressionLevel > 0)
+     * The reader will only read files with a directory depth of $directoryDepth
+     * The reader will replace the given URL ($directory) with $symbolic in the public filenames
+     *
+     * Examples:
+     * Considere the following file system
+     * <pre>
+     * a.txt
+     * b.tar (archive that contains the following files)
+     *     c.txt
+     *     d.tgz (archive that contains the following files)
+     *         e.txt
+     *         dir1/
+     *             f.txt
+     * dir2/
+     *     g.txt
+     *     dir3/
+     *         h.tar (archive that contains the following files)
+     *             i.txt
+     * </pre>
+     *
+     * read('.') will return a reader that gives access to following files (recursively read current dir):
+     * <pre>
+     * a.txt
+     * b.tar
+     * dir2/g.txt
+     * dir2/dir3/h.tar
+     * </pre>
+     *
+     * read('.', 'myBaseDir') will return the following reader:
+     * <pre>
+     * myBaseDir/a.txt
+     * myBaseDir/b.tar
+     * myBaseDir/dir2/g.txt
+     * myBaseDir/dir2/dir3/h.tar
+     * </pre>
+     *
+     * read('.', '', -1) will return the following reader (uncompress everything)
+     * <pre>
+     * a.txt
+     * b.tar/c.txt
+     * b.tar/d.tgz/e.txt
+     * b.tar/d.tgz/dir1/f.txt
+     * dir2/g.txt
+     * dir2/dir3/h.tar/i.txt
+     * </pre>
+     *
+     * read('.', '', 1) will uncompress only one level (so d.tgz will not be uncompressed):
+     * <pre>
+     * a.txt
+     * b.tar/c.txt
+     * b.tar/d.tgz
+     * dir2/g.txt
+     * dir2/dir3/h.tar/i.txt
+     * </pre>
+     *
+     * read('.', '', 0, 0) will not recurse into subdirectories
+     * <pre>
+     * a.txt
+     * b.tar
+     * </pre>
+     *
+     * read('.', '', 0, 1) will recurse only one level in subdirectories
+     * <pre>
+     * a.txt
+     * b.tar
+     * dir2/g.txt
+     * </pre>
+     *
+     * read('.', '', -1, 2) will uncompress everything and recurse in only 2 levels in subdirectories
+     * or archives
+     * <pre>
+     * a.txt
+     * b.tar/c.txt
+     * b.tar/d.tgz/e.txt
+     * dir2/g.txt
+     * </pre>
+     *
+     * The recursion level is determined by the real path, not the symbolic one. So
+     * read('.', 'myBaseDir', -1, 2) will result to the same files:
+     * <pre>
+     * myBaseDir/a.txt
+     * myBaseDir/b.tar/c.txt
+     * myBaseDir/b.tar/d.tgz/e.txt (the public name is depth 3, but the real one is 2, so it is accepted)
+     * myBaseDir/dir2/g.txt
+     * </pre>
+     *
+     * To read a single file, you can do read("a.txt", "public_name.txt")
+     * Take care that if no public name is provided, the default one is empty
+     */
     function read($directory, $symbolic='', $uncompression = 0, $directoryDepth = -1)
     {
         require_once "File/Archive/Reader/Uncompress.php";
@@ -199,16 +225,16 @@ class File_Archive
         return $result;
     }
     /**
-      * @see File_Archive_Reader_Memory
-      */
+     * @see File_Archive_Reader_Memory
+     */
     function readMemory($memory, $filename, $stat=array(), $mime="application/octet-stream")
     {
         require_once "File/Archive/Reader/Memory.php";
         return new File_Archive_Reader_Memory($memory, $filename, $stat, $mime);
     }
     /**
-      * @see File_Archive_Reader_Multi
-      */
+     * @see File_Archive_Reader_Multi
+     */
     function readMulti()
     {
         require_once "File/Archive/Reader/Multi.php";
@@ -216,32 +242,32 @@ class File_Archive
     }
 
     /**
-      * @see File_Archive_Reader_Filter
-      */
+     * @see File_Archive_Reader_Filter
+     */
     function filter($predicate, $source)
     {
         require_once "File/Archive/Reader/Filter.php";
         return new File_Archive_Reader_Filter($predicate, $source);
     }
     /**
-      * @see File_Archive_Predicat_True
-      */
+     * @see File_Archive_Predicat_True
+     */
     function predTrue()
     {
         require_once "File/Archive/Predicate/True.php";
         return new File_Archive_Predicate_True();
     }
     /**
-      * @see File_Archive_Predicat_False
-      */
+     * @see File_Archive_Predicat_False
+     */
     function predFalse()
     {
         require_once "File/Archive/Predicate/False.php";
         return new File_Archive_Predicate_False();
     }
     /**
-      * @see File_Archive_Predicat_And
-      */
+     * @see File_Archive_Predicat_And
+     */
     function predAnd()
     {
         require_once "File/Archive/Predicate/And.php";
@@ -252,8 +278,8 @@ class File_Archive
         return $pred;
     }
     /**
-      * @see File_Archive_Predicat_Or
-      */
+     * @see File_Archive_Predicat_Or
+     */
     function predOr()
     {
         require_once "File/Archive/Predicate/Or.php";
@@ -264,64 +290,64 @@ class File_Archive
         return $pred;
     }
     /**
-      * @see File_Archive_Predicat_Not
-      */
+     * @see File_Archive_Predicat_Not
+     */
     function predNot($pred)
     {
         require_once "File/Archive/Predicate/Not.php";
         return new File_Archive_Predicate_Not($pred);
     }
     /**
-      * @see File_Archive_Predicat_MinSize
-      */
+     * @see File_Archive_Predicat_MinSize
+     */
     function predMinSize($size)
     {
         require_once "File/Archive/Predicate/MinSize.php";
         return new File_Archive_Predicate_MinSize($size);
     }
     /**
-      * @see File_Archive_Predicat_MinTime
-      */
+     * @see File_Archive_Predicat_MinTime
+     */
     function predMinTime($time)
     {
         require_once "File/Archive/Predicate/MinTime.php";
         return new File_Archive_Predicate_MinTime($time);
     }
     /**
-      * @see File_Archive_Predicat_MaxDepth
-      */
+     * @see File_Archive_Predicat_MaxDepth
+     */
     function predMaxDepth($depth)
     {
         require_once "File/Archive/Predicate/MaxDepth.php";
         return new File_Archive_Predicate_MaxDepth($depth);
     }
     /**
-      * @see File_Archive_Predicat_Extension
-      */
+     * @see File_Archive_Predicat_Extension
+     */
     function predExtension($list)
     {
         require_once "File/Archive/Predicate/Extension.php";
         return new File_Archive_Predicate_Extension($list);
     }
     /**
-      * @see File_Archive_Predicat_Ereg
-      */
+     * @see File_Archive_Predicat_Ereg
+     */
     function predEreg($ereg)
     {
         require_once "File/Archive/Predicate/Ereg.php";
         return new File_Archive_Predicate_Ereg($ereg);
     }
     /**
-      * @see File_Archive_Predicat_Eregi
-      */
+     * @see File_Archive_Predicat_Eregi
+     */
     function predEregi($ereg)
     {
         require_once "File/Archive/Predicate/Eregi.php";
         return new File_Archive_Predicate_Eregi($ereg);
     }
     /**
-      * @see File_Archive_Predicat_Custom
-      */
+     * @see File_Archive_Predicat_Custom
+     */
     function predCustom($expression)
     {
         require_once "File/Archive/Predicate/Custom.php";
@@ -329,49 +355,49 @@ class File_Archive
     }
 
     /**
-      * @see File_Archive_Writer_Mail
-      */
+     * @see File_Archive_Writer_Mail
+     */
     function toMail($to, $headers, $message, &$mail = null)
     {
         require_once "File/Archive/Writer/Mail.php";
         return new File_Archive_Writer_Mail($to, $headers, $message, $mail);
     }
     /**
-      * @see File_Archive_Writer_Files
-      */
+     * @see File_Archive_Writer_Files
+     */
     function toFiles($baseDir = "")
     {
         require_once "File/Archive/Writer/Files.php";
         return new File_Archive_Writer_Files($baseDir);
     }
     /**
-      * @see File_Archive_Writer_Memory
-      */
+     * @see File_Archive_Writer_Memory
+     */
     function toMemory()
     {
         require_once "File/Archive/Writer/Memory.php";
         return new File_Archive_Writer_Memory();
     }
     /**
-      * @see File_Archive_Writer_Multi
-      */
+     * @see File_Archive_Writer_Multi
+     */
     function toMulti(&$a, &$b)
     {
         require_once "File/Archive/Writer/Multi.php";
         return new File_Archive_Writer_Multi($a, $b);
     }
     /**
-      * @see File_Archive_Writer_Output
-      */
+     * @see File_Archive_Writer_Output
+     */
     function toOutput($sendHeaders = true)
     {
         require_once "File/Archive/Writer/Output.php";
         return new File_Archive_Writer_Output($sendHeaders);
     }
     /**
-      * @param $type can be one of Tar, Gzip, Tgz, Zip
-      * The case of this parameter is not important
-      */
+     * @param $type can be one of Tar, Gzip, Tgz, Zip
+     * The case of this parameter is not important
+     */
     function toArchive($type, $filename, &$innerWriter, $stat = array(), $autoClose = true)
     {
         $realType = ucfirst($type);

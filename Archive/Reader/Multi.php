@@ -30,32 +30,30 @@
 require_once "Relay.php";
 
 /**
-  * Regroups several readers to make them appear as a single one
-  */
+ * Regroups several readers to make them appear as a single one
+ */
 class File_Archive_Reader_Multi extends File_Archive_Reader_Relay
 {
     /**
-      * @var Array All the sources regrouped in this reader
-      */
+     * @var Array All the sources regrouped in this reader
+     */
     var $sources = array();
     /**
-      * @var Int Index of the source being read currently
-      */
+     * @var Int Index of the source being read currently
+     */
     var $currentIndex = 0;
 
-    var $source=null;
-
     /**
-      * Add a new reader to the list of readers
-      */
+     * Add a new reader to the list of readers
+     */
     function addSource(&$source)
     {
         $this->sources[] =& $source;
     }
 
     /**
-      * @see File_Archive_Reader::next()
-      */
+     * @see File_Archive_Reader::next()
+     */
     function next()
     {
         while(array_key_exists($this->currentIndex, $this->sources))
@@ -72,8 +70,8 @@ class File_Archive_Reader_Multi extends File_Archive_Reader_Relay
         return false;
     }
     /**
-      * @see File_Archive_Reader::close()
-      */
+     * @see File_Archive_Reader::close()
+     */
     function close()
     {
         parent::close();

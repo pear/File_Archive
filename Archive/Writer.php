@@ -30,37 +30,37 @@
 require_once "PEAR.php";
 
 /**
-  * Base class for any writer
-  */
+ * Base class for any writer
+ */
 class File_Archive_Writer
 {
     /**
-      * Create a new file in the writer
-      *
-      * @param String $data filename the name of the file, eventually including a path
-      * @stat Array $stat See PHP stat() function. None of the indexed are required
-      */
+     * Create a new file in the writer
+     *
+     * @param String $data filename the name of the file, eventually including a path
+     * @stat Array $stat See PHP stat() function. None of the indexed are required
+     */
     function newFile($filename, $stat, $mime = "application/octet-stream")
     {
         return PEAR::raiseError("Abstract function call");
     }
 
     /**
-      * Append the specified data to the writer
-      *
-      * @param String $data the data to append to the writer
-      */
+     * Append the specified data to the writer
+     *
+     * @param String $data the data to append to the writer
+     */
     function writeData($data)
     {
         return PEAR::raiseError("Abstract function call");
     }
 
     /**
-      * Append the content of the physical file $filename to the writer
-      * writeFile($filename) must be equivalent to writeData(file_get_contents($filename)) but can be more efficient
-      *
-      * @param String $filename Name of the file which content must be appended to the writer
-      */
+     * Append the content of the physical file $filename to the writer
+     * writeFile($filename) must be equivalent to writeData(file_get_contents($filename)) but can be more efficient
+     *
+     * @param String $filename Name of the file which content must be appended to the writer
+     */
     function writeFile($filename)
     {
         $handle = fopen($filename, "r");
@@ -72,9 +72,9 @@ class File_Archive_Writer
     }
 
     /**
-      * Close the writer, eventually flush the data, write the footer...
-      * This function must be called before the end of the script
-      */
+     * Close the writer, eventually flush the data, write the footer...
+     * This function must be called before the end of the script
+     */
     function close() { }
 }
 

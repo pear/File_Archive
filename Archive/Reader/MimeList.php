@@ -28,9 +28,9 @@
  */
 
 /**
-  * Returns the MIME of the filename, deducted from its extension
-  * If the extension is unknown, returns "application/octet-stream"
-  */
+ * Returns the MIME of the filename, deducted from its extension
+ * If the extension is unknown, returns "application/octet-stream"
+ */
 function File_Archive_Reader_GetMime($filename)
 {
 $mimeList = array(

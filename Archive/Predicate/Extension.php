@@ -30,17 +30,17 @@
 require_once "File/Archive/Predicate.php";
 
 /**
-  * Keep only the files that have a specific extension
-  *
-  * @see        File_Archive_Predicate File_Archive_Reader_Filter
-  */
+ * Keep only the files that have a specific extension
+ *
+ * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ */
 class File_Archive_Predicate_Extension extends File_Archive_Predicate
 {
     var $extensions;
 
     /**
-      * @param $extensions array or comma separated string of allowed extensions
-      */
+     * @param $extensions array or comma separated string of allowed extensions
+     */
     function File_Archive_Predicate_Extension($extensions)
     {
         if(is_string($extensions)) {
@@ -50,8 +50,8 @@ class File_Archive_Predicate_Extension extends File_Archive_Predicate
         }
     }
     /**
-      * @see File_Archive_Predicate::isTrue
-      */
+     * @see File_Archive_Predicate::isTrue
+     */
     function isTrue(&$source)
     {
         $filename = $source->getFilename();

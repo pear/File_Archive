@@ -30,9 +30,9 @@
 require_once "Archive.php";
 
 /**
-  * ZIP archive reader
-  * Currently only allows to browse the archive (getData is not available)
-  */
+ * ZIP archive reader
+ * Currently only allows to browse the archive (getData is not available)
+ */
 class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
 {
     var $currentFilename = NULL;
@@ -42,8 +42,8 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     var $data = NULL;
 
     /**
-      * @see File_Archive_Reader::close()
-      */
+     * @see File_Archive_Reader::close()
+     */
     function close()
     {
         $this->currentFilename = NULL;
@@ -55,17 +55,17 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     }
 
     /**
-      * @see File_Archive_Reader::getFilename()
-      */
+     * @see File_Archive_Reader::getFilename()
+     */
     function getFilename() { return $this->currentFilename; }
     /**
-      * @see File_Archive_Reader::getStat()
-      */
+     * @see File_Archive_Reader::getStat()
+     */
     function getStat() { return $this->currentStat; }
 
     /**
-      * @see File_Archive_Reader::next()
-      */
+     * @see File_Archive_Reader::next()
+     */
     function next()
     {
         if(!parent::next()) {
@@ -102,8 +102,8 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         }
     }
     /**
-      * @see File_Archive_Reader::getData()
-      */
+     * @see File_Archive_Reader::getData()
+     */
     function getData($length = -1)
     {
         if($this->offset >= $this->currentStat[7])
@@ -115,14 +115,11 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             $actualLength = $this->currentStat[7]-$this->offset;
 
         die("Function ZIP::getData not available in this version (extraction of ZIP archive not yet implemented)");
-/*        $this->uncompressData();
-        $result = substr($this->data, $this->offset, $actualLength);
-        $this->offset += $actualLength;
-        return $result;*/
+
     }
     /**
-      * @see File_Archive_Reader::skip()
-      */
+     * @see File_Archive_Reader::skip()
+     */
     function skip($length)
     {
         $this->offset = min($this->offset + $length, $this->currentStat[7]);

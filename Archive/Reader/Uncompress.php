@@ -31,40 +31,40 @@ require_once "File/Archive/Reader.php";
 require_once "ChangeName.php";
 
 /**
-  * Recursively uncompress every file it finds
-  */
+ * Recursively uncompress every file it finds
+ */
 class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
 {
     /**
-      * @var Array Stack of readers
-      */
+     * @var Array Stack of readers
+     */
     var $readers = array();
 
     /**
-      * @var File_Archive_Reader Reader from which all started (usefull to be able to close)
-      */
+     * @var File_Archive_Reader Reader from which all started (usefull to be able to close)
+     */
     var $startReader;
 
     /**
-      * @var Int Maximum depth of uncompression after the basicDir (that may contain some uncompression also)
-      * -1 means no limit
-      */
+     * @var Int Maximum depth of uncompression after the basicDir (that may contain some uncompression also)
+     * -1 means no limit
+     */
     var $uncompressionLevel;
 
     /**
-      * @var Int Depth of uncompression of the basicDir
-      */
+     * @var Int Depth of uncompression of the basicDir
+     */
     var $baseDirCompressionLevel = null;
 
     /**
-      * @var String Only files starting with $baseDir will be reported
-      */
+     * @var String Only files starting with $baseDir will be reported
+     */
     var $baseDir = "";
 
     /**
-      * @var Bool True if the current file has not been reported
-      * (used in setBaseDir to report an error if no file has been found)
-      */
+     * @var Bool True if the current file has not been reported
+     * (used in setBaseDir to report an error if no file has been found)
+     */
     var $currentFileDisplayed = true;
 
     function File_Archive_Reader_Uncompress(&$innerReader, $uncompressionLevel = -1)
@@ -75,13 +75,13 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     }
 
     /**
-      * Attempt to change the current source (if the current file is an archive)
-      * If this is the case, push the current source onto the stack and make the good archive reader
-      * the current source
-      * A file is considered as an archive if its extension is one of tar, gz, zip, tgz
-      *
-      * @return bool whether the source has been pushed or not
-      */
+     * Attempt to change the current source (if the current file is an archive)
+     * If this is the case, push the current source onto the stack and make the good archive reader
+     * the current source
+     * A file is considered as an archive if its extension is one of tar, gz, zip, tgz
+     *
+     * @return bool whether the source has been pushed or not
+     */
     function push()
     {
         if($this->uncompressionLevel>=0 && ($this->baseDirCompressionLevel !== null) &&
@@ -139,8 +139,8 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         return true;
     }
     /**
-      * @see File_Archive_Reader::close()
-      */
+     * @see File_Archive_Reader::close()
+     */
     function next()
     {
         if(!$this->currentFileDisplayed) {
@@ -175,8 +175,8 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         }
     }
     /**
-      * Efficiently filter out the files which URL does not start with $baseDir
-      */
+     * Efficiently filter out the files which URL does not start with $baseDir
+     */
     function setBaseDir($baseDir)
     {
         $this->baseDirUncompressionLevel = null;
@@ -188,8 +188,8 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         $this->currentFileDisplayed = false;
     }
     /**
-      * @see File_Archive_Reader::select()
-      */
+     * @see File_Archive_Reader::select()
+     */
     function select($filename)
     {
         $std = $this->getStandardURL($filename);
@@ -212,8 +212,8 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     }
 
     /**
-      * @see File_Archive_Reader::close()
-      */
+     * @see File_Archive_Reader::close()
+     */
     function close()
     {
         $this->readers = array();

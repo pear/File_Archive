@@ -30,15 +30,15 @@
 require_once "File/Archive/Reader.php";
 
 /**
-  * This reader appear exactly as $source does
-  * This is usefull if you want to dynamically change $source or change
-  * its behaviour
-  */
+ * This reader appear exactly as $source does
+ * This is usefull if you want to dynamically change $source or change
+ * its behaviour
+ */
 class File_Archive_Reader_Relay extends File_Archive_Reader
 {
     /**
-      * @var File_Archive_Reader This reader will have the same comportment as $source
-      */
+     * @var File_Archive_Reader This reader will have the same comportment as $source
+     */
     var $source;
 
     function File_Archive_Reader_Relay(&$source = null)
@@ -47,36 +47,36 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
     }
 
     /**
-      * @see File_Archive_Reader::next()
-      */
+     * @see File_Archive_Reader::next()
+     */
     function next() { return $this->source->next(); }
     /**
-      * @see File_Archive_Reader::getFilename()
-      */
+     * @see File_Archive_Reader::getFilename()
+     */
     function getFilename() { return $this->source->getFilename(); }
     /**
-      * @see File_Archive_Reader::getStat()
-      */
+     * @see File_Archive_Reader::getStat()
+     */
     function getStat() { return $this->source->getStat(); }
     /**
-      * @see File_Archive_Reader::getMime()
-      */
+     * @see File_Archive_Reader::getMime()
+     */
     function getMime() { return $this->source->getMime(); }
     /**
-      * @see File_Archive_Reader::getDataFilename()
-      */
+     * @see File_Archive_Reader::getDataFilename()
+     */
     function getDataFilename() { return $this->source->getDataFilename(); }
     /**
-      * @see File_Archive_Reader::getData()
-      */
+     * @see File_Archive_Reader::getData()
+     */
     function getData($length = -1) { return $this->source->getData($length); }
     /**
-      * @see File_Archive_Reader::skip()
-      */
+     * @see File_Archive_Reader::skip()
+     */
     function skip($length) { return $this->source->skip($length); }
     /**
-      * @see File_Archive_Reader::close()
-      */
+     * @see File_Archive_Reader::close()
+     */
     function close()
     {
         if($this->source != null) {

@@ -30,19 +30,19 @@
 require_once "Reader.php";
 
 /**
-  * A predicate is an object that can evaluate to true or false depending on the
-  * file currently read by a File_Archive_Reader
-  *
-  * @see File_Archive_Reader_Filter
-  */
+ * A predicate is an object that can evaluate to true or false depending on the
+ * file currently read by a File_Archive_Reader
+ *
+ * @see File_Archive_Reader_Filter
+ */
 class File_Archive_Predicate
 {
     /**
-      * Indicates whether the current file from the reader should be kept
-      *
-      * @param File_Archive_Reader $source Reader which current file is to be examined
-      * @return bool False iif the current file must be filtered out
-      */
+     * Indicates whether the current file from the reader should be kept
+     *
+     * @param File_Archive_Reader $source Reader which current file is to be examined
+     * @return bool False iif the current file must be filtered out
+     */
     function isTrue(&$source) { return PEAR::raiseError("Abstract function call"); }
 }
 

@@ -164,7 +164,7 @@ class Test extends PHPUnit_TestCase
         $this->assertTrue($predicat->isTrue($source));
     }
 
-    //TODO: test the writers
+    //TODO: test the toMail, toFiles
     function testToMemory()
     {
         $source = File_Archive::read('test.php');
@@ -202,9 +202,22 @@ class Test extends PHPUnit_TestCase
 //    function testZip() { $this->_testArchive('zip', 'zip'); }
     function testGzip() { $this->_testArchive('gzip', 'gz'); }
     function testTgz() { $this->_testArchive('tgz', 'tgz'); }
+
+    function testMultiWriter()
+    {
+        $source = File_Archive::readMemory("ABCDEF", "A.txt");
+        $source->extract(
+            File_Archive::toMulti(
+                $a = File_Archive::toMemory(),
+                $b = File_Archive::toMemory()
+            )
+        );
+        $this->assertEquals($a->getData(), "ABCDEF");
+        $this->assertEquals($b->getData(), "ABCDEF");
+    }
 }
 
 $test = new PHPUnit_TestSuite("Test");
 $result = PHPUnit::run($test);
-echo $result->toString();
+echo $result->toHTML();
 ?>

@@ -30,28 +30,28 @@
 require_once "MemoryArchive.php";
 
 /**
-  * ZIP archive writer
-  */
+ * ZIP archive writer
+ */
 class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
 {
     /**
-      * @var Int Compression level
-      */
+     * @var Int Compression level
+     */
     var $compressionLevel = 9;
 
     /**
-      * @var Int Current position in the writer
-      */
+     * @var Int Current position in the writer
+     */
     var $offset = 0;
 
     /**
-      * @var String Optionnal comment to add to the zip
-      */
+     * @var String Optionnal comment to add to the zip
+     */
     var $comment = "";
 
     /**
-      * @var Data written at the end of the ZIP file
-      */
+     * @var Data written at the end of the ZIP file
+     */
     var $central = "";
 
     function File_Archive_Writer_Zip($filename, &$innerWriter, $stat=array(), $autoClose = true)
@@ -61,21 +61,21 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
     }
 
     /**
-      * Change the level of the compression
-      * This may be done between two files
-      * The compression level is an int from 0 (no compression) to 9 (best compression)
-      * @param Int $compressionLevel New compression level from 0 to 9
-      */
+     * Change the level of the compression
+     * This may be done between two files
+     * The compression level is an int from 0 (no compression) to 9 (best compression)
+     * @param Int $compressionLevel New compression level from 0 to 9
+     */
     function setCompressionLevel($compressionLevel) { $this->compressionLevel = $compressionLevel; }
 
     /**
-      * Set a comment on the ZIP file
-      */
+     * Set a comment on the ZIP file
+     */
     function setComment($comment) { $this->comment = $comment; }
 
     /**
-      * @see File_Archive_Writer_MemoryArchive::appendFileData
-      */
+     * @see File_Archive_Writer_MemoryArchive::appendFileData
+     */
     function appendFileData($filename, $stat, $data)
     {
         $filename = preg_replace("/^(\.{1,2}(\/|\\\))+/","",$filename);
@@ -111,8 +111,8 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
 
     }
     /**
-      * @see File_Archive_Writer_MemoryArchive::sendFooter
-      */
+     * @see File_Archive_Writer_MemoryArchive::sendFooter
+     */
     function sendFooter()
     {
         $this->innerWriter->writeData(
@@ -126,8 +126,8 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
         );
     }
     /**
-      * @see File_Archive_Writer::getMime
-      */
+     * @see File_Archive_Writer::getMime
+     */
     function getMime() { return "application/zip"; }
 }
 

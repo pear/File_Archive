@@ -30,20 +30,20 @@
 require_once "Relay.php";
 
 /**
-  * Base class for all the filters
-  * A filter is a reader that takes its input from another reader and only keep
-  * files according to a certain predicate.
-  */
+ * Base class for all the filters
+ * A filter is a reader that takes its input from another reader and only keep
+ * files according to a certain predicate.
+ */
 class File_Archive_Reader_Filter extends File_Archive_Reader_Relay
 {
     /**
-      * @var File_Archive_Reader_Predicat
-      */
+     * @var File_Archive_Reader_Predicat
+     */
     var $predicate;
 
     /**
-      * $source is the reader to filter
-      */
+     * $source is the reader to filter
+     */
     function File_Archive_Reader_Filter($predicate, &$source)
     {
         parent::File_Archive_Reader_Relay($source);
@@ -51,8 +51,8 @@ class File_Archive_Reader_Filter extends File_Archive_Reader_Relay
     }
 
     /**
-      * @see File_Archive_Reader::next()
-      */
+     * @see File_Archive_Reader::next()
+     */
     function next()
     {
         do

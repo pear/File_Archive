@@ -30,25 +30,25 @@
 require_once "File/Archive/Predicate.php";
 
 /**
-  * Remove the URLs with a too high number of nested directories
-  *
-  * @see        File_Archive_Predicate File_Archive_Reader_Filter
-  */
+ * Remove the URLs with a too high number of nested directories
+ *
+ * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ */
 class File_Archive_Predicate_MaxDepth extends File_Archive_Predicate
 {
     var $maxDepth;
 
     /**
-      * @param int $maxDepth Maximal number of folders before the actual file in $source->getFilename()
-      *        '1/2/3/4/foo.txt' will be accepted with $maxDepth == 4 and rejected with $maxDepth == 5
-      */
+     * @param int $maxDepth Maximal number of folders before the actual file in $source->getFilename()
+     *        '1/2/3/4/foo.txt' will be accepted with $maxDepth == 4 and rejected with $maxDepth == 5
+     */
     function File_Archive_Predicate_MaxDepth($maxDepth)
     {
         $this->maxDepth = $maxDepth;
     }
     /**
-      * @see File_Archive_Predicate::isTrue
-      */
+     * @see File_Archive_Predicate::isTrue
+     */
     function isTrue(&$source)
     {
         $url = parse_url($source->getFilename());

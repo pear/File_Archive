@@ -30,25 +30,25 @@
 require_once "File/Archive/Predicate.php";
 
 /**
-  * Keep only the files modified after a given date (or with unknown modification date)
-  *
-  * @see        File_Archive_Predicate File_Archive_Reader_Filter
-  */
+ * Keep only the files modified after a given date (or with unknown modification date)
+ *
+ * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ */
 class File_Archive_Predicate_MinTime extends File_Archive_Predicate
 {
     var $minTime = 0;
 
     /**
-      * @param int $minTime Unix timestamp of the minimal modification date of the files
-      */
+     * @param int $minTime Unix timestamp of the minimal modification date of the files
+     */
     function File_Archive_Predicate_MinTime($minTime)
     {
         $this->minTime = $minTime;
 
     }
     /**
-      * @see File_Archive_Predicate::isTrue
-      */
+     * @see File_Archive_Predicate::isTrue
+     */
     function isTrue(&$source)
     {
         $stat = $source->getStat();

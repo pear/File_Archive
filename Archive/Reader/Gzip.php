@@ -41,8 +41,8 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
     var $hasComment = FALSE;
 
     /**
-      * @see File_Archive_Reader::close()
-      */
+     * @see File_Archive_Reader::close()
+     */
     function close()
     {
         $this->data = NULL;
@@ -52,8 +52,8 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
     }
 
     /**
-      * @see File_Archive_Reader::next()
-      */
+     * @see File_Archive_Reader::next()
+     */
     function next()
     {
         if(!parent::next()) {
@@ -113,15 +113,15 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         return TRUE;
     }
     /**
-      * @see File_Archive_Reader::getFilename()
-      */
+     * @see File_Archive_Reader::getFilename()
+     */
     function getFilename()
     {
         return $this->name;
     }
     /**
-      * @see File_Archive_Reader::getStat()
-      */
+     * @see File_Archive_Reader::getStat()
+     */
     function getStat()
     {
         return array(
@@ -129,8 +129,8 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         );
     }
     /**
-      * @see File_Archive_Reader::getData()
-      */
+     * @see File_Archive_Reader::getData()
+     */
     function getData($length = -1)
     {
         if($length == -1)
@@ -147,8 +147,8 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         }
     }
     /**
-      * @see File_Archive_Reader::skip()
-      */
+     * @see File_Archive_Reader::skip()
+     */
     function skip($length)
     {
         $this->offset += $length;

@@ -31,43 +31,43 @@ require_once "Archive.php";
 require_once "Memory.php";
 
 /**
-  * Base class for all the archiveWriters that can only work on complete files
-  * (the write data function may be called with small chunks of data)
-  */
+ * Base class for all the archiveWriters that can only work on complete files
+ * (the write data function may be called with small chunks of data)
+ */
 class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
 {
     /**
-      * @var File_Archive_Writer_Memory A buffer where the data will be put waiting for the file to be complete
-      */
+     * @var File_Archive_Writer_Memory A buffer where the data will be put waiting for the file to be complete
+     */
     var $memoryWriter = null;
     /**
-      * @var String Name of the file which data are coming
-      */
+     * @var String Name of the file which data are coming
+     */
     var $currentFilename = null;
     /**
-      * @var Array Stats of the file which data are coming
-      */
+     * @var Array Stats of the file which data are coming
+     */
     var $currentStat = null;
     /**
-      * @var String URL of the file being treated if it is a physical file
-      */
+     * @var String URL of the file being treated if it is a physical file
+     */
     var $currentDataFile = null;
     /**
-      * @var Int Number of times newFile function has been called
-      */
+     * @var Int Number of times newFile function has been called
+     */
     var $nbFiles = 0;
 
     /**
-      * See the constructor of File_Archive_Writer for more informations
-      */
+     * See the constructor of File_Archive_Writer for more informations
+     */
     function File_Archive_Writer_MemoryArchive($filename, &$t, $stat=array(), $autoClose = true)
     {
         $this->memoryWriter = new File_Archive_Writer_Memory();
         parent::File_Archive_Writer_Archive($filename, $t, $stat, $autoClose);
     }
     /**
-      * @see File_Archive_Writer::newFile
-      */
+     * @see File_Archive_Writer::newFile
+     */
     function newFile($filename, $stat, $mime = "application/octet-stream")
     {
         if($this->nbFiles == 0) {
@@ -84,8 +84,8 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
         return true;
     }
     /**
-      * @see File_Archive_Writer::close
-      */
+     * @see File_Archive_Writer::close
+     */
     function close()
     {
         $this->flush();
@@ -94,10 +94,10 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
         parent::close();
     }
     /**
-      * Indicate that all the data have been read from the current file
-      * and send it to appendFileData
-      * Send the current data to the appendFileData function
-      */
+     * Indicate that all the data have been read from the current file
+     * and send it to appendFileData
+     * Send the current data to the appendFileData function
+     */
     function flush()
     {
         if($this->currentFilename !== null) {
@@ -115,12 +115,12 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
         }
     }
     /**
-      * @see File_Archive_Writer::writeData
-      */
+     * @see File_Archive_Writer::writeData
+     */
     function writeData($data) { $this->memoryWriter->writeData($data); }
     /**
-      * @see File_Archive_Writer::writeFile
-      */
+     * @see File_Archive_Writer::writeFile
+     */
     function writeFile($filename)
     {
         if($this->currentDataFile == null && $this->memoryWriter->isEmpty()) {
@@ -132,28 +132,28 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
 
 //MUST REWRITE FUNCTIONS
     /**
-      * The subclass must treat the data $data
-      * $data is the entire data of the filename $filename
-      * $stat is the stat of the file
-      */
+     * The subclass must treat the data $data
+     * $data is the entire data of the filename $filename
+     * $stat is the stat of the file
+     */
     function appendFileData($filename, $stat, $data) { }
 
 //SHOULD REWRITE FUNCTIONS
     /**
-      * The subclass may rewrite the sendHeader function if it needs to execute code
-      * before the first file
-      */
+     * The subclass may rewrite the sendHeader function if it needs to execute code
+     * before the first file
+     */
     function sendHeader() { }
     /**
-      * The subclass may rewrite the sendFooter function if it needs to execute code
-      * before closing the archive
-      */
+     * The subclass may rewrite the sendFooter function if it needs to execute code
+     * before closing the archive
+     */
     function sendFooter() { }
     /**
-      * The subclass may rewrite this class if it knows an efficient way to treat a physical file
-      * This function is equivalent to $this->appendFileData($filename, stat($dataFilename), file_get_contents($dataFilename));
-      * but may be more efficient
-      */
+     * The subclass may rewrite this class if it knows an efficient way to treat a physical file
+     * This function is equivalent to $this->appendFileData($filename, stat($dataFilename), file_get_contents($dataFilename));
+     * but may be more efficient
+     */
     function appendFile($filename, $dataFilename)
     {
         $this->appendFileData($filename, stat($dataFilename), file_get_contents($dataFilename));

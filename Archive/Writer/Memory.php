@@ -30,33 +30,33 @@
 require_once "File/Archive/Writer.php";
 
 /**
-  * Write the concatenation of the files
-  * in a buffer
-  */
+ * Write the concatenation of the files
+ * in a buffer
+ */
 class File_Archive_Writer_Memory extends File_Archive_Writer
 {
     /**
-      * @var string $data The buffer
-      */
+     * @var string $data The buffer
+     */
     var $data = "";
 
     function writeData($d) { $this->data .= $d; }
 
     /**
-      * Retrieve the concatenated data
-      *
-      * @return string buffer
-      */
+     * Retrieve the concatenated data
+     *
+     * @return string buffer
+     */
     function getData() { return $this->data; }
 
     /**
-      * Clear the buffer
-      */
+     * Clear the buffer
+     */
     function clear() { $this->data = ""; }
 
     /**
-      * Returns true iif the buffer is empty
-      */
+     * Returns true iif the buffer is empty
+     */
     function isEmpty() { return empty($this->data); }
 }
 

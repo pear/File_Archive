@@ -32,40 +32,40 @@ require_once "Relay.php";
 require_once "DB.php";
 
 /**
-  * This reader will display the files contained in an SQL request
-  * This reader does not free the given ressource
-  * It is your responsibility to call $res->free() if necessary
-  *
-  * The ressource is the result of an SQL request that have one or two columns
-  *  Column 0: URL of the stream (this will be given to File_Archive::read)
-  *  Column 1: Symbolic name of the URL (default: column 0)
-  */
+ * This reader will display the files contained in an SQL request
+ * This reader does not free the given ressource
+ * It is your responsibility to call $res->free() if necessary
+ *
+ * The ressource is the result of an SQL request that have one or two columns
+ *  Column 0: URL of the stream (this will be given to File_Archive::read)
+ *  Column 1: Symbolic name of the URL (default: column 0)
+ */
 class File_Archive_Reader_DBFile extends File_Archive_Reader_Relay
 {
     /**
-      * @var Object Handle to the set of results being processed
-      * The rows must contain an URL in first pos
-      */
+     * @var Object Handle to the set of results being processed
+     * The rows must contain an URL in first pos
+     */
     var $res = null;
 
     /**
-      * @var Integer Current row number
-      */
+     * @var Integer Current row number
+     */
     var $currentRowPos = 0;
 
     /**
-      * @param Object $res Handle to the set of results being processed
-      * The rows must contain an URL in first pos
-      *
-      * This parameter is returned by DB::query
-      */
+     * @param Object $res Handle to the set of results being processed
+     * The rows must contain an URL in first pos
+     *
+     * This parameter is returned by DB::query
+     */
     function File_Archive_Reader_DBFile($res)
     {
         $this->res = $res;
     }
     /**
-      * @see File_Archive_Reader::close()
-      */
+     * @see File_Archive_Reader::close()
+     */
     function close()
     {
         parent::close();
@@ -74,8 +74,8 @@ class File_Archive_Reader_DBFile extends File_Archive_Reader_Relay
         $this->source = null;
     }
     /**
-      * @see File_Archive_Reader::next()
-      */
+     * @see File_Archive_Reader::next()
+     */
     function next()
     {
         $row = $this->res->fetchRow(DB_FETCHMODE_ORDERED, $this->currentRowPos);

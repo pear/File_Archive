@@ -30,28 +30,28 @@
 require_once "File/Archive/Writer.php";
 
 /**
-  * Writer to the standard output
-  * It will concatenate the files that it receive
-  * It may send some headers, but will do so only for the first file
-  */
+ * Writer to the standard output
+ * It will concatenate the files that it receive
+ * It may send some headers, but will do so only for the first file
+ */
 class File_Archive_Writer_Output extends File_Archive_Writer
 {
     /**
-      * @var Bool If true, the Content-type and Content-disposition headers will be sent
-      * The file will be considered as an attachment and the MIME will be deduced from its extension
-      */
+     * @var Bool If true, the Content-type and Content-disposition headers will be sent
+     * The file will be considered as an attachment and the MIME will be deduced from its extension
+     */
     var $sendHeaders;
 
     /**
-      * @param $sendHeaders see the variable
-      */
+     * @param $sendHeaders see the variable
+     */
     function File_Archive_Writer_Output($sendHeaders = true)
     {
         $this->sendHeaders = $sendHeaders;
     }
     /**
-      * @see File_Archive_Writer::newFile
-      */
+     * @see File_Archive_Writer::newFile
+     */
     function newFile($filename, $stat, $mime="application/octet-stream")
     {
         if($this->sendHeaders) {
@@ -61,12 +61,12 @@ class File_Archive_Writer_Output extends File_Archive_Writer
         }
     }
     /**
-      * @see File_Archive_Writer::writeData
-      */
+     * @see File_Archive_Writer::writeData
+     */
     function writeData($data) { echo $data; }
     /**
-      * @see File_Archive_Writer::writeFile
-      */
+     * @see File_Archive_Writer::writeFile
+     */
     function writeFile($filename) { readfile($filename); }
 }
 

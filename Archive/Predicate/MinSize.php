@@ -30,24 +30,24 @@
 require_once "File/Archive/Predicate.php";
 
 /**
-  * Keep only the files larger than a given size
-  *
-  * @see        File_Archive_Predicate File_Archive_Reader_Filter
-  */
+ * Keep only the files larger than a given size
+ *
+ * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ */
 class File_Archive_Predicate_MinSize extends File_Archive_Predicate
 {
     var $minSize = 0;
 
     /**
-      * @param int $minSize minimal size of the file (in Bytes)
-      */
+     * @param int $minSize minimal size of the file (in Bytes)
+     */
     function File_Archive_Predicate_MinSize($minSize)
     {
         $this->minSize = $minSize;
     }
     /**
-      * @see File_Archive_Predicate::isTrue
-      */
+     * @see File_Archive_Predicate::isTrue
+     */
     function isTrue(&$source)
     {
         $stat = $source->getStat();

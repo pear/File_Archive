@@ -35,13 +35,13 @@ require_once "File/Archive/Writer.php";
 class File_Archive_Writer_Files extends File_Archive_Writer
 {
     /**
-      * @var Object Handle to the file where the data are currently written
-      */
+     * @var Object Handle to the file where the data are currently written
+     */
     var $handle = null;
 
     /**
-      * Ensure that $pathname exists, or create it if it does not
-      */
+     * Ensure that $pathname exists, or create it if it does not
+     */
     function mkdirr($pathname)
     {
         // Check if directory already exists
@@ -67,8 +67,8 @@ class File_Archive_Writer_Files extends File_Archive_Writer
     }
 
     /**
-      * @see File_Archive_Writer::newFile
-      */
+     * @see File_Archive_Writer::newFile
+     */
     function newFile($filename, $stat, $mime="application/octet-stream")
     {
         if($this->handle !== NULL) {
@@ -82,12 +82,12 @@ class File_Archive_Writer_Files extends File_Archive_Writer
         $this->handle = fopen($filename, "w");
     }
     /**
-      * @see File_Archive_Writer::writeData
-      */
+     * @see File_Archive_Writer::writeData
+     */
     function writeData($data) { fwrite($this->handle, $data); }
     /**
-      * @see File_Archive_Writer::close
-      */
+     * @see File_Archive_Writer::close
+     */
     function close()
     {
         if($this->handle !== null) {

@@ -30,24 +30,24 @@
 require_once "File/Archive/Predicate.php";
 
 /**
-  * Keep only the files which name follow a given case insensitive regular expression
-  *
-  * @see        File_Archive_Predicate File_Archive_Reader_Filter eregi
-  */
+ * Keep only the files which name follow a given case insensitive regular expression
+ *
+ * @see        File_Archive_Predicate File_Archive_Reader_Filter eregi
+ */
 class File_Archive_Predicate_Eregi extends File_Archive_Predicate
 {
     var $ereg;
 
     /**
-      * @param string $ereg is the regular expression
-      */
+     * @param string $ereg is the regular expression
+     */
     function File_Archive_Predicate_Eregi($ereg)
     {
         $this->ereg = $ereg;
     }
     /**
-      * @see File_Archive_Predicate::isTrue
-      */
+     * @see File_Archive_Predicate::isTrue
+     */
     function isTrue(&$source)
     {
         return eregi($this->ereg, $source->getFilename());

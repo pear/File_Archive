@@ -30,15 +30,15 @@
 require_once "File/Archive/Predicate.php";
 
 /**
-  * Always evaluate to false
-  *
-  * @see        File_Archive_Predicate File_Archive_Reader_Filter
-  */
+ * Always evaluate to false
+ *
+ * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ */
 class File_Archive_Predicate_False extends File_Archive_Predicate
 {
     /**
-      * @see File_Archive_Predicate::isTrue
-      */
+     * @see File_Archive_Predicate::isTrue
+     */
     function isTrue(&$source) { return false; }
 }
 

@@ -31,33 +31,30 @@ require_once "Relay.php";
 require_once "File.php";
 
 /**
-  * Recursively reads a directory
-  */
+ * Recursively reads a directory
+ */
 class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
 {
     /**
-      * @var String URL of the directory that must be read
-      */
+     * @var String URL of the directory that must be read
+     */
     var $directory;
     /**
-      * @var String URL of the directory as the reader will display it
-      */
-    /**
-      * @var Int The subdirectories will be read up to a depth of maxRecurs
-      * If maxRecurs == 0, the subdirectories will not be read
-      * If maxRecurs == -1, the depth is considered infinite
-      */
+     * @var Int The subdirectories will be read up to a depth of maxRecurs
+     * If maxRecurs == 0, the subdirectories will not be read
+     * If maxRecurs == -1, the depth is considered infinite
+     */
     var $maxRecurs;
     /**
-      * @var Object Handle returned by the openedDirectory function
-      */
+     * @var Object Handle returned by the openedDirectory function
+     */
     var $directoryHandle = null;
 
     /**
-      * $directory is the path of the directory that must be read
-      * If $maxRecurs is specified, the subdirectories will be read up to a depth of $maxRecurs
-      * In particular, if $maxRecurs == 0, the subdirectories won't be read.
-      */
+     * $directory is the path of the directory that must be read
+     * If $maxRecurs is specified, the subdirectories will be read up to a depth of $maxRecurs
+     * In particular, if $maxRecurs == 0, the subdirectories won't be read.
+     */
     function File_Archive_Reader_Directory($directory, $symbolic='', $maxRecurs=-1)
     {
         $this->directory = $directory;
@@ -65,8 +62,8 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
         $this->maxRecurs = $maxRecurs;
     }
     /**
-      * @see File_Archive_Reader::close()
-      */
+     * @see File_Archive_Reader::close()
+     */
     function close()
     {
         parent::close();
@@ -75,8 +72,10 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
         $this->source = null;
     }
     /**
-      * @see File_Archive_Reader::next()
-      */
+     * @see File_Archive_Reader::next()
+     *
+     * The files are returned in the same order as readdir
+     */
     function next()
     {
         if($this->directoryHandle == null)
@@ -105,8 +104,8 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
         return true;
     }
     /**
-      * @see File_Archive_Reader::getFilename()
-      */
+     * @see File_Archive_Reader::getFilename()
+     */
     function getFilename() { return $this->symbolic . parent::getFilename(); }
 }
 

@@ -30,39 +30,39 @@
 require_once "File/Archive/Reader.php";
 
 /**
-  * A reader that takes its input from a memory buffer
-  */
+ * A reader that takes its input from a memory buffer
+ */
 class File_Archive_Reader_Memory extends File_Archive_Reader
 {
     /**
-      * @var String Name of the file exported by this reader
-      */
+     * @var String Name of the file exported by this reader
+     */
     var $filename;
     /**
-      * @var Array Stat of the file exported by this reader
-      */
+     * @var Array Stat of the file exported by this reader
+     */
     var $stat;
     /**
-      * @var String MIME type of the file exported by this reader
-      */
+     * @var String MIME type of the file exported by this reader
+     */
     var $mime;
     /**
-      * @var String Memory buffer that contains the data of the file
-      */
+     * @var String Memory buffer that contains the data of the file
+     */
     var $memory;
     /**
-      * @var Int Current position in the file
-      */
+     * @var Int Current position in the file
+     */
     var $offset = 0;
     /**
-      * @var Boolean Has the file already been read
-      */
+     * @var Boolean Has the file already been read
+     */
     var $alreadyRead = false;
 
     /**
-      * $memory is the content of the file. The content should not be changer after the constructor
-      * $filename and $stat are the caracteristics of the file contained in the reader
-      */
+     * $memory is the content of the file. The content should not be changer after the constructor
+     * $filename and $stat are the caracteristics of the file contained in the reader
+     */
     function File_Archive_Reader_Memory($memory, $filename, $stat=array(), $mime="application/octet-stream")
     {
         $this->memory = $memory;
@@ -73,8 +73,8 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     }
 
     /**
-      * The subclass should overwrite this function to change the filename, stat and memory
-      */
+     * The subclass should overwrite this function to change the filename, stat and memory
+     */
     function next()
     {
         if($this->alreadyRead) {
@@ -86,21 +86,21 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     }
 
     /**
-      * @see File_Archive_Reader::getFilename()
-      */
+     * @see File_Archive_Reader::getFilename()
+     */
     function getFilename() { return $this->filename; }
     /**
-      * @see File_Archive_Reader::getStat()
-      */
+     * @see File_Archive_Reader::getStat()
+     */
     function getStat() { return $this->stat; }
     /**
-      * @see File_Archive_Reader::getMime()
-      */
+     * @see File_Archive_Reader::getMime()
+     */
     function getMime() { return $this->mime; }
 
     /**
-      * @see File_Archive_Reader::getData()
-      */
+     * @see File_Archive_Reader::getData()
+     */
     function getData($length = -1)
     {
         if($this->offset == strlen($this->memory)) {
@@ -116,8 +116,8 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
         return $result;
     }
     /**
-      * @see File_Archive_Reader::skip()
-      */
+     * @see File_Archive_Reader::skip()
+     */
     function skip($length)
     {
         $actualLength = min($length, strlen($this->memory) - $this->offset);
@@ -125,8 +125,8 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
         return $actualLength;
     }
     /**
-      * @see File_Archive_Reader::close()
-      */
+     * @see File_Archive_Reader::close()
+     */
     function close()
     {
         $this->offset = 0;
