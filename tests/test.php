@@ -38,6 +38,7 @@ class Test extends PHPUnit_TestCase
 
         $data = $reader->getData();
         $this->assertFalse(empty($data));
+        $reader->close();
     }
     function testAdvancedURLReader()
     {
@@ -48,6 +49,15 @@ class Test extends PHPUnit_TestCase
             $nbFiles++;
         }
         $this->assertEquals(39, $nbFiles);
+        $reader->close();
+    }
+    function testDownloadAdvancedURL()
+    {
+        $reader = File_Archive::read("http://poocl.la-grotte.org/downloads/PEAR2/poocl.tar/File/Archive.php");
+        $this->assertTrue($reader->next());
+        $data = $reader->getData();
+        echo htmlentities($data);
+        $reader->close();
     }
     function testMultiReader()
     {
