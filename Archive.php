@@ -476,13 +476,26 @@ class File_Archive
         return new File_Archive_Writer_Output($sendHeaders);
     }
     /**
-     * @param $type can be one of Tar, Gzip, Tgz, Zip
-     * The case of this parameter is not important
+     * @param string $filename name of the archive file
+     * @param File_Archive_Writer $innerWriter writer where the archive will be written
+     * @param string $type can be one of Tar, Gz, Gzip, Tgz, Zip (default is the extension of $filename)
+     *        The case of this parameter is not important
+     * @param array $stat Statistics of the archive (see stat function)
+     * @param bool $autoClose If set to true, $innerWriter will be closed when the returned archive is close
+     *        Default value is true.
      */
-    function toArchive($type, $filename, &$innerWriter, $stat = array(), $autoClose = true)
+    function toArchive($filename, &$innerWriter, $type=null, $stat = array(), $autoClose = true)
     {
-        $realType = ucfirst($type);
-        switch($realType)
+        if($type == null) {
+            $dotPos = strrpos($filename, '.');
+            if($dotPos !== false) {
+                $type = substr($filename, $dotPos+1);
+            } else {
+                return PEAR::raiseError("Unknown archive type for $filename (you should specify a third argument)");
+            }
+        }
+        $type = ucfirst($type);
+        switch($type)
         {
         case "Tgz":
             require_once "File/Archive/Writer/Tar.php";
@@ -490,11 +503,15 @@ class File_Archive
             return new File_Archive_Writer_Tar("$filename.tar",
                     new File_Archive_Writer_Gzip($filename, $innerWriter, $stat),
                     $stat, $autoClose);
-
-        default:
-            require_once "File/Archive/Writer/$realType.php";
-            $class = "File_Archive_Writer_$realType";
+        case "Tar":
+        case "Zip":
+        case "Gz":
+        case "Gzip":
+            require_once "File/Archive/Writer/$type.php";
+            $class = "File_Archive_Writer_$type";
             return new $class($filename, $innerWriter, $stat, $autoClose);
+        default:
+            return PEAR::raiseError("Extension $type unknown");
         }
     }
 }
