@@ -286,6 +286,12 @@ class File_Archive
         return $result;
     }
     /**
+     * Contains only one file with data read from a memory buffer
+     *
+     * @param string $memory content of the file
+     * @param string $filename public name of the file
+     * @param array $stat statistics of the file. Index 7 (size) will be overwritten to match the size of $memory
+     * @param string $mime mime type of the file. Default will determine the mime type thanks to the extension of $filename
      * @see File_Archive_Reader_Memory
      */
     function readMemory($memory, $filename, $stat=array(), $mime=null)
@@ -294,6 +300,9 @@ class File_Archive
         return new File_Archive_Reader_Memory($memory, $filename, $stat, $mime);
     }
     /**
+     * Contains several other sources. Take care the sources don't have several files with the same filename.
+     * The sources are given as a parameter, or can be added thanks to the reader addSource method
+     *
      * @param array $sources Array of strings or readers that will be added to the multi reader
      *        If the parameter is a string, a reader will be built thanks to the read function
      * @see File_Archive_Reader_Multi, File_Archive::read()
@@ -316,6 +325,12 @@ class File_Archive
         return $result;
     }
     /**
+     * Make the files of a source appear as one large file whose content is the concatenation of the content of all the files
+     *
+     * @param File_Archive_Reader $source The source whose files must be concatened
+     * @param string $filename name of the only file of the created reader
+     * @param array $stat statistics of the file. Index 7 (size) will be overwritten to match the total size of the files
+     * @param string $mime mime type of the file. Default will determine the mime type thanks to the extension of $filename
      * @see File_Archive_Reader_Concat
      */
     function readConcat(&$source, $filename, $stat=array(), $mime=null)
@@ -325,6 +340,10 @@ class File_Archive
     }
 
     /**
+     * Removes from a source the files that do not follow a given predicat
+     *
+     * @param File_Archive_Predicate $predicate Only the files for which $predicate->isTrue() will be kept
+     * @param File_Archive_Reader $source Source that will be filtered
      * @see File_Archive_Reader_Filter
      */
     function filter($predicate, $source)
@@ -333,6 +352,8 @@ class File_Archive
         return new File_Archive_Reader_Filter($predicate, $source);
     }
     /**
+     * Predicate that always evaluate to true
+     *
      * @see File_Archive_Predicate_True
      */
     function predTrue()
@@ -341,6 +362,8 @@ class File_Archive
         return new File_Archive_Predicate_True();
     }
     /**
+     * Predicate that always evaluate to false
+     *
      * @see File_Archive_Predicate_False
      */
     function predFalse()
@@ -349,6 +372,10 @@ class File_Archive
         return new File_Archive_Predicate_False();
     }
     /**
+     * Predicate that evaluates to the logical AND of the parameters
+     * You can add other predicates thanks to the File_Archive_Predicate_And::addPredicate() function
+     *
+     * @param File_Archive_Predicate (any number of them)
      * @see File_Archive_Predicate_And
      */
     function predAnd()
@@ -362,6 +389,10 @@ class File_Archive
         return $pred;
     }
     /**
+     * Predicate that evaluates to the logical OR of the parameters
+     * You can add other predicates thanks to the File_Archive_Predicate_Or::addPredicate() function
+     *
+     * @param File_Archive_Predicate (any number of them)
      * @see File_Archive_Predicate_Or
      */
     function predOr()
@@ -375,6 +406,9 @@ class File_Archive
         return $pred;
     }
     /**
+     * Negate a predicate
+     *
+     * @param File_Archive_Predicate $pred Predicate to negate
      * @see File_Archive_Predicate_Not
      */
     function predNot($pred)
@@ -383,6 +417,9 @@ class File_Archive
         return new File_Archive_Predicate_Not($pred);
     }
     /**
+     * Evaluates to true iif the file is larger than a given size
+     *
+     * @param int $size the minimal size of the files (in Bytes)
      * @see File_Archive_Predicate_MinSize
      */
     function predMinSize($size)
@@ -391,6 +428,9 @@ class File_Archive
         return new File_Archive_Predicate_MinSize($size);
     }
     /**
+     * Evaluates to true iif the file has been modified after a given time
+     *
+     * @param int $time Unix timestamp of the minimal modification time of the files
      * @see File_Archive_Predicate_MinTime
      */
     function predMinTime($time)
@@ -399,6 +439,9 @@ class File_Archive
         return new File_Archive_Predicate_MinTime($time);
     }
     /**
+     * Evaluates to true iif the file has less that a given number of directories in its path
+     *
+     * @param int $depth Maximal number of directories in path of the files
      * @see File_Archive_Predicate_MaxDepth
      */
     function predMaxDepth($depth)
@@ -407,6 +450,9 @@ class File_Archive
         return new File_Archive_Predicate_MaxDepth($depth);
     }
     /**
+     * Evaluates to true iif the extension of the file is in a given list
+     *
+     * @param array or string $list List or comma separated string of possible extension of the files
      * @see File_Archive_Predicate_Extension
      */
     function predExtension($list)
@@ -415,7 +461,11 @@ class File_Archive
         return new File_Archive_Predicate_Extension($list);
     }
     /**
-     * @see File_Archive_Predicate_MIME
+     * Evaluates to true iif the MIME type of the file is in a given list
+     *
+     * @param array or string $list List or comma separated string of possible MIME types of the files
+     *        You may enter wildcards like "image/*" to select all the MIME in class image
+     * @see File_Archive_Predicate_MIME, MIME_Type::isWildcard()
      */
     function predMIME($list)
     {
@@ -423,7 +473,10 @@ class File_Archive
         return new File_Archive_Predicate_MIME($list);
     }
     /**
-     * @see File_Archive_Predicate_Ereg
+     * Evaluates to true iif the name of the file follow a given regular expression
+     *
+     * @param string $ereg regular expression that the filename must follow
+     * @see File_Archive_Predicate_Ereg, ereg()
      */
     function predEreg($ereg)
     {
@@ -431,7 +484,10 @@ class File_Archive
         return new File_Archive_Predicate_Ereg($ereg);
     }
     /**
-     * @see File_Archive_Predicate_Eregi
+     * Evaluates to true iif the name of the file follow a given regular expression (case insensitive version)
+     *
+     * @param string $ereg regular expression that the filename must follow
+     * @see File_Archive_Predicate_Eregi, eregi
      */
     function predEregi($ereg)
     {
@@ -439,6 +495,19 @@ class File_Archive
         return new File_Archive_Predicate_Eregi($ereg);
     }
     /**
+     * Custom predicate built by supplying a string expression
+     *
+     * Example:
+     *     new File_Archive_Predicate_Custom("return strlen($name)<100;")
+     *     new File_Archive_Predicate_Custom("strlen($name)<100;")
+     *     new File_Archive_Predicate_Custom("strlen($name)<100")
+     *     new File_Archive_Predicate_Custom("strlen($source->getFilename())<100")
+     *
+     * @param string $expression String containing an expression that evaluates to a boolean
+     *        If the expression doesn't contain a return statement, it will be added at the begining of the expression
+     *        A ';' will be added at the end of the expression so that you don't have to write it
+     *        You may use the $name variable to refer to the current filename (with path...), $time for the modification time (unix timestamp)
+     *        $size for the size of the file in bytes, $mime for the MIME type of the file
      * @see File_Archive_Predicate_Custom
      */
     function predCustom($expression)
@@ -448,6 +517,12 @@ class File_Archive
     }
 
     /**
+     * Send the files as a mail attachment
+     *
+     * @param Mail $mail Object used to send mail (see Mail::factory)
+     * @param array or String $to An array or a string with comma separated recipients
+     * @param array $headers The headers that will be passed to the Mail_mime object
+     * @param string $message Text body of the mail
      * @see File_Archive_Writer_Mail
      */
     function toMail($to, $headers, $message, &$mail = null)
@@ -456,6 +531,10 @@ class File_Archive
         return new File_Archive_Writer_Mail($to, $headers, $message, $mail);
     }
     /**
+     * Write the files on the hard drive
+     *
+     * @param string $baseDir if specified, the files will be created in that directory
+     *        If they don't exist, the directories will automatically be created
      * @see File_Archive_Writer_Files
      */
     function toFiles($baseDir = "")
@@ -464,6 +543,10 @@ class File_Archive
         return new File_Archive_Writer_Files($baseDir);
     }
     /**
+     * Send the content of the files to a memory buffer
+     *
+     * @param out $data if specified, the data will be written to this buffer
+     *        Else, you can retrieve the buffer with the File_Archive_Writer_Memory::getData() function
      * @see File_Archive_Writer_Memory
      */
     function toMemory(&$data = null)
@@ -472,6 +555,9 @@ class File_Archive
         return new File_Archive_Writer_Memory($data);
     }
     /**
+     * Duplicate the writing operation on two writers
+     *
+     * @param File_Archive_Writer $a, $b writers where data will be duplicated
      * @see File_Archive_Writer_Multi
      */
     function toMulti(&$a, &$b)
@@ -480,6 +566,10 @@ class File_Archive
         return new File_Archive_Writer_Multi($a, $b);
     }
     /**
+     * Send the content of the files to the standard output (so to the client for a website)
+     *
+     * @param bool $sendHeaders If true some headers will be sent to force the download of the file
+     *             Default value is true
      * @see File_Archive_Writer_Output
      */
     function toOutput($sendHeaders = true)
@@ -488,6 +578,8 @@ class File_Archive
         return new File_Archive_Writer_Output($sendHeaders);
     }
     /**
+     * Compress the data to a tar, gz, tar/gz or zip format
+     *
      * @param string $filename name of the archive file
      * @param File_Archive_Writer $innerWriter writer where the archive will be written
      * @param string $type can be one of Tar, Gz, Tgz, Zip (default is the extension of $filename)
