@@ -20,9 +20,9 @@
  </maintainers>
 
  <release>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <date>2005-02-20</date>
-  <state>alpha</state>
+  <state>beta</state>
   <notes>
    + Add a MIME predicate
    + Change the toArchive function to detect the compression format using the extension of the file
@@ -62,6 +62,7 @@
       <file>MimeList.php</file>
       <file>Multi.php</file>
       <file>Relay.php</file>
+      <file>Select.php</file>
       <file>Tar.php</file>
       <file>Uncompress.php</file>
       <file>Zip.php</file>
@@ -81,6 +82,9 @@
     </dir>
     <dir name="tests" role="test">
      <file name="test.php"/>
+    </dir>
+    <dir name="doc" role="doc">
+     <file name="readme.txt"/>
     </dir>
    </dir>
   </filelist>
