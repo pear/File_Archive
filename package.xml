@@ -23,7 +23,11 @@
   <version>0.1.0</version>
   <date>2005-02-20</date>
   <state>alpha</state>
-  <notes>First release of File_Archive</notes>
+  <notes>
+   + Add a MIME predicate
+   + Change the toArchive function to detect the compression format using the extension of the file
+     (Warning: this is not backward compatible since the order of the arguments have changed)
+  </notes>
   <filelist>
    <dir name="File" role="php">
     <file>Archive.php</file>
@@ -89,4 +93,13 @@
   </deps>
   
  </release>
+ 
+ <changelog>
+  <release>
+   <version>0.1.0</version>
+   <state>alpha</state>
+   <date>2005-02-20</state>
+   <notes>First release</notes>
+  </release>
+ </changelog>
 </package>
