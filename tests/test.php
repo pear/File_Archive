@@ -223,25 +223,20 @@ class Test extends PHPUnit_TestCase
         $filename = "test.$extension";
 
         $source = File_Archive::read('test.php');
-        $compressed = File_Archive::toMemory();
         $source->extract(
             File_Archive::toArchive(
                 $archiveFormat,
-                'test.php',
-                $compressed
+                $filename,
+                $compressed = File_Archive::toMemory()
             )
         );
 
         require_once "File/Archive/Reader/Uncompress.php";
 
-        $source = new File_Archive_Reader_Uncompress(
-            File_Archive::readMemory($compressed->getData(), $filename)
-        );
+        $source = new File_Archive_Reader_Uncompress($compressed->makeReader());
+        $source->extract(File_Archive::toMemory($uncompressed));
 
-        $uncompressed = File_Archive::toMemory();
-        $source->extract($uncompressed);
-
-        $this->assertEquals(file_get_contents('test.php'), $uncompressed->getData());
+        $this->assertEquals(file_get_contents('test.php'), $uncompressed);
     }
     function testTar() { $this->_testArchive('tar', 'tar'); }
     function testZip() { $this->_testArchive('zip', 'zip'); }

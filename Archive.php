@@ -443,10 +443,10 @@ class File_Archive
     /**
      * @see File_Archive_Writer_Memory
      */
-    function toMemory()
+    function toMemory(&$data = null)
     {
         require_once "File/Archive/Writer/Memory.php";
-        return new File_Archive_Writer_Memory();
+        return new File_Archive_Writer_Memory($data);
     }
     /**
      * @see File_Archive_Writer_Multi

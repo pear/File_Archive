@@ -41,13 +41,35 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
      * @access private
      */
     var $data = "";
+    /**
+     * Informations about the file being written into this writer
+     */
+    var $filename;
+    var $stat;
+    var $mime;
+
+    function File_Archive_Writer_Memory(&$data = null)
+    {
+        $this->data =& $data;
+        $this->data = '';
+    }
+
+    function test()
+    {
+        $this->data = 'foo';
+    }
 
     function writeData($d) { $this->data .= $d; }
 
     /**
      * @see File_Archive_Writer::newFile
      */
-    function newFile() {}
+    function newFile($filename, $stat, $mime = "application/octet-stream")
+    {
+        $this->filename = $filename;
+        $this->stat = $stat;
+        $this->mime = $mime;
+    }
 
     /**
      * Retrieve the concatenated data
@@ -67,6 +89,24 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
      * Returns true iif the buffer is empty
      */
     function isEmpty() { return empty($this->data); }
+
+    /**
+     * Creates a reader from this writer
+     * @param string $filename Name of the file provided by the reader
+     * @param array $stat Statistics of the file provided by the reader
+     * @param string $mime Mime type of the file provided by the reader
+     *
+     * Any unspecified parameter will be set to the value of the last file written in this writer
+     */
+    function makeReader($filename = null, $stat=null, $mime=null)
+    {
+        require_once "File/Archive/Reader/Memory.php";
+        return new File_Archive_Reader_Memory(
+            $this->data,
+            $filename == null ? $this->filename : $filename,
+            $stat     == null ? $this->stat     : $stat,
+            $mime     == null ? $this->mime     : $mime);
+    }
 }
 
 ?>
