@@ -60,19 +60,25 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
      */
     var $central = "";
 
-    function File_Archive_Writer_Zip($filename, &$innerWriter, $stat=array(), $autoClose = true)
+    function File_Archive_Writer_Zip($filename, &$innerWriter,
+                                     $stat=array(), $autoClose = true)
     {
-        parent::File_Archive_Writer_MemoryArchive($filename, $innerWriter, $stat, $autoClose);
-        function_exists('gzcompress') or die("GZ Compress function not available");
+        parent::File_Archive_Writer_MemoryArchive(
+                    $filename, $innerWriter, $stat, $autoClose
+                );
+        function_exists('gzcompress') or
+                die("GZ Compress function not available");
     }
 
     /**
-     * Change the level of the compression
-     * This may be done between two files
-     * The compression level is an int from 0 (no compression) to 9 (best compression)
+     * Change the level of the compression. This may be done between two files
+     *
      * @param Int $compressionLevel New compression level from 0 to 9
      */
-    function setCompressionLevel($compressionLevel) { $this->compressionLevel = $compressionLevel; }
+    function setCompressionLevel($compressionLevel)
+    {
+        $this->compressionLevel = $compressionLevel;
+    }
 
     /**
      * Set a comment on the ZIP file
@@ -80,7 +86,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
     function setComment($comment) { $this->comment = $comment; }
 
     /**
-     * @see File_Archive_Writer_MemoryArchive::appendFileData()
+     * @see    File_Archive_Writer_MemoryArchive::appendFileData()
      * @access protected
      */
     function appendFileData($filename, $stat, $data)
@@ -120,7 +126,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
 
     }
     /**
-     * @see File_Archive_Writer_MemoryArchive::sendFooter()
+     * @see    File_Archive_Writer_MemoryArchive::sendFooter()
      * @access protected
      */
     function sendFooter()

@@ -2,7 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * Base class for all the transformation writers that will generate one single file
+ * Base class for all the transformation writers that will generate one single
+ * file
  *
  * PHP versions 4 and 5
  *
@@ -32,12 +33,14 @@
 require_once "File/Archive/Writer.php";
 
 /**
- * Base class for all the transformation writers that will generate one single file
+ * Base class for all the transformation writers that will generate one single
+ * file
  */
 class File_Archive_Writer_Archive extends File_Archive_Writer
 {
     /**
-     * @var File_Archive_Writer The compressed data will be written to this writer
+     * @var File_Archive_Writer The compressed data will be written to this
+     * writer
      * @access private
      */
     var $innerWriter;
@@ -49,12 +52,18 @@ class File_Archive_Writer_Archive extends File_Archive_Writer
     var $autoClose;
 
     /**
-     * @param String $filename Name to give to the archive (the name will probably be used by the inner writer)
-     * @param File_Archive_Writer $innerWriter The inner writer to which the compressed data will be written
-     * @param Array $stat The stat of the archive (see the PHP stat() function). No element are required in this array
-     * @param Bool $autoClose Indicate if the inner writer must be closed when closing this
+     * @param String $filename Name to give to the archive (the name will
+     * probably be used by the inner writer)
+     *
+     * @param File_Archive_Writer $innerWriter The inner writer to which the
+     *        compressed data will be written
+     * @param array $stat The stat of the archive (see the PHP stat() function).
+     *        No element are required in this array
+     * @param bool $autoClose Indicate if the inner writer must be closed when
+     *        closing this
      */
-    function File_Archive_Writer_Archive($filename, &$innerWriter, $stat = array(), $autoClose = true)
+    function File_Archive_Writer_Archive($filename, &$innerWriter,
+                                         $stat = array(), $autoClose = true)
     {
         $this->innerWriter =& $innerWriter;
         $this->autoClose = $autoClose;

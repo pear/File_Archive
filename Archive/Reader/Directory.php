@@ -57,10 +57,12 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
 
     /**
      * $directory is the path of the directory that must be read
-     * If $maxRecurs is specified, the subdirectories will be read up to a depth of $maxRecurs
-     * In particular, if $maxRecurs == 0, the subdirectories won't be read.
+     * If $maxRecurs is specified, the subdirectories will be read up to a depth
+     * of $maxRecurs. In particular, if $maxRecurs == 0, the subdirectories
+     * won't be read.
      */
-    function File_Archive_Reader_Directory($directory, $symbolic='', $maxRecurs=-1)
+    function File_Archive_Reader_Directory($directory, $symbolic='',
+                                           $maxRecurs=-1)
     {
         $this->directory = $directory;
         $this->symbolic = $this->getStandardURL($symbolic);
@@ -71,10 +73,12 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
      */
     function close()
     {
-        parent::close();
+        $error = parent::close();
 
         $this->directoryHandle = null;
         $this->source = null;
+
+        return $error;
     }
     /**
      * @see File_Archive_Reader::next()
@@ -86,7 +90,9 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
         if ($this->directoryHandle == null) {
             $this->directoryHandle = opendir($this->directory);
             if (!is_resource($this->directoryHandle)) {
-                return PEAR::raiseError("Directory {$this->directory} not found");
+                return PEAR::raiseError(
+                    "Directory {$this->directory} not found"
+                );
             }
         }
 
@@ -103,7 +109,9 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
             $current = $this->directory.'/'.$file;
             if (is_dir($current)) {
                 if ($this->maxRecurs != 0) {
-                    $this->source = new File_Archive_Reader_Directory($current, $file.'/', $this->maxRecurs-1);
+                    $this->source = new File_Archive_Reader_Directory(
+                        $current, $file.'/', $this->maxRecurs-1
+                    );
                 }
             } else {
                 $this->source = new File_Archive_Reader_File($current, $file);

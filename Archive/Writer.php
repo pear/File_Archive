@@ -39,8 +39,9 @@ class File_Archive_Writer
     /**
      * Create a new file in the writer
      *
-     * @param String $data filename the name of the file, eventually including a path
-     * @stat Array $stat See PHP stat() function. None of the indexed are required
+     * @param string $filename Name of the file, eventually including a path
+     * @param array $stat Its Statistics. None of the indexes are required
+     * @param string $mime MIME type of the file
      */
     function newFile($filename, $stat = array(), $mime = "application/octet-stream")
     {
@@ -59,9 +60,11 @@ class File_Archive_Writer
 
     /**
      * Append the content of the physical file $filename to the writer
-     * writeFile($filename) must be equivalent to writeData(file_get_contents($filename)) but can be more efficient
+     * writeFile($filename) must be equivalent to
+     * writeData(file_get_contents($filename)) but can be more efficient
      *
-     * @param String $filename Name of the file which content must be appended to the writer
+     * @param string $filename Name of the file which content must be appended
+     *        to the writer
      */
     function writeFile($filename)
     {

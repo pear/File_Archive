@@ -50,10 +50,11 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
     var $mime;
 
     /**
-     * @param reference $data If provided, the data will be output in this variable
-     *        Any existent data in $data will be overwritten by the actual data of the writer
-     *        You should not modify manually this variable while using this writer (you can
-     *        safely use all the functions of the archive, like clear for example)
+     * @param reference $data If provided, the data will be output in this
+     *        variable. Any existent data in $data will be overwritten by the
+     *        actual data of the writer. You should not modify manually this
+     *        variable while using this writer (you can safely use all the
+     *        functions of the archive, like clear for example)
      */
     function File_Archive_Writer_Memory(&$data = null)
     {
@@ -75,8 +76,8 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
 
     /**
      * Retrieve the concatenated data
-     * The value is returned by reference for performance problems, but you should
-     * not manually modify it
+     * The value is returned by reference for performance problems, but you
+     * should not manually modify it
      *
      * @return string buffer
      */
@@ -99,7 +100,8 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
      * @param array $stat Statistics of the file provided by the reader
      * @param string $mime Mime type of the file provided by the reader
      *
-     * Any unspecified parameter will be set to the value of the last file written in this writer
+     * Any unspecified parameter will be set to the value of the last file
+     * written in this writer
      */
     function makeReader($filename = null, $stat = null, $mime = null)
     {

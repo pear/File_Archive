@@ -3,7 +3,8 @@
 
 /**
  * Factory to access the most common File_Archive features
- * It uses lazy include, so you dont have to include the files from File/Archive/* directories
+ * It uses lazy include, so you dont have to include the files from
+ * File/Archive/* directories
  *
  * PHP versions 4 and 5
  *
@@ -38,18 +39,21 @@ require_once "PEAR.php";
 
 /**
  * Factory to access the most common File_Archive features
- * It uses lazy include, so you dont have to include the files from File/Archive/* directories
+ * It uses lazy include, so you dont have to include the files from
+ * File/Archive/* directories
  */
 class File_Archive
 {
     /**
-     * Create a reader to read the URL $URL
-     * If the URL is a directory, it will recursively read that directory
-     * If $uncompressionLevel is not null, the archives (files with extension tar, zip, gz or tgz) will
-     *  be considered as directories (up to a depth of $uncompressionLevel if $uncompressionLevel > 0)
-     * The reader will only read files with a directory depth of $directoryDepth
-     * The reader will replace the given URL ($URL) with $symbolic in the public filenames
-     * The default symbolic name will be the last filename in the URL (or '' for directories)
+     * Create a reader to read the URL $URL.
+     * If the URL is a directory, it will recursively read that directory.
+     * If $uncompressionLevel is not null, the archives (files with extension
+     * tar, zip, gz or tgz) will be considered as directories (up to a depth of
+     * $uncompressionLevel if $uncompressionLevel > 0). The reader will only
+     * read files with a directory depth of $directoryDepth. It reader will
+     * replace the given URL ($URL) with $symbolic in the public filenames
+     * The default symbolic name is the last filename in the URL (or '' for
+     * directories)
      *
      * Examples:
      * Considere the following file system
@@ -68,7 +72,8 @@ class File_Archive
      *             i.txt
      * </pre>
      *
-     * readUncompress('.') will return a reader that gives access to following files (recursively read current dir):
+     * readUncompress('.') will return a reader that gives access to following
+     * files (recursively read current dir):
      * <pre>
      * a.txt
      * b.tar
@@ -84,7 +89,8 @@ class File_Archive
      * myBaseDir/dir2/dir3/h.tar
      * </pre>
      *
-     * readUncompress('.', '', -1) will return the following reader (uncompress everything)
+     * readUncompress('.', '', -1) will return the following reader (uncompress
+     * everything)
      * <pre>
      * a.txt
      * b.tar/c.txt
@@ -94,7 +100,8 @@ class File_Archive
      * dir2/dir3/h.tar/i.txt
      * </pre>
      *
-     * readUncompress('.', '', 1) will uncompress only one level (so d.tgz will not be uncompressed):
+     * readUncompress('.', '', 1) will uncompress only one level (so d.tgz will
+     * not be uncompressed):
      * <pre>
      * a.txt
      * b.tar/c.txt
@@ -109,15 +116,16 @@ class File_Archive
      * b.tar
      * </pre>
      *
-     * readUncompress('.', '', 0, 1) will recurse only one level in subdirectories
+     * readUncompress('.', '', 0, 1) will recurse only one level in
+     * subdirectories
      * <pre>
      * a.txt
      * b.tar
      * dir2/g.txt
      * </pre>
      *
-     * readUncompress('.', '', -1, 2) will uncompress everything and recurse in only 2 levels in subdirectories
-     * or archives
+     * readUncompress('.', '', -1, 2) will uncompress everything and recurse in
+     * only 2 levels in subdirectories or archives
      * <pre>
      * a.txt
      * b.tar/c.txt
@@ -125,12 +133,12 @@ class File_Archive
      * dir2/g.txt
      * </pre>
      *
-     * The recursion level is determined by the real path, not the symbolic one. So
-     * readUncompress('.', 'myBaseDir', -1, 2) will result to the same files:
+     * The recursion level is determined by the real path, not the symbolic one.
+     * So readUncompress('.', 'myBaseDir', -1, 2) will result to the same files:
      * <pre>
      * myBaseDir/a.txt
      * myBaseDir/b.tar/c.txt
-     * myBaseDir/b.tar/d.tgz/e.txt (the public name is depth 3, but the real one is 2, so it is accepted)
+     * myBaseDir/b.tar/d.tgz/e.txt (accepted because the real depth is 2)
      * myBaseDir/dir2/g.txt
      * </pre>
      *
@@ -141,10 +149,12 @@ class File_Archive
      *
      * Note: This function uncompress files reading their extension
      *       The compressed files must have a tar, zip, gz or tgz extension
-     *       Since it is impossible for some URLs to use is_dir or is_file, this function may not work with
+     *       Since it is impossible for some URLs to use is_dir or is_file, this
+     *       function may not work with
      *       URLs containing folders which name ends with such an extension
      */
-    function read($URL, $symbolic = null, $uncompression = 0, $directoryDepth = -1)
+    function read($URL, $symbolic = null,
+                  $uncompression = 0, $directoryDepth = -1)
     {
         require_once "File/Archive/Reader/Uncompress.php";
         require_once "File/Archive/Reader/ChangeName.php";
@@ -219,7 +229,9 @@ class File_Archive
                 if ($dotPos !== false) {
                     $extension = substr($file, $dotPos+1);
                 }
-            } while (!File_Archive_Reader_Uncompress::isKnownExtension($extension) || is_dir($file));
+            } while (
+                !File_Archive_Reader_Uncompress::isKnownExtension($extension) ||
+                 is_dir($file));
 
             $parsedURL['path'] = $file;
             $file = '';
@@ -266,7 +278,10 @@ class File_Archive
                 require_once "File/Archive/Predicate/MaxDepth.php";
 
                 $tmp = new File_Archive_Reader_Filter(
-                    new File_Archive_Predicate($directoryDepth + substr_count(substr($std, $pos+1), '/')),
+                    new File_Archive_Predicate(
+                        $directoryDepth +
+                        substr_count(substr($std, $pos+1), '/')
+                    ),
                     $result
                 );
                 unset($result);
@@ -290,8 +305,10 @@ class File_Archive
      *
      * @param string $memory content of the file
      * @param string $filename public name of the file
-     * @param array $stat statistics of the file. Index 7 (size) will be overwritten to match the size of $memory
-     * @param string $mime mime type of the file. Default will determine the mime type thanks to the extension of $filename
+     * @param array $stat statistics of the file. Index 7 (size) will be
+     *        overwritten to match the size of $memory
+     * @param string $mime mime type of the file. Default will determine the
+     *        mime type thanks to the extension of $filename
      * @see File_Archive_Reader_Memory
      */
     function readMemory($memory, $filename, $stat=array(), $mime=null)
@@ -300,12 +317,14 @@ class File_Archive
         return new File_Archive_Reader_Memory($memory, $filename, $stat, $mime);
     }
     /**
-     * Contains several other sources. Take care the sources don't have several files with the same filename.
-     * The sources are given as a parameter, or can be added thanks to the reader addSource method
+     * Contains several other sources. Take care the sources don't have several
+     * files with the same filename. The sources are given as a parameter, or
+     * can be added thanks to the reader addSource method
      *
-     * @param array $sources Array of strings or readers that will be added to the multi reader
-     *        If the parameter is a string, a reader will be built thanks to the read function
-     * @see File_Archive_Reader_Multi, File_Archive::read()
+     * @param array $sources Array of strings or readers that will be added to
+     *        the multi reader. If the parameter is a string, a reader will be
+     *        built thanks to the read function
+     * @see   File_Archive_Reader_Multi, File_Archive::read()
      */
     function readMulti(&$sources = array())
     {
@@ -325,13 +344,17 @@ class File_Archive
         return $result;
     }
     /**
-     * Make the files of a source appear as one large file whose content is the concatenation of the content of all the files
+     * Make the files of a source appear as one large file whose content is the
+     * concatenation of the content of all the files
      *
-     * @param File_Archive_Reader $source The source whose files must be concatened
+     * @param File_Archive_Reader $source The source whose files must be
+     *        concatened
      * @param string $filename name of the only file of the created reader
-     * @param array $stat statistics of the file. Index 7 (size) will be overwritten to match the total size of the files
-     * @param string $mime mime type of the file. Default will determine the mime type thanks to the extension of $filename
-     * @see File_Archive_Reader_Concat
+     * @param array $stat statistics of the file. Index 7 (size) will be
+     *        overwritten to match the total size of the files
+     * @param string $mime mime type of the file. Default will determine the
+     *        mime type thanks to the extension of $filename
+     * @see   File_Archive_Reader_Concat
      */
     function readConcat(&$source, $filename, $stat=array(), $mime=null)
     {
@@ -342,9 +365,10 @@ class File_Archive
     /**
      * Removes from a source the files that do not follow a given predicat
      *
-     * @param File_Archive_Predicate $predicate Only the files for which $predicate->isTrue() will be kept
+     * @param File_Archive_Predicate $predicate Only the files for which
+     *        $predicate->isTrue() will be kept
      * @param File_Archive_Reader $source Source that will be filtered
-     * @see File_Archive_Reader_Filter
+     * @see   File_Archive_Reader_Filter
      */
     function filter($predicate, $source)
     {
@@ -373,7 +397,8 @@ class File_Archive
     }
     /**
      * Predicate that evaluates to the logical AND of the parameters
-     * You can add other predicates thanks to the File_Archive_Predicate_And::addPredicate() function
+     * You can add other predicates thanks to the
+     * File_Archive_Predicate_And::addPredicate() function
      *
      * @param File_Archive_Predicate (any number of them)
      * @see File_Archive_Predicate_And
@@ -390,7 +415,8 @@ class File_Archive
     }
     /**
      * Predicate that evaluates to the logical OR of the parameters
-     * You can add other predicates thanks to the File_Archive_Predicate_Or::addPredicate() function
+     * You can add other predicates thanks to the
+     * File_Archive_Predicate_Or::addPredicate() function
      *
      * @param File_Archive_Predicate (any number of them)
      * @see File_Archive_Predicate_Or
@@ -430,7 +456,8 @@ class File_Archive
     /**
      * Evaluates to true iif the file has been modified after a given time
      *
-     * @param int $time Unix timestamp of the minimal modification time of the files
+     * @param int $time Unix timestamp of the minimal modification time of the
+     *        files
      * @see File_Archive_Predicate_MinTime
      */
     function predMinTime($time)
@@ -439,7 +466,8 @@ class File_Archive
         return new File_Archive_Predicate_MinTime($time);
     }
     /**
-     * Evaluates to true iif the file has less that a given number of directories in its path
+     * Evaluates to true iif the file has less that a given number of
+     * directories in its path
      *
      * @param int $depth Maximal number of directories in path of the files
      * @see File_Archive_Predicate_MaxDepth
@@ -452,7 +480,8 @@ class File_Archive
     /**
      * Evaluates to true iif the extension of the file is in a given list
      *
-     * @param array or string $list List or comma separated string of possible extension of the files
+     * @param array or string $list List or comma separated string of possible
+     * extension of the files
      * @see File_Archive_Predicate_Extension
      */
     function predExtension($list)
@@ -463,9 +492,10 @@ class File_Archive
     /**
      * Evaluates to true iif the MIME type of the file is in a given list
      *
-     * @param array or string $list List or comma separated string of possible MIME types of the files
-     *        You may enter wildcards like "image/*" to select all the MIME in class image
-     * @see File_Archive_Predicate_MIME, MIME_Type::isWildcard()
+     * @param array or string $list List or comma separated string of possible
+     *        MIME types of the files. You may enter wildcards like "image/*" to
+     *        select all the MIME in class image
+     * @see   File_Archive_Predicate_MIME, MIME_Type::isWildcard()
      */
     function predMIME($list)
     {
@@ -473,7 +503,8 @@ class File_Archive
         return new File_Archive_Predicate_MIME($list);
     }
     /**
-     * Evaluates to true iif the name of the file follow a given regular expression
+     * Evaluates to true iif the name of the file follow a given regular
+     * expression
      *
      * @param string $ereg regular expression that the filename must follow
      * @see File_Archive_Predicate_Ereg, ereg()
@@ -484,7 +515,8 @@ class File_Archive
         return new File_Archive_Predicate_Ereg($ereg);
     }
     /**
-     * Evaluates to true iif the name of the file follow a given regular expression (case insensitive version)
+     * Evaluates to true iif the name of the file follow a given regular
+     * expression (case insensitive version)
      *
      * @param string $ereg regular expression that the filename must follow
      * @see File_Archive_Predicate_Eregi, eregi
@@ -498,17 +530,20 @@ class File_Archive
      * Custom predicate built by supplying a string expression
      *
      * Example:
-     *     new File_Archive_Predicate_Custom("return strlen($name)<100;")
-     *     new File_Archive_Predicate_Custom("strlen($name)<100;")
-     *     new File_Archive_Predicate_Custom("strlen($name)<100")
-     *     new File_Archive_Predicate_Custom("strlen($source->getFilename())<100")
+     *   new File_Archive_Predicate_Custom("return strlen($name)<100;")
+     *   new File_Archive_Predicate_Custom("strlen($name)<100;")
+     *   new File_Archive_Predicate_Custom("strlen($name)<100")
+     *   new File_Archive_Predicate_Custom("strlen($source->getFilename())<100")
      *
-     * @param string $expression String containing an expression that evaluates to a boolean
-     *        If the expression doesn't contain a return statement, it will be added at the begining of the expression
-     *        A ';' will be added at the end of the expression so that you don't have to write it
-     *        You may use the $name variable to refer to the current filename (with path...), $time for the modification time (unix timestamp)
-     *        $size for the size of the file in bytes, $mime for the MIME type of the file
-     * @see File_Archive_Predicate_Custom
+     * @param string $expression String containing an expression that evaluates
+     *        to a boolean. If the expression doesn't contain a return
+     *        statement, it will be added at the begining of the expression
+     *        A ';' will be added at the end of the expression so that you don't
+     *        have to write it. You may use the $name variable to refer to the
+     *        current filename (with path...), $time for the modification time
+     *        (unix timestamp), $size for the size of the file in bytes, $mime
+     *        for the MIME type of the file
+     * @see   File_Archive_Predicate_Custom
      */
     function predCustom($expression)
     {
@@ -520,8 +555,10 @@ class File_Archive
      * Send the files as a mail attachment
      *
      * @param Mail $mail Object used to send mail (see Mail::factory)
-     * @param array or String $to An array or a string with comma separated recipients
-     * @param array $headers The headers that will be passed to the Mail_mime object
+     * @param array or String $to An array or a string with comma separated
+     *        recipients
+     * @param array $headers The headers that will be passed to the Mail_mime
+     *        object
      * @param string $message Text body of the mail
      * @see File_Archive_Writer_Mail
      */
@@ -533,9 +570,10 @@ class File_Archive
     /**
      * Write the files on the hard drive
      *
-     * @param string $baseDir if specified, the files will be created in that directory
-     *        If they don't exist, the directories will automatically be created
-     * @see File_Archive_Writer_Files
+     * @param string $baseDir if specified, the files will be created in that
+     *        directory. If they don't exist, the directories will automatically
+     *        be created
+     * @see   File_Archive_Writer_Files
      */
     function toFiles($baseDir = "")
     {
@@ -546,8 +584,9 @@ class File_Archive
      * Send the content of the files to a memory buffer
      *
      * @param out $data if specified, the data will be written to this buffer
-     *        Else, you can retrieve the buffer with the File_Archive_Writer_Memory::getData() function
-     * @see File_Archive_Writer_Memory
+     *        Else, you can retrieve the buffer with the
+     *        File_Archive_Writer_Memory::getData() function
+     * @see   File_Archive_Writer_Memory
      */
     function toMemory(&$data = null)
     {
@@ -566,11 +605,12 @@ class File_Archive
         return new File_Archive_Writer_Multi($a, $b);
     }
     /**
-     * Send the content of the files to the standard output (so to the client for a website)
+     * Send the content of the files to the standard output (so to the client
+     * for a website)
      *
-     * @param bool $sendHeaders If true some headers will be sent to force the download of the file
-     *             Default value is true
-     * @see File_Archive_Writer_Output
+     * @param bool $sendHeaders If true some headers will be sent to force the
+     *        download of the file. Default value is true
+     * @see   File_Archive_Writer_Output
      */
     function toOutput($sendHeaders = true)
     {
@@ -581,21 +621,26 @@ class File_Archive
      * Compress the data to a tar, gz, tar/gz or zip format
      *
      * @param string $filename name of the archive file
-     * @param File_Archive_Writer $innerWriter writer where the archive will be written
-     * @param string $type can be one of Tar, Gz, Tgz, Zip (default is the extension of $filename)
-     *        The case of this parameter is not important
+     * @param File_Archive_Writer $innerWriter writer where the archive will be
+     *        written
+     * @param string $type can be one of Tar, Gz, Tgz, Zip (default is the
+     *        extension of $filename). The case of this parameter is not
+     *        important
      * @param array $stat Statistics of the archive (see stat function)
-     * @param bool $autoClose If set to true, $innerWriter will be closed when the returned archive is close
-     *        Default value is true.
+     * @param bool $autoClose If set to true, $innerWriter will be closed when
+     *        the returned archive is close. Default value is true.
      */
-    function toArchive($filename, &$innerWriter, $type = null, $stat = array(), $autoClose = true)
+    function toArchive($filename, &$innerWriter, $type = null,
+                       $stat = array(), $autoClose = true)
     {
         if ($type == null) {
             $dotPos = strrpos($filename, '.');
             if ($dotPos !== false) {
                 $type = substr($filename, $dotPos+1);
             } else {
-                return PEAR::raiseError("Unknown archive type for $filename (you should specify a third argument)");
+                return PEAR::raiseError(
+                    "Unknown archive type for $filename ".
+                    "(you should specify a third argument)");
             }
         }
         $type = ucfirst($type);
@@ -607,8 +652,8 @@ class File_Archive
             require_once "File/Archive/Writer/Tar.php";
             require_once "File/Archive/Writer/Gzip.php";
             return new File_Archive_Writer_Tar("$filename.tar",
-                    new File_Archive_Writer_Gzip($filename, $innerWriter, $stat),
-                    $stat, $autoClose);
+                new File_Archive_Writer_Gzip($filename, $innerWriter, $stat),
+                $stat, $autoClose);
         case "Tar":
         case "Zip":
         case "Gzip":

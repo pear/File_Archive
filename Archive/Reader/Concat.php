@@ -32,8 +32,8 @@
 require_once "Relay.php";
 
 /**
- * This reader provides one single file that is the concatenation of the data of all the files of
- * another reader
+ * This reader provides one single file that is the concatenation of the data of
+ * all the files of another reader
  */
 class File_Archive_Reader_Concat extends File_Archive_Reader
 {
@@ -43,7 +43,8 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
     var $mime;
     var $opened = false;
 
-    function File_Archive_Reader_Concat(&$source, $filename, $stat=array(), $mime=null)
+    function File_Archive_Reader_Concat(&$source, $filename,
+                                        $stat=array(), $mime=null)
     {
         $this->source =& $source;
         $this->filename = $filename;
@@ -57,7 +58,8 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
             $this->stat[7] += $sourceStat[7];
         }
         if (PEAR::isError($error) || PEAR::isError($source->close())) {
-            die("Error in File_Archive_Reader_Concat constructor ({$error->getMessage()}), cannot continue");
+            die("Error in File_Archive_Reader_Concat constructor ".
+                "({$error->getMessage()}), cannot continue");
         }
     }
 
@@ -83,7 +85,10 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::getMime()
      */
-    function getMime() { return $this->mime==null ? parent::getMime() : $this->mime; }
+    function getMime()
+    {
+        return $this->mime==null ? parent::getMime() : $this->mime;
+    }
     /**
      * @see File_Archive_Reader::getData()
      */
@@ -95,7 +100,9 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
 
         $result = '';
         while ($length == -1 || strlen($result)<$length) {
-            $sourceData = $this->source->getData($length==-1 ? -1 : $length - strlen($result));
+            $sourceData = $this->source->getData(
+                $length==-1 ? -1 : $length - strlen($result)
+            );
 
             if (PEAR::isError($sourceData)) {
                 return $sourceData;

@@ -2,7 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * Keep only the files which name follow a given case insensitive regular expression
+ * Keep only the files which name follow a given case insensitive regular
+ * expression
  *
  * PHP versions 4 and 5
  *
@@ -32,7 +33,8 @@
 require_once "File/Archive/Predicate.php";
 
 /**
- * Keep only the files which name follow a given case insensitive regular expression
+ * Keep only the files which name follow a given case insensitive regular
+ * expression
  *
  * @see        File_Archive_Predicate, File_Archive_Reader_Filter eregi
  */

@@ -2,7 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * Keep only the files modified after a given date (or with unknown modification date)
+ * Keep only the files modified after a given date (or with unknown modification
+ * date)
  *
  * PHP versions 4 and 5
  *
@@ -32,7 +33,8 @@
 require_once "File/Archive/Predicate.php";
 
 /**
- * Keep only the files modified after a given date (or with unknown modification date)
+ * Keep only the files modified after a given date (or with unknown modification
+ * date)
  *
  * @see        File_Archive_Predicate, File_Archive_Reader_Filter
  */
@@ -41,7 +43,8 @@ class File_Archive_Predicate_MinTime extends File_Archive_Predicate
     var $minTime = 0;
 
     /**
-     * @param int $minTime Unix timestamp of the minimal modification date of the files
+     * @param int $minTime Unix timestamp of the minimal modification date of
+     *        the files
      */
     function File_Archive_Predicate_MinTime($minTime)
     {

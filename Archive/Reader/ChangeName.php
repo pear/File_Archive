@@ -79,17 +79,24 @@ class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
     var $oldBaseName;
     var $newBaseName;
 
-    function File_Archive_Reader_ChangeBaseName($oldBaseName, $newBaseName, &$source)
+    function File_Archive_Reader_ChangeBaseName
+                        ($oldBaseName, $newBaseName, &$source)
     {
         parent::File_Archive_Reader_Relay($source);
         $this->oldBaseName = $this->getStandardURL($oldBaseName);
         if (substr($this->oldBaseName, -1) == '/') {
-            $this->oldBaseName = substr($this->oldBaseName, 0, strlen($this->oldBaseName)-1);
+            $this->oldBaseName = substr(
+                        $this->oldBaseName,
+                        0, strlen($this->oldBaseName)-1
+                   );
         }
 
         $this->newBaseName = $this->getStandardURL($newBaseName);
         if (substr($this->newBaseName, -1) == '/') {
-            $this->newBaseName = substr($this->newBaseName, 0, strlen($this->newBaseName)-1);
+            $this->newBaseName = substr(
+                        $this->newBaseName, 0,
+                        strlen($this->newBaseName)-1
+                   );
         }
     }
 
@@ -100,9 +107,13 @@ class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
     {
         $name = parent::getFilename();
         if (empty($this->oldBaseName) ||
-           strncmp($name, $this->oldBaseName.'/', strlen($this->oldBaseName)+1) == 0) {
+          !strncmp($name, $this->oldBaseName.'/', strlen($this->oldBaseName)+1)) {
             return $this->newBaseName.
-                   (empty($this->newBaseName) || strlen($name)<=strlen($this->oldBaseName)+1 ? '' : '/').
+                   (
+                    empty($this->newBaseName) ||
+                    strlen($name)<=strlen($this->oldBaseName)+1 ?
+                    '' : '/'
+                   ).
                    substr($name, strlen($this->oldBaseName)+1);
         } else {
             return $name;

@@ -69,13 +69,15 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
 
     /**
      * @param string $memory is the content of the file.
-     *               This parameter is passed as a reference for performance reasons
-     *               The content should not be changer after the constructor
+     *        This parameter is passed as a reference for performance
+     *        reasons. The content should not be changer after the constructor
      * @param string $filename is the name of the file
-     * @param array  $stat are the statistics of the file. The size will be recomputed from $memory
+     * @param array  $stat are the statistics of the file. The size will be
+     *        recomputed from $memory
      * @param string $mime is the mime type of the file
      */
-    function File_Archive_Reader_Memory(&$memory, $filename, $stat=array(), $mime=null)
+    function File_Archive_Reader_Memory(&$memory, $filename,
+                                        $stat=array(), $mime=null)
     {
         $this->memory = &$memory;
         $this->filename = $this->getStandardURL($filename);
@@ -85,7 +87,8 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     }
 
     /**
-     * The subclass should overwrite this function to change the filename, stat and memory
+     * The subclass should overwrite this function to change the filename, stat
+     * and memory
      */
     function next()
     {
@@ -108,7 +111,10 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::getMime()
      */
-    function getMime() { return $this->mime==null ? parent::getMime() : $this->mime; }
+    function getMime()
+    {
+        return $this->mime==null ? parent::getMime() : $this->mime;
+    }
 
     /**
      * @see File_Archive_Reader::getData()

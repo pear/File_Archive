@@ -67,7 +67,9 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
 
     /**
      * Go to next entry in ZIP archive
-     * This function may stop on a folder, so it does not comply to the File_Archive_Reader::next specs
+     * This function may stop on a folder, so it does not comply to the
+     * File_Archive_Reader::next specs
+     *
      * @see File_Archive_Reader::next()
      */
     function nextWithFolders()

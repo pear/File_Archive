@@ -40,35 +40,37 @@ require_once "Memory.php";
 class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
 {
     /**
-     * @var File_Archive_Writer_Memory A buffer where the data will be put waiting for the file to be complete
+     * @var    File_Archive_Writer_Memory A buffer where the data will be put
+     *         waiting for the file to be complete
      * @access private
      */
     var $memoryWriter = null;
     /**
-     * @var String Name of the file which data are coming
+     * @var    string Name of the file which data are coming
      * @access private
      */
     var $currentFilename = null;
     /**
-     * @var Array Stats of the file which data are coming
+     * @var    array Stats of the file which data are coming
      * @access private
      */
     var $currentStat = null;
     /**
-     * @var String URL of the file being treated if it is a physical file
+     * @var    string URL of the file being treated if it is a physical file
      * @access private
      */
     var $currentDataFile = null;
     /**
-     * @var Int Number of times newFile function has been called
+     * @var    int Number of times newFile function has been called
      * @access protected
      */
     var $nbFiles = 0;
 
     /**
-     * See the constructor of File_Archive_Writer for more informations
+     * @see File_Archive_Writer::File_Archive_Writer()
      */
-    function File_Archive_Writer_MemoryArchive($filename, &$t, $stat = array(), $autoClose = true)
+    function File_Archive_Writer_MemoryArchive
+                ($filename, &$t, $stat = array(), $autoClose = true)
     {
         $this->memoryWriter = new File_Archive_Writer_Memory();
         parent::File_Archive_Writer_Archive($filename, $t, $stat, $autoClose);
@@ -76,7 +78,8 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
     /**
      * @see File_Archive_Writer::newFile()
      */
-    function newFile($filename, $stat = array(), $mime = "application/octet-stream")
+    function newFile($filename, $stat = array(),
+                     $mime = "application/octet-stream")
     {
         if ($this->nbFiles == 0) {
             $error = $this->sendHeader();
@@ -168,23 +171,22 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
 
 //SHOULD REWRITE FUNCTIONS
     /**
-     * The subclass may rewrite the sendHeader function if it needs to execute code
-     * before the first file
+     * The subclass may rewrite the sendHeader function if it needs to execute
+     * code before the first file
      *
      * @access protected
      */
     function sendHeader() { }
     /**
-     * The subclass may rewrite the sendFooter function if it needs to execute code
-     * before closing the archive
+     * The subclass may rewrite the sendFooter function if it needs to execute
+     * code before closing the archive
      *
      * @access protected
      */
     function sendFooter() { }
     /**
-     * The subclass may rewrite this class if it knows an efficient way to treat a physical file
-     * This function is equivalent to $this->appendFileData($filename, stat($dataFilename), file_get_contents($dataFilename));
-     * but may be more efficient
+     * The subclass may rewrite this class if it knows an efficient way to treat
+     * a physical file.
      *
      * @access protected
      */

@@ -44,7 +44,8 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     var $readers = array();
 
     /**
-     * @var File_Archive_Reader Reader from which all started (usefull to be able to close)
+     * @var File_Archive_Reader Reader from which all started (usefull to be
+     *      able to close)
      * @access private
      */
     var $startReader;
@@ -71,12 +72,14 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
 
     /**
      * @var Bool True if the current file has not been reported
-     *           (used in setBaseDir to report an error if no file has been found)
+     *           (used in setBaseDir to report an error if no file has been
+     *           found)
      * @access private
      */
     var $currentFileDisplayed = true;
 
-    function File_Archive_Reader_Uncompress(&$innerReader, $uncompressionLevel = -1)
+    function File_Archive_Reader_Uncompress(
+                        &$innerReader, $uncompressionLevel = -1)
     {
         $this->source =& $innerReader;
         $this->startReader =& $innerReader;
@@ -84,10 +87,12 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     }
 
     /**
-     * Check if File_Archive_Reader_Uncompress can read an archive with a specific extension
+     * Check if File_Archive_Reader_Uncompress can read an archive with a
+     * specific extension
      *
      * @param string $extension the extension of the archive to read
-     * @return bool whether this file can be read by File_Archive_Reader_Uncompress
+     * @return bool whether this file can be read by
+     *         File_Archive_Reader_Uncompress
      * @static
      */
     function isKnownExtension($extension)
@@ -100,9 +105,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
 
     /**
      * Attempt to change the current source (if the current file is an archive)
-     * If this is the case, push the current source onto the stack and make the good archive reader
-     * the current source
-     * A file is considered as an archive if its extension is one of tar, gz, zip, tgz
+     * If this is the case, push the current source onto the stack and make the
+     * good archive reader the current source. A file is considered as an
+     * archive if its extension is one of tar, gz, zip, tgz
      *
      * @return bool whether the source has been pushed or not
      * @access private
@@ -189,12 +194,17 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
                 $currentFilename = $this->source->getFilename();
 
                 if (strlen($currentFilename) < strlen($this->baseDir)) {
-                    $goodFile = (strncmp($this->baseDir, $currentFilename, strlen($currentFilename)) == 0 &&
-                                 $this->baseDir{strlen($currentFilename)} == '/');
+                    $goodFile =
+                        (strncmp($this->baseDir, $currentFilename,
+                                 strlen($currentFilename)) == 0 &&
+                         $this->baseDir{strlen($currentFilename)} == '/');
                 } else if (strlen($currentFilename) > strlen($this->baseDir)) {
                     $goodFile = empty($this->baseDir) ||
-                       (strncmp($this->baseDir, $currentFilename, strlen($this->baseDir)) == 0 &&
-                       (substr($this->baseDir,-1) == '/' || $currentFilename{strlen($this->baseDir)} == '/'));
+                       (strncmp($this->baseDir, $currentFilename,
+                                strlen($this->baseDir)) == 0 &&
+                        (substr($this->baseDir,-1) == '/' ||
+                         $currentFilename{strlen($this->baseDir)} == '/')
+                       );
                 } else {
                     $goodFile = (strcmp($this->baseDir, $currentFilename) == 0);
                 }

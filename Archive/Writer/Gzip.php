@@ -52,16 +52,20 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer_MemoryArchive
     /**
      * Set the compression level
      *
-     * @param int $compressionLevel From 0 (no compression) to 9 (best compression)
+     * @param int $compressionLevel From 0 (no compression) to 9 (best
+     *        compression)
      */
-    function setCompressionLevel($compressionLevel) { $this->compressionLevel = $compressionLevel; }
+    function setCompressionLevel($compressionLevel)
+    {
+        $this->compressionLevel = $compressionLevel;
+    }
 
     /**
      * @see File_Archive_Writer_MemoryArchive::appendFileData()
      */
     function appendFileData($filename, $stat, $data)
     {
-        $flags = bindec("000".(!empty($this->comment)? "1" : "0").(!empty($filename)? "1" : "0")."000");
+        $flags = (empty($this->comment)? 0 : 16) + (empty($filename)? 0 : 8);
         $mtime = isset($stat[9]) ? $stat[9] : time();
 
         return $this->innerWriter->writeData(

@@ -47,7 +47,8 @@ class File_Archive_Predicate_Or extends File_Archive_Predicate
     var $preds;
 
     /**
-     * Build the predicate using the optional File_Archive_Predicates given as arguments
+     * Build the predicate using the optional File_Archive_Predicates given as
+     * arguments
      *
      * Example:
      *   new File_Archive_Predicate_And($pred1, $pred2, $pred3)

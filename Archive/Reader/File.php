@@ -59,9 +59,9 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     var $stat = null;
     /**
-     * @var File_Archive_Reader_Memory If we can't use stat on the URL, we need to read the whole
-     *      file to compute its length. In this case $memory won't be null, and store the content
-     *      of the file
+     * @var File_Archive_Reader_Memory If we can't use stat on the URL, we need
+     *      to read the whole file to compute its length. In this case $memory
+     *      won't be null, and store the content of the file
      * @access private
      */
     var $memory = null;
@@ -95,8 +95,8 @@ class File_Archive_Reader_File extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::next()
      *
-     * The first time next is called, it will open the file handle and return true
-     * Then if will return false
+     * The first time next is called, it will open the file handle and return
+     * true. Then if will return false
      * Raise an error if the file does not exist
      */
     function next()

@@ -111,9 +111,9 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
     /**
      * Creates the TAR footer for a file
      *
-     * @param array $stat the statistics of the file
-     * @return string A string made of less than 512 characteres to fill the last
-     *                512 byte long block
+     * @param  array $stat the statistics of the file
+     * @return string A string made of less than 512 characteres to fill the
+     *         last 512 byte long block
      * @access private
      */
     function tarFooter($stat)
@@ -127,22 +127,26 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
     }
 
     /**
-     * @see File_Archive_Writer_MemoryArchive::appendFile()
+     * @see    File_Archive_Writer_MemoryArchive::appendFile()
      * @access protected
      */
     function appendFile($filename, $dataFilename)
     {
         $stat = stat($dataFilename);
 
-        $error = $this->innerWriter->writeData($this->tarHeader($filename, $stat));
+        $error = $this->innerWriter->writeData(
+                    $this->tarHeader($filename, $stat)
+                 );
         if (PEAR::isError($error)) {
             return $error;
         }
-        $this->innerWriter->writeFile($dataFilename);
+        $error = $this->innerWriter->writeFile($dataFilename);
         if (PEAR::isError($error)) {
             return $error;
         }
-        $this->innerWriter->writeData($this->tarFooter($stat));
+        $error = $this->innerWriter->writeData(
+                    $this->tarFooter($stat)
+                 );
         if (PEAR::isError($error)) {
             return $error;
         }
@@ -156,7 +160,9 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         $size = strlen($data);
         $stat[7] = $size;
 
-        $error = $this->innerWriter->writeData($this->tarHeader($filename, $stat));
+        $error = $this->innerWriter->writeData(
+                    $this->tarHeader($filename, $stat)
+                 );
         if (PEAR::isError($error)) {
             return $error;
         }
@@ -164,7 +170,9 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         if (PEAR::isError($error)) {
             return $error;
         }
-        $error = $this->innerWriter->writeData($this->tarFooter($stat));
+        $error = $this->innerWriter->writeData(
+                    $this->tarFooter($stat)
+                 );
         if (PEAR::isError($error)) {
             return $error;
         }

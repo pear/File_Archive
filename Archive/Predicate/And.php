@@ -2,7 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * Evaluates to true iif all predicates given as constructor parameters evaluate to true
+ * Evaluates to true iif all predicates given as constructor parameters evaluate
+ * to true
  *
  * PHP versions 4 and 5
  *
@@ -32,12 +33,13 @@
 require_once "File/Archive/Predicate.php";
 
 /**
- * Evaluates to true iif all predicates given as constructor parameters evaluate to true
+ * Evaluates to true iif all predicates given as constructor parameters evaluate
+ * to true
  *
  * Example:
  *  new File_Archive_Predicate_And($pred1, $pred2, $pred3)
  *
- * @see        File_Archive_Predicate, File_Archive_Reader_Filter
+ * @see File_Archive_Predicate, File_Archive_Reader_Filter
  */
 class File_Archive_Predicate_And extends File_Archive_Predicate
 {
@@ -48,7 +50,8 @@ class File_Archive_Predicate_And extends File_Archive_Predicate
     var $preds;
 
     /**
-     * Build the predicate using the optional File_Archive_Predicates given as arguments
+     * Build the predicate using the optional File_Archive_Predicates given as
+     * arguments
      *
      * Example:
      *   new File_Archive_Predicate_And($pred1, $pred2, $pred3)

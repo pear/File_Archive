@@ -88,7 +88,10 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         if ($this->hasName) {
             while (($char = $this->source->getData(1)) !== "\0") {
                 if ($char === null) {
-                    return PEAR::raiseError("Not valid gz file (unexpected end of archive reading filename)");
+                    return PEAR::raiseError(
+                        "Not valid gz file (unexpected end of archive ".
+                        "reading filename)"
+                    );
                 }
                 if (PEAR::isError($char)) {
                     return $char;
@@ -101,7 +104,10 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         if ($this->hasComment) {
             while (($char = $this->source->getData(1)) !== "\0") {
                 if ($char === null) {
-                    return PEAR::raiseError("Not valid gz file (unexpected end of archive reading comment)");
+                    return PEAR::raiseError(
+                        "Not valid gz file (unexpected end of archive ".
+                        "reading comment)"
+                    );
                 }
                 if (PEAR::isError($char)) {
                     return $char;
@@ -123,7 +129,10 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         $this->offset = 0;
 
         if ($size != strlen($this->data)) {
-            return PEAR::raiseError("Not valid gz file (size error {$size} != ".strlen($this->data).")");
+            return PEAR::raiseError(
+                "Not valid gz file (size error {$size} != ".
+                strlen($this->data).")"
+            );
         }
         if ($crc32 != crc32($this->data)) {
             return PEAR::raiseError("Not valid gz file (checksum error)");

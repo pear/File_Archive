@@ -60,7 +60,8 @@ class File_Archive_Reader
     {
         $std = $this->getStandardURL($filename);
 
-        //TODO: not very efficient: close and re open the archive to start from the begining
+        //TODO: not very efficient:
+        //close and re open the archive to start from the begining
         $error = $this->close();
         if (PEAR::isError($error)) {
             return $error;
@@ -100,7 +101,10 @@ class File_Archive_Reader
      *
      * @return string Name of the current file
      */
-    function getFilename() { return PEAR::raiseError("Reader abstract function call (getFilename)"); }
+    function getFilename()
+    {
+        return PEAR::raiseError("Reader abstract function call (getFilename)");
+    }
 
     /**
      * Returns an array of statistics about the file
@@ -139,7 +143,10 @@ class File_Archive_Reader
      * If $length is not specified, reads up to the end of the file
      * If $length is specified reads up to $length
      */
-    function getData($length = -1) { return PEAR::raiseError("Reader abstract function call (getData)"); }
+    function getData($length = -1)
+    {
+        return PEAR::raiseError("Reader abstract function call (getData)");
+    }
 
     /**
      * Skip some data and returns how many bytes have been skipped
@@ -161,7 +168,10 @@ class File_Archive_Reader
      * Put back the reader in the state it was before the first call
      * to next()
      */
-    function close() { return PEAR::raiseError("Reader abstract function call (close)"); }
+    function close()
+    {
+        return PEAR::raiseError("Reader abstract function call (close)");
+    }
 
     /**
      * Sends the current file to the Writer $writer
@@ -189,11 +199,15 @@ class File_Archive_Reader
     }
 
     /**
-     * Sends the whole reader to $writer and close the reader
-     * If $autoClose is true (default), $writer will be closed after the extraction
-     * Data will be sent to the reader by chunks of at most $bufferSize bytes
+     * Sends the whole reader to $writer
+     *
+     * @param File_Archive_Writer $writer Where to write the files of the reader
+     * @param bool $autoClose If true, close $writer at the end of the function.
+     *        Default value is true
+     * @param int $bufferSize Size of the chunks that will be sent to the writer
+     *        Default value is 100kB
      */
-    function extract(&$writer, $autoClose = true, $bufferSize = 102400)  //Default 100ko buffer
+    function extract(&$writer, $autoClose = true, $bufferSize = 102400)
     {
         while (($error = $this->next()) === true) {
             $filename = $this->getFilename();
@@ -223,9 +237,16 @@ class File_Archive_Reader
 
     /**
      * Extract only one file (given by the URL)
-     * This is like calling select, sendData and (if $autoClose is true) closing the writer
+     *
+     * @param string $filename URL of the file to extract from this
+     * @param File_Archive_Writer $writer Where to write the file
+     * @param bool $autoClose If true, close $writer at the end of the function
+     *        Default value is true
+     * @param int $bufferSize Size of the chunks that will be sent to the writer
+     *        Default value is 100kB
      */
-    function extractFile($filename, &$writer, $autoClose = true, $bufferSize = 102400)
+    function extractFile($filename, &$writer,
+                         $autoClose = true, $bufferSize = 102400)
     {
         if (($error = $this->select($filename)) === true) {
             $result = $this->sendData($writer, $bufferSize);
