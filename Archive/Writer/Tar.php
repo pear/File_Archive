@@ -46,11 +46,11 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
      */
     function tarHeader($filename, $stat)
     {
-        $mode = $stat[2];
-        $uid  = $stat[4];
-        $gid  = $stat[5];
+        $mode = isset($stat[2]) ? $stat[2] : 0x8000;
+        $uid  = isset($stat[4]) ? $stat[4] : 0;
+        $gid  = isset($stat[5]) ? $stat[5] : 0;
         $size = $stat[7];
-        $time = $stat[9];
+        $time = isset($stat[9]) ? $stat[9] : time();
         $link = "";
 
         if ($mode & 0x4000) {

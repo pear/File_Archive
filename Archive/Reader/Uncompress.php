@@ -100,7 +100,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         return $extension == 'tar' ||
                $extension == 'zip' ||
                $extension == 'gz' ||
-               $extension == 'tgz';
+               $extension == 'tgz' ||
+               $extension == 'tbz' ||
+               $extension == 'bz2';
     }
 
     /**
@@ -123,53 +125,58 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
 
         // Check the extension of the file (maybe we need to uncompress it?)
         $filename  = $this->source->getFilename();
+        $extensions = explode('.', strtolower($filename));
 
-        $pos = strrpos($filename, '.');
-        $extension = "";
-        if ($pos !== false) {
-            $extension = strtolower(substr($filename, $pos+1));
+        $reader =& $this->source;
+        $nbUncompressions = 0;
+
+        while(($extension = array_pop($extensions)) !== null) {
+            $nbUncompressions++;
+            unset($next);
+            switch($extension) {
+            case "tar":
+                require_once "Tar.php";
+                $next = new File_Archive_Reader_Tar($reader, $nbUncompressions == 1);
+                unset($reader); $reader =& $next;
+                break;
+            case "gz":
+            case "gzip":
+                require_once "Gzip.php";
+                $next = new File_Archive_Reader_Gzip($reader, $nbUncompressions == 1);
+                unset($reader); $reader =& $next;
+                break;
+            case "zip":
+                require_once "Zip.php";
+                $next = new File_Archive_Reader_Zip($reader, $nbUncompressions == 1);
+                unset($reader); $reader =& $next;
+                break;
+            case "bz2":
+            case "bzip2":
+                require_once "Bzip2.php";
+                $next = new File_Archive_Reader_Bzip2($reader, $nbUncompressions == 1);
+                unset($reader); $reader =& $next;
+                break;
+            case "tgz":
+                array_push($extensions, "tar", "gz");
+                break;
+            case "tbz":
+                array_push($extensions, "tar", "bz2");
+                break;
+            default:
+                $extensions = array();
+                break;
+            }
         }
-
-        switch($extension) {
-        case "tar":
-            require_once "Tar.php";
-            $this->readers[count($this->readers)] =& $this->source;
-            $next = new File_Archive_Reader_AddBaseName($filename,
-                new File_Archive_Reader_Tar($this->source, true)
-            );
-            break;
-        case "gz":
-            require_once "Gzip.php";
-            $this->readers[count($this->readers)] =& $this->source;
-            $next = new File_Archive_Reader_AddBaseName($filename,
-                new File_Archive_Reader_Gzip($this->source, true)
-            );
-            break;
-        case "zip":
-            require_once "Zip.php";
-            $this->readers[count($this->readers)] =& $this->source;
-            $next = new File_Archive_Reader_AddBaseName($filename,
-                new File_Archive_Reader_Zip($this->source, true)
-            );
-            break;
-        case "tgz":
-            require_once "Tar.php";
-            require_once "Gzip.php";
-            $this->readers[count($this->readers)] =& $this->source;
-            $next = new File_Archive_Reader_AddBaseName($filename,
-                new File_Archive_Reader_Tar(
-                    new File_Archive_Reader_Gzip(
-                        $this->source, true
-                    )
-                )
-            );
-            break;
-        default:
+        if($nbUncompressions == 1) {
             return false;
+        } else {
+            $this->readers[count($this->readers)] =& $this->source;
+            unset($this->source);
+            $this->source = new File_Archive_Reader_AddBaseName(
+                $filename, $reader
+            );
+            return true;
         }
-        unset($this->source);
-        $this->source = $next;
-        return true;
     }
     /**
      * @see File_Archive_Reader::close()

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * Uncompress a file that was compressed in the Gzip format
+ * Uncompress a file that was compressed in the Bzip2 format
  *
  * PHP versions 4 and 5
  *
@@ -32,18 +32,13 @@
 require_once "Archive.php";
 
 /**
- * Uncompress a file that was compressed in the Gzip format
+ * Uncompress a file that was compressed in the Bzip2 format
  */
-class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
+class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
 {
     var $data = null;
     var $offset = 0;
     var $alreadyRead = false;
-
-    var $name = null;
-    var $comment = null;
-    var $hasName = false;
-    var $hasComment = false;
 
     /**
      * @see File_Archive_Reader::close()
@@ -70,84 +65,20 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         }
         $this->alreadyRead = true;
 
-        $header = $this->source->getData(10);
-        if (PEAR::isError($header)) {
-            return $header;
-        }
-
-        $id = unpack("H2id1/H2id2/C1tmp/C1flags",substr($header,0,4));
-        if ($id['id1'] != "1f" || $id['id2'] != "8b") {
-            return PEAR::raiseError("Not valid gz file (wrong header)");
-        }
-
-        $temp = decbin($id['flags']);
-        $this->hasName = ($temp & 0x8);
-        $this->hasComment = ($temp & 0x4);
-
-        $this->name = "";
-        if ($this->hasName) {
-            while (($char = $this->source->getData(1)) !== "\0") {
-                if ($char === null) {
-                    return PEAR::raiseError(
-                        "Not valid gz file (unexpected end of archive ".
-                        "reading filename)"
-                    );
-                }
-                if (PEAR::isError($char)) {
-                    return $char;
-                }
-                $this->name .= $char;
-            }
-            $this->name = $this->getStandardURL($this->name);
-        } else {
-            $this->name = "gzipFile";
-        }
-        $this->comment = "";
-        if ($this->hasComment) {
-            while (($char = $this->source->getData(1)) !== "\0") {
-                if ($char === null) {
-                    return PEAR::raiseError(
-                        "Not valid gz file (unexpected end of archive ".
-                        "reading comment)"
-                    );
-                }
-                if (PEAR::isError($char)) {
-                    return $char;
-                }
-                $this->comment .= $char;
-            }
-        }
-
         $this->data = $this->source->getData();
         if (PEAR::isError($this->data)) {
             return $this->data;
         }
 
-        $temp = unpack("Vcrc32/Visize",substr($this->data,-8));
-        $crc32 = $temp['crc32'];
-        $size = $temp['isize'];
-
-        $this->data = gzinflate(substr($this->data,0,strlen($this->data)-8));
+        $this->data = bzdecompress($this->data);
         $this->offset = 0;
 
-        if ($size != strlen($this->data)) {
-            return PEAR::raiseError(
-                "Not valid gz file (size error {$size} != ".
-                strlen($this->data).")"
-            );
-        }
-        if ($crc32 != crc32($this->data)) {
-            return PEAR::raiseError("Not valid gz file (checksum error)");
-        }
         return true;
     }
     /**
      * @see File_Archive_Reader::getFilename()
      */
-    function getFilename()
-    {
-        return $this->name;
-    }
+    function getFilename() { return "bzip2File"; }
     /**
      * @see File_Archive_Reader::getStat()
      */

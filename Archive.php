@@ -72,7 +72,7 @@ class File_Archive
      *             i.txt
      * </pre>
      *
-     * readUncompress('.') will return a reader that gives access to following
+     * read('.') will return a reader that gives access to following
      * files (recursively read current dir):
      * <pre>
      * a.txt
@@ -81,7 +81,7 @@ class File_Archive
      * dir2/dir3/h.tar
      * </pre>
      *
-     * readUncompress('.', 'myBaseDir') will return the following reader:
+     * read('.', 'myBaseDir') will return the following reader:
      * <pre>
      * myBaseDir/a.txt
      * myBaseDir/b.tar
@@ -89,7 +89,7 @@ class File_Archive
      * myBaseDir/dir2/dir3/h.tar
      * </pre>
      *
-     * readUncompress('.', '', -1) will return the following reader (uncompress
+     * read('.', '', -1) will return the following reader (uncompress
      * everything)
      * <pre>
      * a.txt
@@ -100,7 +100,7 @@ class File_Archive
      * dir2/dir3/h.tar/i.txt
      * </pre>
      *
-     * readUncompress('.', '', 1) will uncompress only one level (so d.tgz will
+     * read('.', '', 1) will uncompress only one level (so d.tgz will
      * not be uncompressed):
      * <pre>
      * a.txt
@@ -110,13 +110,13 @@ class File_Archive
      * dir2/dir3/h.tar/i.txt
      * </pre>
      *
-     * readUncompress('.', '', 0, 0) will not recurse into subdirectories
+     * read('.', '', 0, 0) will not recurse into subdirectories
      * <pre>
      * a.txt
      * b.tar
      * </pre>
      *
-     * readUncompress('.', '', 0, 1) will recurse only one level in
+     * read('.', '', 0, 1) will recurse only one level in
      * subdirectories
      * <pre>
      * a.txt
@@ -124,7 +124,7 @@ class File_Archive
      * dir2/g.txt
      * </pre>
      *
-     * readUncompress('.', '', -1, 2) will uncompress everything and recurse in
+     * read('.', '', -1, 2) will uncompress everything and recurse in
      * only 2 levels in subdirectories or archives
      * <pre>
      * a.txt
@@ -134,7 +134,7 @@ class File_Archive
      * </pre>
      *
      * The recursion level is determined by the real path, not the symbolic one.
-     * So readUncompress('.', 'myBaseDir', -1, 2) will result to the same files:
+     * So read('.', 'myBaseDir', -1, 2) will result to the same files:
      * <pre>
      * myBaseDir/a.txt
      * myBaseDir/b.tar/c.txt
@@ -297,7 +297,7 @@ class File_Archive
             //Select the requested folder in the uncompress reader
             $isDir = $result->setBaseDir($std);
             if (PEAR::isError($isDir)) {
-                return PEAR::raiseError("File $URL not found");
+                return PEAR::raiseError("File $std not found");
             }
             if ($isDir && $symbolic==null) {
                 //Default symbolic name for directories is empty
@@ -655,46 +655,81 @@ class File_Archive
      * @param string $filename name of the archive file
      * @param File_Archive_Writer $innerWriter writer where the archive will be
      *        written
-     * @param string $type can be one of Tar, Gz, Tgz, Zip (default is the
-     *        extension of $filename). The case of this parameter is not
-     *        important
+     * @param string $type can be one of tgz, tbz, tar, zip, gz, gzip, bz2,
+     *        bzip2 (default is the extension of $filename) or any composition
+     *        of them (for example tar.gz or tar.bz2). The case of this
+     *        parameter is not important.
      * @param array $stat Statistics of the archive (see stat function)
      * @param bool $autoClose If set to true, $innerWriter will be closed when
      *        the returned archive is close. Default value is true.
      */
-    function toArchive($filename, &$innerWriter, $type = null,
+    function toArchive($filename, &$innerWriter = null, $type = null,
                        $stat = array(), $autoClose = true)
     {
-        if ($type == null) {
-            $dotPos = strrpos($filename, '.');
-            if ($dotPos !== false) {
-                $type = substr($filename, $dotPos+1);
-            } else {
-                return PEAR::raiseError(
-                    "Unknown archive type for $filename ".
-                    "(you should specify a third argument)");
+        if($type == null) {
+            $extensions = explode('.', strtolower($filename));
+        } else {
+            $extensions = explode('.', strtolower($type));
+        }
+        if($innerWriter != null) {
+            $writer =& $innerWriter;
+        } else {
+            $writer = File_Archive::toFiles();
+        }
+        $nbCompressions = 0;
+        while(($extension = array_pop($extensions)) !== null) {
+            unset($next);
+            switch($extension) {
+            case "tgz":
+                array_push($extensions, "tar", "gz");
+                break;
+            case "tbz":
+                array_push($extensions, "tar", "bzip2");
+                break;
+            case "tar":
+                require_once "File/Archive/Writer/Tar.php";
+                $next = new File_Archive_Writer_Tar(
+                    implode(".", $extensions).".$extension",
+                    $writer, $stat, $autoClose
+                );
+                unset($writer); $writer =& $next;
+                break;
+            case "zip":
+                require_once "File/Archive/Writer/Zip.php";
+                $next = new File_Archive_Writer_Zip(
+                    implode(".", $extensions).".$extension",
+                    $writer, $stat, $autoClose
+                );
+                unset($writer); $writer =& $next;
+                break;
+            case "gz":
+            case "gzip":
+                require_once "File/Archive/Writer/Gzip.php";
+                $next = new File_Archive_Writer_Gzip(
+                    implode(".", $extensions).".$extension",
+                    $writer, $stat, $autoClose
+                );
+                unset($writer); $writer =& $next;
+                break;
+            case "bz2":
+            case "bzip2":
+                require_once "File/Archive/Writer/Bzip2.php";
+                $next = new File_Archive_Writer_Bzip2(
+                    implode(".", $extensions).".$extension",
+                    $writer, $stat, $autoClose
+                );
+                unset($writer); $writer =& $next;
+                break;
+            default:
+                if($type !== null || $nbCompressions == 0) {
+                    return PEAR::raiseError("Archive $extension unknown");
+                }
+                break;
             }
+            $nbCompressions ++;
+            $autoClose = true;
         }
-        $type = ucfirst($type);
-        if ($type == "Gz") {
-            $type = "Gzip";
-        }
-        switch($type) {
-        case "Tgz":
-            require_once "File/Archive/Writer/Tar.php";
-            require_once "File/Archive/Writer/Gzip.php";
-            return new File_Archive_Writer_Tar("$filename.tar",
-                new File_Archive_Writer_Gzip($filename, $innerWriter, $stat),
-                $stat, $autoClose);
-        case "Tar":
-        case "Zip":
-        case "Gzip":
-            require_once "File/Archive/Writer/$type.php";
-            $class = "File_Archive_Writer_$type";
-            return new $class($filename, $innerWriter, $stat, $autoClose);
-        default:
-            return PEAR::raiseError("Extension $type unknown");
-        }
+        return $writer;
     }
 }
 

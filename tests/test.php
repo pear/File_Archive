@@ -236,6 +236,7 @@ class Test extends PHPUnit_TestCase
         $filename = "test.$extension";
 
         $source = File_Archive::read('test.php');
+
         $source->extract(
             File_Archive::toArchive(
                 $filename,
@@ -254,10 +255,11 @@ class Test extends PHPUnit_TestCase
     function testZip() { $this->_testArchive('zip'); }
     function testGzip() { $this->_testArchive('gz'); }
     function testTgz() { $this->_testArchive('tgz'); }
+    function testBzip2() { $this->_testArchive('bz2');}
     function testWriteZip()
     {
         //Build the writer
-        $writer = File_Archive::toArchive('example1.zip', File_Archive::toFiles());
+        $writer = File_Archive::toArchive('example1.tar.bz2');
 
         //Write the list of even number in [0..999]
         $writer->newFile("even.txt");

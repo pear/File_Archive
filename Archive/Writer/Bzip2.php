@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * Compress a single file to Gzip format
+ * Compress a single file to Bzip2 format
  *
  * PHP versions 4 and 5
  *
@@ -32,22 +32,11 @@
 require_once "MemoryArchive.php";
 
 /**
- * Compress a single file to Gzip format
+ * Compress a single file to Bzip2 format
  */
-class File_Archive_Writer_Gzip extends File_Archive_Writer_MemoryArchive
+class File_Archive_Writer_Bzip2 extends File_Archive_Writer_MemoryArchive
 {
-    var $comment = "";
-    var $compressionLevel = 9;
-
-    /**
-     * The Gzip file format allows a comment to be put at the end of the file
-     * By default, no comments are put there
-     * You can change this by calling setComment
-     *
-     * @param string $comment
-     */
-    function setComment($comment) { $this->comment = $comment; }
-
+    var $compressionLevel=9;
     /**
      * Set the compression level
      *
@@ -64,15 +53,8 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer_MemoryArchive
      */
     function appendFileData($filename, $stat, $data)
     {
-        $flags = (empty($this->comment)? 0 : 16) + (empty($filename)? 0 : 8);
-        $mtime = isset($stat[9]) ? $stat[9] : time();
-
         return $this->innerWriter->writeData(
-            pack("C1C1C1C1VC1C1",0x1f,0x8b,8,$flags,$mtime,2,0xFF).
-            (empty($filename) ? "" : $filename."\0").
-            (empty($this->comment) ? "" : $this->comment."\0").
-            gzdeflate($data, $this->compressionLevel).
-            pack("VV",crc32($data),strlen($data))
+            bzcompress($data, $this->compressionLevel)
         );
     }
 }
