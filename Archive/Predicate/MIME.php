@@ -57,12 +57,13 @@ class File_Archive_Predicate_MIME extends File_Archive_Predicate
      */
     function isTrue(&$source)
     {
-        foreach($mimes as $mime)
+        $sourceMIME = $source->getMIME();
+        foreach($this->mimes as $mime)
         {
             if(MIME_Type::isWildcard($mime)) {
-                $result = MIME_Type::wildcardMatch($mime, $source->getMIME());
+                $result = MIME_Type::wildcardMatch($mime, $sourceMIME);
             } else {
-                $result = ($mime == $source->getMIME());
+                $result = ($mime == $sourceMIME);
             }
             if($result !== false) {
                 return $result;

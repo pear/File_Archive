@@ -108,7 +108,7 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::getMime()
      */
-    function getMime() { return $this->mime!=null ? $this->mime : parent::getMime(); }
+    function getMime() { return $this->mime==null ? parent::getMime() : $this->mime; }
 
     /**
      * @see File_Archive_Reader::getData()

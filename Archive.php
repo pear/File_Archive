@@ -289,7 +289,7 @@ class File_Archive
     /**
      * @see File_Archive_Reader_Memory
      */
-    function readMemory($memory, $filename, $stat=array(), $mime="application/octet-stream")
+    function readMemory($memory, $filename, $stat=array(), $mime=null)
     {
         require_once "File/Archive/Reader/Memory.php";
         return new File_Archive_Reader_Memory($memory, $filename, $stat, $mime);
@@ -486,7 +486,7 @@ class File_Archive
     /**
      * @param string $filename name of the archive file
      * @param File_Archive_Writer $innerWriter writer where the archive will be written
-     * @param string $type can be one of Tar, Gz, Gzip, Tgz, Zip (default is the extension of $filename)
+     * @param string $type can be one of Tar, Gz, Tgz, Zip (default is the extension of $filename)
      *        The case of this parameter is not important
      * @param array $stat Statistics of the archive (see stat function)
      * @param bool $autoClose If set to true, $innerWriter will be closed when the returned archive is close
@@ -503,6 +503,9 @@ class File_Archive
             }
         }
         $type = ucfirst($type);
+        if($type == "Gz") {
+            $type = "Gzip";
+        }
         switch($type)
         {
         case "Tgz":
@@ -513,7 +516,6 @@ class File_Archive
                     $stat, $autoClose);
         case "Tar":
         case "Zip":
-        case "Gz":
         case "Gzip":
             require_once "File/Archive/Writer/$type.php";
             $class = "File_Archive_Writer_$type";

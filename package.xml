@@ -39,6 +39,7 @@
       <file>Extension.php</file>
       <file>False.php</file>
       <file>MaxDepth.php</file>
+      <file>MIME.php</file>
       <file>MinSize.php</file>
       <file>MinTime.php</file>
       <file>Not.php</file>
