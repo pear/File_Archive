@@ -100,7 +100,11 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
             }
             $this->name = $this->getStandardURL($this->name);
         } else {
-            $this->name = "gzipFile";
+            $this->name = $this->source->getFilename();
+            $pos = strrpos($name, ".");
+            if ($pos !== false && $pos !== 0) {
+                $this->name = substr($this->name, 0, $pos);
+            }
         }
         $this->comment = "";
         if ($this->hasComment) {

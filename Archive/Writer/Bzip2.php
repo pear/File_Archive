@@ -49,6 +49,26 @@ class File_Archive_Writer_Bzip2 extends File_Archive_Writer_MemoryArchive
     }
 
     /**
+     * @see File_Archive_Writer::newFile()
+     *
+     * Check that one single file is written in the BZip2 archive
+     */
+    function newFile($filename, $stat = array(),
+                     $mime = "application/octet-stream")
+    {
+        $result = parent::newFile($filename, $stat, $mime);
+        if ($result !== true) {
+            return $result;
+        }
+        if($this->nbFiles > 1) {
+            return PEAR::raiseError("A Bzip2 archive can only contain one single file.".
+                                    "Use Tbz archive to be able to write several files");
+        }
+        return true;
+    }
+
+
+    /**
      * @see File_Archive_Writer_MemoryArchive::appendFileData()
      */
     function appendFileData($filename, $stat, $data)

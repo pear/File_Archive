@@ -76,9 +76,21 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
         return true;
     }
     /**
+     * Return the name of the single file contained in the archive
+     * deduced from the name of the archive (the extension is removed)
+     *
      * @see File_Archive_Reader::getFilename()
      */
-    function getFilename() { return "bzip2File"; }
+    function getFilename()
+    {
+        $name = $this->source->getFilename();
+        $pos = strrpos($name, ".");
+        if ($pos === false || $pos === 0) {
+            return $name;
+        } else {
+            return substr($name, 0, $pos);
+        }
+    }
     /**
      * @see File_Archive_Reader::getStat()
      */
