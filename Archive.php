@@ -182,7 +182,7 @@ class File_Archive
             $realSymbolic = $symbolic;
         }
 
-        if (empty($URL) || is_dir($URL) && $source == null) {
+        if ((empty($URL) || is_dir($URL)) && $source == null) {
             require_once "File/Archive/Reader/Directory.php";
 
             $result = new File_Archive_Reader_Uncompress(
