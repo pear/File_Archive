@@ -331,7 +331,7 @@ class File_Archive
         return new File_Archive_Reader_Filter($predicate, $source);
     }
     /**
-     * @see File_Archive_Predicat_True
+     * @see File_Archive_Predicate_True
      */
     function predTrue()
     {
@@ -339,7 +339,7 @@ class File_Archive
         return new File_Archive_Predicate_True();
     }
     /**
-     * @see File_Archive_Predicat_False
+     * @see File_Archive_Predicate_False
      */
     function predFalse()
     {
@@ -347,7 +347,7 @@ class File_Archive
         return new File_Archive_Predicate_False();
     }
     /**
-     * @see File_Archive_Predicat_And
+     * @see File_Archive_Predicate_And
      */
     function predAnd()
     {
@@ -359,7 +359,7 @@ class File_Archive
         return $pred;
     }
     /**
-     * @see File_Archive_Predicat_Or
+     * @see File_Archive_Predicate_Or
      */
     function predOr()
     {
@@ -371,7 +371,7 @@ class File_Archive
         return $pred;
     }
     /**
-     * @see File_Archive_Predicat_Not
+     * @see File_Archive_Predicate_Not
      */
     function predNot($pred)
     {
@@ -379,7 +379,7 @@ class File_Archive
         return new File_Archive_Predicate_Not($pred);
     }
     /**
-     * @see File_Archive_Predicat_MinSize
+     * @see File_Archive_Predicate_MinSize
      */
     function predMinSize($size)
     {
@@ -387,7 +387,7 @@ class File_Archive
         return new File_Archive_Predicate_MinSize($size);
     }
     /**
-     * @see File_Archive_Predicat_MinTime
+     * @see File_Archive_Predicate_MinTime
      */
     function predMinTime($time)
     {
@@ -395,7 +395,7 @@ class File_Archive
         return new File_Archive_Predicate_MinTime($time);
     }
     /**
-     * @see File_Archive_Predicat_MaxDepth
+     * @see File_Archive_Predicate_MaxDepth
      */
     function predMaxDepth($depth)
     {
@@ -403,7 +403,7 @@ class File_Archive
         return new File_Archive_Predicate_MaxDepth($depth);
     }
     /**
-     * @see File_Archive_Predicat_Extension
+     * @see File_Archive_Predicate_Extension
      */
     function predExtension($list)
     {
@@ -411,7 +411,15 @@ class File_Archive
         return new File_Archive_Predicate_Extension($list);
     }
     /**
-     * @see File_Archive_Predicat_Ereg
+     * @see File_Archive_Predicate_MIME
+     */
+    function predMIME($list)
+    {
+        require_once "File/Archive/Predicate/MIME.php";
+        return new File_Archive_Predicate_MIME($list);
+    }
+    /**
+     * @see File_Archive_Predicate_Ereg
      */
     function predEreg($ereg)
     {
@@ -419,7 +427,7 @@ class File_Archive
         return new File_Archive_Predicate_Ereg($ereg);
     }
     /**
-     * @see File_Archive_Predicat_Eregi
+     * @see File_Archive_Predicate_Eregi
      */
     function predEregi($ereg)
     {
@@ -427,7 +435,7 @@ class File_Archive
         return new File_Archive_Predicate_Eregi($ereg);
     }
     /**
-     * @see File_Archive_Predicat_Custom
+     * @see File_Archive_Predicate_Custom
      */
     function predCustom($expression)
     {

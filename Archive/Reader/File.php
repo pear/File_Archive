@@ -30,6 +30,7 @@
  */
 
 require_once "File/Archive/Reader.php";
+require_once "MIME/Type.php";
 
 /**
  * Reader that represents a single file
@@ -144,8 +145,18 @@ class File_Archive_Reader_File extends File_Archive_Reader
         return $this->stat;
     }
 
-    //TODO: use the PEAR library to find the MIME extension of the file
-    // function getMime()
+    /**
+     * @see File_Archive_Reader::getMime
+     */
+    function getMime()
+    {
+        $result = MIME_Type::autoDetect($this->getFilename());
+        if(PEAR::isError($result)) {
+            return parent::getMime();
+        } else {
+            return $result;
+        }
+    }
 
     /**
      * @see File_Archive_Reader::getData()
