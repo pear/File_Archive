@@ -206,7 +206,7 @@ class File_Archive
             do
             {
                 if($pos == strlen($realPath)) {
-                    return new File_Archive_Reader_File($std, $symbolic);
+                    return new File_Archive_Reader_File($std, $realSymbolic);
                 }
 
                 $pos = strpos($realPath, '/', $pos+1);
