@@ -256,15 +256,25 @@ class Test extends PHPUnit_TestCase
     function testTgz() { $this->_testArchive('tgz'); }
     function testWriteZip()
     {
-        $source = File_Archive::readMulti();
-        $source->addSource(File_Archive::read('test.php'));
-        $source->addSource(File_Archive::readMemory("This is a dynamic file put in the ZIP archive", "dynamic.txt"));
-        $source->extract(
-            File_Archive::toArchive('test.zip',
-                File_Archive::toFiles()
-            )
-        );
-        $source->close();
+        //Build the writer
+        $writer = File_Archive::toArchive('example1.zip', File_Archive::toFiles());
+
+        //Write the list of even number in [0..999]
+        $writer->newFile("even.txt");
+        for($i=0; $i<1000; $i+=2)
+        {
+            $writer->writeData("$i\n");
+        }
+
+        //Write the list of odd number in [0..999]
+        $writer->newFile("odd.txt");
+        for($i=1; $i<1000; $i+=2)
+        {
+            $writer->writeData("$i\n");
+        }
+
+        //Close the writer
+        $writer->close();
     }
 
     function testMultiWriter()

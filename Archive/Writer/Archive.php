@@ -40,13 +40,13 @@ class File_Archive_Writer_Archive extends File_Archive_Writer
      * @var File_Archive_Writer The compressed data will be written to this writer
      * @access private
      */
-    var $innerWriter = NULL;
+    var $innerWriter;
 
     /**
      * @var bool If true, the innerWriter will be closed when closing this
      * @access private
      */
-    var $autoClose = TRUE;
+    var $autoClose;
 
     /**
      * @param String $filename Name to give to the archive (the name will probably be used by the inner writer)

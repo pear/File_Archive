@@ -203,8 +203,7 @@ class File_Archive
             $realPath = isset($parsedURL['path']) ? $parsedURL['path'] : '';
 
             $pos = 0;
-            do
-            {
+            do {
                 if($pos == strlen($realPath)) {
                     return new File_Archive_Reader_File($std, $realSymbolic);
                 }
@@ -303,8 +302,7 @@ class File_Archive
     {
         require_once "File/Archive/Reader/Multi.php";
         $result = new File_Archive_Reader_Multi();
-        foreach($sources as $index => $foo)
-        {
+        foreach($sources as $index => $foo) {
             if(is_string($sources[index])) {
                 $result->addSource(File_Archive::read($sources[index]));
             } else {
@@ -366,8 +364,9 @@ class File_Archive
         require_once "File/Archive/Predicate/Or.php";
         $pred = new File_Archive_Predicate_Or();
         $args = func_get_args();
-        foreach($args as $p)
+        foreach($args as $p) {
             $pred->addPredicate($p);
+        }
         return $pred;
     }
     /**
@@ -506,8 +505,7 @@ class File_Archive
         if($type == "Gz") {
             $type = "Gzip";
         }
-        switch($type)
-        {
+        switch($type) {
         case "Tgz":
             require_once "File/Archive/Writer/Tar.php";
             require_once "File/Archive/Writer/Gzip.php";

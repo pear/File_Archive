@@ -62,8 +62,7 @@ class File_Archive_Reader
 
         //TODO: not very efficient: close and re open the archive to start from the begining
         $this->close();
-        while($this->next())
-        {
+        while($this->next()) {
             if($this->getFilename() == $std)
                 return true;
         }
@@ -80,10 +79,11 @@ class File_Archive_Reader
         $std = str_replace("\\", "/", $path);
         while($std != ($std = preg_replace("/[^\/:?]+\/\.\.\//", "", $std))) ;
         $std = str_replace("/./", "", $std);
-        if(strncmp($std, "./", 2) == 0)
+        if(strncmp($std, "./", 2) == 0) {
             return substr($std, 2);
-        else
+        } else {
             return $std;
+        }
     }
 
     /**
@@ -156,9 +156,9 @@ class File_Archive_Reader
     function sendData(&$writer, $bufferSize = 102400)
     {
         $filename = $this->getDataFilename();
-        if($filename !== NULL)
+        if($filename !== NULL) {
             $writer->writeFile($filename);
-        else {
+        } else {
             while(($data = $this->getData($bufferSize)) !== null)
                 $writer->writeData($data);
         }
@@ -171,8 +171,7 @@ class File_Archive_Reader
      */
     function extract(&$writer, $autoClose = true, $bufferSize = 102400)  //Default 100ko buffer
     {
-        while(($error = $this->next()) === true)
-        {
+        while(($error = $this->next()) === true) {
             $filename = $this->getFilename();
             $stat = $this->getStat();
 

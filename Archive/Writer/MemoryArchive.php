@@ -76,7 +76,7 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
     /**
      * @see File_Archive_Writer::newFile
      */
-    function newFile($filename, $stat, $mime = "application/octet-stream")
+    function newFile($filename, $stat=array(), $mime = "application/octet-stream")
     {
         if($this->nbFiles == 0) {
             $this->sendHeader();

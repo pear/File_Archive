@@ -122,8 +122,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
             $extension = strtolower(substr($filename, $pos+1));
         }
 
-        switch($extension)
-        {
+        switch($extension) {
         case "tar":
             require_once "Tar.php";
             $this->readers[count($this->readers)] =& $this->source;
@@ -157,7 +156,8 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
                 )
             );
             break;
-        default: return false;
+        default:
+            return false;
         }
         unset($this->source);
         $this->source = $next;
@@ -172,13 +172,10 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
             $this->currentFileDisplayed = true;
             return true;
         }
-        while(true)
-        {
+        while(true) {
             //Remove the readers we have completly read from the stack
-            do
-            {
-                while(! $this->source->next())
-                {
+            do {
+                while(! $this->source->next()) {
                     if(empty($this->readers)) {
                         return false;
                     }
@@ -208,8 +205,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
                 $this->baseDirCompressionLevel = count($this->readers);
             }
 
-            if(! $this->push())
+            if(! $this->push()) {
                 return true;
+            }
         }
     }
     /**
@@ -221,9 +219,6 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     {
         $this->baseDirUncompressionLevel = null;
         $this->baseDir = $baseDir;
-/*        if(substr($this->baseDir,-1)=='/') {
-            $this->baseDir=substr($this->baseDir, 0, -1);
-        } */
 
         if(! $this->next()) {
             return PEAR::raiseError("No directory $baseDir in inner reader");
@@ -240,8 +235,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
 
         $this->close();
 
-        while($this->source->next())
-        {
+        while($this->source->next()) {
             $currentFilename = $this->source->getFilename().'/';
             $compLength = min(strlen($currentFilename), strlen($filename));
             if( strncmp($currentFilename, $std, $compLength) == 0 ) {

@@ -66,8 +66,7 @@ class File_Archive_Writer
     function writeFile($filename)
     {
         $handle = fopen($filename, "r");
-        while(!feof($handle))
-        {
+        while(!feof($handle)) {
             $this->writeData(fread($handle, 102400));
         }
         fclose($handle);

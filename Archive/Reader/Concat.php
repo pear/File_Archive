@@ -52,8 +52,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
 
         //Compute the total length
         $this->stat[7] = 0;
-        while($source->next())
-        {
+        while($source->next()) {
             $sourceStat = $source->getStat();
             $this->stat[7] += $sourceStat[7];
         }
@@ -95,8 +94,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
         }
 
         $result = '';
-        while($length == -1 || strlen($result)<$length)
-        {
+        while($length == -1 || strlen($result)<$length) {
             $sourceData = $this->source->getData($length==-1 ? -1 : $length - strlen($result));
 
             if(PEAR::isError($sourceData)) {
@@ -123,8 +121,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
     function skip($length)
     {
         $skipped = 0;
-        while($skipped < $length)
-        {
+        while($skipped < $length) {
             $sourceSkipped = $this->source->skip($length);
             if(PEAR::isError($sourceSkipped)) {
                 return $skipped;

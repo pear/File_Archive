@@ -56,8 +56,7 @@ class File_Archive_Reader_Filter extends File_Archive_Reader_Relay
      */
     function next()
     {
-        do
-        {
+        do {
             $error = $this->source->next();
             if($error !== true) {
                 return $error;

@@ -72,8 +72,7 @@ class File_Archive_Predicate_And extends File_Archive_Predicate
      */
     function isTrue(&$source)
     {
-        foreach($this->preds as $p)
-        {
+        foreach($this->preds as $p) {
             if(!$p->isTrue($source)) {
                 return false;
             }

@@ -139,8 +139,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             return false;
         }
 
-        do
-        {
+        do {
             $result = $this->nextWithFolders();
             if($result !== true) {
                 return $result;

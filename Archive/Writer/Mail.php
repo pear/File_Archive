@@ -168,7 +168,7 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
                 $headers,
                 $body)
           ) {
-            die("Error sending mail");
+            return PEAR::raiseError("Error sending mail");
         }
     }
 }

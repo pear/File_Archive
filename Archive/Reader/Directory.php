@@ -87,8 +87,7 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
             $this->directoryHandle = opendir($this->directory);
 
         while($this->source == null ||
-             !$this->source->next())
-        {
+             !$this->source->next()) {
             $file = readdir($this->directoryHandle);
             if($file == '.' || $file == '..') {
                 continue;
