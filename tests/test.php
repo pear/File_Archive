@@ -56,7 +56,6 @@ class Test extends PHPUnit_TestCase
         $reader = File_Archive::read("http://poocl.la-grotte.org/downloads/PEAR2/poocl.tar/File/Archive.php");
         $this->assertTrue($reader->next());
         $data = $reader->getData();
-        echo htmlentities($data);
         $reader->close();
     }
     function testMultiReader()

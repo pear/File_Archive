@@ -43,12 +43,13 @@ require_once "PEAR.php";
 class File_Archive
 {
     /**
-     * Returns a reader to read the URL $URL
+     * Create a reader to read the URL $URL
      * If the URL is a directory, it will recursively read that directory
      * If $uncompressionLevel is not null, the archives (files with extension tar, zip, gz or tgz) will
      *  be considered as directories (up to a depth of $uncompressionLevel if $uncompressionLevel > 0)
      * The reader will only read files with a directory depth of $directoryDepth
-     * The reader will replace the given URL ($directory) with $symbolic in the public filenames
+     * The reader will replace the given URL ($URL) with $symbolic in the public filenames
+     * The default symbolic name will be the last filename in the URL (or '' for directories)
      *
      * Examples:
      * Considere the following file system
@@ -133,15 +134,17 @@ class File_Archive
      * myBaseDir/dir2/g.txt
      * </pre>
      *
-     * To read a single file, you can do read("a.txt", "public_name.txt")
-     * Take care that if no public name is provided, the default one is empty
+     * To read a single file, you can do read('a.txt', 'public_name.txt')
+     * If no public name is provided, the default one is the name of the file
+     * read('dir2/g.txt') contains the single file named 'g.txt'
+     * read('b.tar/c.txt') contains the single file named 'c.txt'
      *
      * Note: This function uncompress files reading their extension
      *       The compressed files must have a tar, zip, gz or tgz extension
      *       Since it is impossible for some URLs to use is_dir or is_file, this function may not work with
      *       URLs containing folders which name ends with such an extension
      */
-    function read($URL, $symbolic='', $uncompression = 0, $directoryDepth = -1)
+    function read($URL, $symbolic=null, $uncompression = 0, $directoryDepth = -1)
     {
         require_once "File/Archive/Reader/Uncompress.php";
         require_once "File/Archive/Reader/ChangeName.php";
@@ -154,6 +157,17 @@ class File_Archive
 
         //Find the first file in $directory
         $std = File_Archive_Reader::getStandardURL($URL);
+        if($symbolic == null) {
+            $slashPos = strrpos($std, '/');
+            if($slashPos === false) {
+                $realSymbolic = '';
+            } else {
+                $realSymbolic = substr($std, $slashPos+1);
+            }
+        } else {
+            $realSymbolic = $symbolic;
+        }
+
         if(is_dir($URL)) {
             require_once "File/Archive/Reader/Directory.php";
 
@@ -171,9 +185,9 @@ class File_Archive
                 unset($result);
                 $result =& $tmp;
             }
-            if(!empty($symbolic)) {
+            if(!empty($realSymbolic)) {
                 $tmp = new File_Archive_Reader_AddBaseName(
-                    $symbolic,
+                    $realSymbolic,
                     $result
                 );
                 unset($result);
@@ -181,7 +195,7 @@ class File_Archive
             }
         } else if(is_file($URL)) {
             require_once "File/Archive/Reader/File.php";
-            return new File_Archive_Reader_File($URL, $symbolic);
+            return new File_Archive_Reader_File($URL, $realSymbolic);
         } else {
             require_once "File/Archive/Reader/File.php";
 
@@ -241,9 +255,12 @@ class File_Archive
                 new File_Archive_Reader_File($file),
                 $uncompressionLevel
             );
-            $error = $result->setBaseDir($std);
-            if(PEAR::isError($error)) {
+            $isDir = $result->setBaseDir($std);
+            if(PEAR::isError($isDir)) {
                 return PEAR::raiseError("File $URL not found");
+            }
+            if($isDir && $symbolic==null) {
+                $realSymbolic = '';
             }
 
             if($directoryDepth >= 0) {
@@ -257,10 +274,10 @@ class File_Archive
                 $result =& $tmp;
             }
 
-            if($std != $symbolic) {
+            if($std != $realSymbolic) {
                 $tmp = new File_Archive_Reader_ChangeBaseName(
                     $std,
-                    $symbolic,
+                    $realSymbolic,
                     $result
                 );
                 unset($result);

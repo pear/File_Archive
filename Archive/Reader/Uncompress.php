@@ -201,6 +201,8 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     }
     /**
      * Efficiently filter out the files which URL does not start with $baseDir
+     * Throws an error if the $baseDir can't be found
+     * @return bool Whether baseDir was a directory or a file
      */
     function setBaseDir($baseDir)
     {
@@ -211,6 +213,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
             return PEAR::raiseError("No directory $baseDir in inner reader");
         }
         $this->currentFileDisplayed = false;
+        return strlen($this->getFilename())>strlen($baseDir);
     }
     /**
      * @see File_Archive_Reader::select()
