@@ -46,10 +46,12 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
 
     /**
      * Retrieve the concatenated data
+     * The value is returned by reference for performance problems, but you should
+     * not manually modify it
      *
      * @return string buffer
      */
-    function getData() { return $this->data; }
+    function &getData() { return $this->data; }
 
     /**
      * Clear the buffer

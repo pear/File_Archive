@@ -68,12 +68,16 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     var $alreadyRead = false;
 
     /**
-     * $memory is the content of the file. The content should not be changer after the constructor
-     * $filename and $stat are the caracteristics of the file contained in the reader
+     * @param string $memory is the content of the file.
+     *               This parameter is passed as a reference for performance reasons
+     *               The content should not be changer after the constructor
+     * @param string $filename is the name of the file
+     * @param array  $stat are the statistics of the file. The size will be recomputed from $memory
+     * @param string $mime is the mime type of the file
      */
-    function File_Archive_Reader_Memory($memory, $filename, $stat=array(), $mime="application/octet-stream")
+    function File_Archive_Reader_Memory(&$memory, $filename, $stat=array(), $mime="application/octet-stream")
     {
-        $this->memory = $memory;
+        $this->memory = &$memory;
         $this->filename = $this->getStandardURL($filename);
         $this->stat = $stat;
         $this->stat[7] = strlen($this->memory);
