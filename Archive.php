@@ -182,6 +182,7 @@ class File_Archive
             $realSymbolic = $symbolic;
         }
 
+        //If the URL can be interpreted as a directory, and we are reading from the file system
         if ((empty($URL) || is_dir($URL)) && $source == null) {
             require_once "File/Archive/Reader/Directory.php";
 
@@ -207,28 +208,28 @@ class File_Archive
                 unset($result);
                 $result =& $tmp;
             }
+
+        //If the URL can be interpreted as a file, and we are reading from the file system
         } else if (is_file($URL) && substr($URL, -1)!='/' && $source == null) {
             require_once "File/Archive/Reader/File.php";
             return new File_Archive_Reader_File($URL, $realSymbolic);
+
+        //Else, we will have to build a complex reader
         } else {
             require_once "File/Archive/Reader/File.php";
 
             $parsedURL = parse_url($std);
             $realPath = isset($parsedURL['path']) ? $parsedURL['path'] : '';
 
+            // Try to find a file with a known extension in the path (
+            // (to manage URLs like archive.tar/directory/file)
             $pos = 0;
             do {
-                if ($pos == strlen($realPath)) {
-                    if($source == null) {
-                        return new File_Archive_Reader_File(
-                                            $std, $realSymbolic);
-                    } else {
-                        $file = ($realPath == '.' ? '' : $realPath);
-                        break;
-                    }
+                if($pos+1<strlen($realPath)) {
+                    $pos = strpos($realPath, '/', $pos+1);
+                } else {
+                    $pos = false;
                 }
-
-                $pos = strpos($realPath, '/', $pos+1);
                 if ($pos === false) {
                     $pos = strlen($realPath);
                 }
@@ -239,10 +240,12 @@ class File_Archive
                 if ($dotPos !== false) {
                     $extension = substr($file, $dotPos+1);
                 }
-            } while (
-                !File_Archive_Reader_Uncompress::isKnownExtension($extension) ||
-                (is_dir($file) && $source==null));
+            } while ($pos < strlen($realPath) &&
+                (!File_Archive_Reader_Uncompress::isKnownExtension($extension) ||
+                 (is_dir($file) && $source==null)));
 
+            //Build the URL back, with the new path to a file with an archive extension
+            // or to a file / directory is is_file / is_dir cant be used (HTTP, or $source != null)
             $parsedURL['path'] = $file;
             $file = '';
 
@@ -271,13 +274,16 @@ class File_Archive
                 $file .= '#'.$parsedURL['fragment'];
             }
 
-            // Build the reader
+            //If we are reading from the file system
             if($source == null) {
+                //Create a file reader
                 $result = new File_Archive_Reader_Uncompress(
                             new File_Archive_Reader_File($file),
                             $uncompressionLevel
                           );
             } else {
+                //Select in the source the file $file
+
                 require_once "File/Archive/Reader/Filter.php";
                 require_once "File/Archive/Predicate/Select.php";
                 $result = new File_Archive_Reader_Uncompress(
@@ -288,15 +294,18 @@ class File_Archive
                             $uncompressionLevel
                           );
             }
+            //Select the requested folder in the uncompress reader
             $isDir = $result->setBaseDir($std);
             if (PEAR::isError($isDir)) {
                 return PEAR::raiseError("File $URL not found");
             }
             if ($isDir && $symbolic==null) {
+                //Default symbolic name for directories is empty
                 $realSymbolic = '';
             }
 
             if ($directoryDepth >= 0) {
+                //Limit the maximum depth if necessary
                 require_once "File/Archive/Predicate/MaxDepth.php";
 
                 $tmp = new File_Archive_Reader_Filter(
@@ -311,6 +320,7 @@ class File_Archive
             }
 
             if ($std != $realSymbolic) {
+                //Change the base name to the symbolic one if necessary
                 $tmp = new File_Archive_Reader_ChangeBaseName(
                     $std,
                     $realSymbolic,
