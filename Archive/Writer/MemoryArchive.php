@@ -192,7 +192,10 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
      */
     function appendFile($filename, $dataFilename)
     {
-        return $this->appendFileData($filename, stat($dataFilename), file_get_contents($dataFilename));
+        return $this->appendFileData(
+                            $filename,
+                            stat($dataFilename),
+                            file_get_contents($dataFilename));
     }
 }
 

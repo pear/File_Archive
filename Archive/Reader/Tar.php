@@ -126,7 +126,9 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
             7 => octdec($header['size']),
             9 => octdec($header['mtime'])
             );
-        $this->currentFilename = $this->getStandardURL($header['path'].$header['filename']);
+        $this->currentFilename = $this->getStandardURL(
+                        $header['path'] . $header['filename']
+                    );
 
         $this->leftLength = $this->currentStat[7];
         if ($this->leftLength % 512 == 0) {

@@ -94,7 +94,15 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
         $filename = preg_replace("/^(\.{1,2}(\/|\\\))+/","",$filename);
 
         $mtime = (isset($stat[9])? getdate($stat[9]) : getdate());
-        $mtime = preg_replace("/(..){1}(..){1}(..){1}(..){1}/","\\x\\4\\x\\3\\x\\2\\x\\1",dechex(($mtime['year']-1980<<25)|($mtime['mon']<<21)|($mtime['mday']<<16)|($mtime['hours']<<11)|($mtime['minutes']<<5)|($mtime['seconds']>>1)));
+        $mtime = preg_replace(
+                     "/(..){1}(..){1}(..){1}(..){1}/",
+                     "\\x\\4\\x\\3\\x\\2\\x\\1",
+                     dechex(($mtime['year']-1980<<25)|
+                            ($mtime['mon'    ]<<21)|
+                            ($mtime['mday'   ]<<16)|
+                            ($mtime['hours'  ]<<11)|
+                            ($mtime['minutes']<<5)|
+                            ($mtime['seconds']>>1)));
         eval('$mtime = "'.$mtime.'";');
 
         $crc32 = crc32($data);
@@ -105,7 +113,12 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
 
         $zipData = "\x50\x4b\x03\x04\x14\x00\x00\x00\x08\x00".
                    $mtime.
-                   pack("VVVvv",$crc32,$complength,$normlength,strlen($filename),0x00).
+                   pack("VVVvv",
+                        $crc32,
+                        $complength,
+                        $normlength,
+                        strlen($filename),
+                        0x00).
                    $filename.
                    $data;
 

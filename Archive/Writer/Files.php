@@ -55,11 +55,15 @@ class File_Archive_Writer_Files extends File_Archive_Writer
 
         // Ensure a file does not already exist with the same name
         if (is_file($pathname)) {
-            return PEAR::raiseError("File $pathname exists, unable to create directory");
+            return PEAR::raiseError(
+                "File $pathname exists, unable to create directory"
+            );
         }
 
         // Crawl up the directory tree
-        $next_pathname = substr($pathname, 0, strrpos($pathname, DIRECTORY_SEPARATOR));
+        $next_pathname = substr(
+                    $pathname,
+                    0, strrpos($pathname, DIRECTORY_SEPARATOR));
         if (($error = $this->mkdirr($next_pathname)) === true) {
             if (!mkdir($pathname)) {
                 return PEAR::raiseError("Unable to create directory $pathname");

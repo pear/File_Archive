@@ -139,7 +139,9 @@ class File_Archive_Reader_File extends File_Archive_Reader
 
                 //Put the whole file content in memory
                 require_once "Memory.php";
-                $this->memory = new File_Archive_Reader_Memory($this->getData(), $this->symbolic);
+                $this->memory = new File_Archive_Reader_Memory(
+                                        $this->getData(),
+                                        $this->symbolic);
 
                 $this->stat = $this->memory->getStat();
                 $this->stat = array(7 => $this->stat[7] + $alreadyRead);

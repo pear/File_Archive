@@ -82,9 +82,11 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
 
     /**
      * @param Mail $mail Object used to send mail (see Mail::factory)
-     * @param Array or String $to An array or a string with comma separated recipients
-     * @param Array $headers The headers that will be passed to the Mail_mime object
-     * @param String $message Text body of the mail
+     * @param array or string $to An array or a string with comma separated
+     *        recipients
+     * @param array $headers The headers that will be passed to the Mail_mime
+     *        object
+     * @param string $message Text body of the mail
      */
     function File_Archive_Writer_Mail($to, $headers, $message, &$mail = null)
     {
@@ -113,7 +115,8 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
     /**
      * @see Mail_Mime::addHTMLImage()
      */
-    function addHTMLImage($file, $c_type = 'application/octet-stream', $name = '', $isfile = true)
+    function addHTMLImage($file, $c_type = 'application/octet-stream',
+                          $name = '', $isfile = true)
     {
         return $this->mime->addHTMLImage($file, $c_type, $name, $isfile);
     }
@@ -138,7 +141,11 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
             return;
         }
 
-        $error = $this->mime->addAttachment($this->currentData, $this->currentMime, $this->currentFilename, false);
+        $error = $this->mime->addAttachment(
+                        $this->currentData,
+                        $this->currentMime,
+                        $this->currentFilename,
+                        false);
         $this->currentData = "";
         return $error;
     }

@@ -37,13 +37,14 @@ require_once "File/Archive/Reader.php";
 class File_Archive_Reader_Archive extends File_Archive_Reader
 {
     /**
-     * @var File_Archive_Reader Single file source that contains the archive to uncompress
+     * @var    File_Archive_Reader Single file source that contains the archive
+     *         to uncompress
      * @access protected
      */
     var $source = null;
 
     /**
-     * @var bool Indicate whether the $source is currently opened
+     * @var    bool Indicate whether the $source is currently opened
      * @access private
      */
     var $sourceOpened = false;
@@ -51,7 +52,7 @@ class File_Archive_Reader_Archive extends File_Archive_Reader
     /**
      * The source was let in this state at the end
      *
-     * @var bool Indicate whether the $source was given opened
+     * @var    bool Indicate whether the $source was given opened
      * @access private
      */
     var $sourceInitiallyOpened;

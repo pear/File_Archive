@@ -104,19 +104,24 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             //Check the compression method
             if ($this->header['Method'] != 0 &&
                $this->header['Method'] != 8) {
-                return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle compression method {$this->header['Method']}");
+                return PEAR::raiseError("File_Archive_Reader_Zip doesn't ".
+                        "handle compression method {$this->header['Method']}");
             }
             if ($this->header['Flag'] & 1) {
-                return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle encrypted files");
+                return PEAR::raiseError("File_Archive_Reader_Zip doesn't ".
+                        "handle encrypted files");
             }
             if ($this->header['Flag'] & 8) {
-                return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle bit flag 3 set");
+                return PEAR::raiseError("File_Archive_Reader_Zip doesn't ".
+                        "handle bit flag 3 set");
             }
             if ($this->header['Flag'] & 32) {
-                return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle compressed patched data");
+                return PEAR::raiseError("File_Archive_Reader_Zip doesn't ".
+                        "handle compressed patched data");
             }
             if ($this->header['Flag'] & 64) {
-                return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle strong encrypted files");
+                return PEAR::raiseError("File_Archive_Reader_Zip doesn't ".
+                        "handle strong encrypted files");
             }
 
             $this->currentStat = array(
@@ -209,7 +214,8 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         }
 
         if (crc32($this->data) != $this->header['CRC']) {
-            return PEAR::raiseError("Zip archive : CRC fails on entry {$this->currentFilename}");
+            return PEAR::raiseError("Zip archive : CRC fails on entry ".
+                                    $this->currentFilename);
         }
     }
 }
