@@ -82,7 +82,7 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
      */
     function close()
     {
-        if($this->source != null) {
+        if ($this->source != null) {
             return $this->source->close();
         }
     }

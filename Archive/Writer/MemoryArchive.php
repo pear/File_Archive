@@ -68,24 +68,24 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
     /**
      * See the constructor of File_Archive_Writer for more informations
      */
-    function File_Archive_Writer_MemoryArchive($filename, &$t, $stat=array(), $autoClose = true)
+    function File_Archive_Writer_MemoryArchive($filename, &$t, $stat = array(), $autoClose = true)
     {
         $this->memoryWriter = new File_Archive_Writer_Memory();
         parent::File_Archive_Writer_Archive($filename, $t, $stat, $autoClose);
     }
     /**
-     * @see File_Archive_Writer::newFile
+     * @see File_Archive_Writer::newFile()
      */
-    function newFile($filename, $stat=array(), $mime = "application/octet-stream")
+    function newFile($filename, $stat = array(), $mime = "application/octet-stream")
     {
-        if($this->nbFiles == 0) {
+        if ($this->nbFiles == 0) {
             $error = $this->sendHeader();
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
         } else {
             $error = $this->flush();
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
         }
@@ -98,16 +98,16 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
         return true;
     }
     /**
-     * @see File_Archive_Writer::close
+     * @see File_Archive_Writer::close()
      */
     function close()
     {
         $error = $this->flush();
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
         $error = $this->sendFooter();
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
 
@@ -122,8 +122,8 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
      */
     function flush()
     {
-        if($this->currentFilename !== null) {
-            if($this->currentDataFile !== null) {
+        if ($this->currentFilename !== null) {
+            if ($this->currentDataFile !== null) {
                 $error = $this->appendFile($this->currentFilename,
                                   $this->currentDataFile);
             } else {
@@ -131,7 +131,7 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
                                  $this->currentStat,
                                  $this->memoryWriter->getData());
             }
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
 
@@ -141,15 +141,15 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
         }
     }
     /**
-     * @see File_Archive_Writer::writeData
+     * @see File_Archive_Writer::writeData()
      */
     function writeData($data) { return $this->memoryWriter->writeData($data); }
     /**
-     * @see File_Archive_Writer::writeFile
+     * @see File_Archive_Writer::writeFile()
      */
     function writeFile($filename)
     {
-        if($this->currentDataFile == null && $this->memoryWriter->isEmpty()) {
+        if ($this->currentDataFile == null && $this->memoryWriter->isEmpty()) {
             $this->currentDataFile = $filename;
         } else {
             return $this->memoryWriter->writeFile($filename);

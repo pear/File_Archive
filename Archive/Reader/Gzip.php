@@ -36,23 +36,23 @@ require_once "Archive.php";
  */
 class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
 {
-    var $data = NULL;
+    var $data = null;
     var $offset = 0;
-    var $alreadyRead = FALSE;
+    var $alreadyRead = false;
 
-    var $name = NULL;
-    var $comment = NULL;
-    var $hasName = FALSE;
-    var $hasComment = FALSE;
+    var $name = null;
+    var $comment = null;
+    var $hasName = false;
+    var $hasComment = false;
 
     /**
      * @see File_Archive_Reader::close()
      */
     function close()
     {
-        $this->data = NULL;
+        $this->data = null;
         $this->offset = 0;
-        $this->alreadyRead = FALSE;
+        $this->alreadyRead = false;
         parent::close();
     }
 
@@ -61,22 +61,22 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
      */
     function next()
     {
-        if(!parent::next()) {
+        if (!parent::next()) {
             return false;
         }
 
-        if($this->alreadyRead) {
+        if ($this->alreadyRead) {
             return false;
         }
         $this->alreadyRead = true;
 
         $header = $this->source->getData(10);
-        if(PEAR::isError($header)) {
+        if (PEAR::isError($header)) {
             return $header;
         }
 
         $id = unpack("H2id1/H2id2/C1tmp/C1flags",substr($header,0,4));
-        if($id['id1'] != "1f" || $id['id2'] != "8b") {
+        if ($id['id1'] != "1f" || $id['id2'] != "8b") {
             return PEAR::raiseError("Not valid gz file (wrong header)");
         }
 
@@ -85,12 +85,12 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         $this->hasComment = ($temp & 0x4);
 
         $this->name = "";
-        if($this->hasName) {
-            while(($char = $this->source->getData(1)) !== "\0") {
-                if($char === null) {
+        if ($this->hasName) {
+            while (($char = $this->source->getData(1)) !== "\0") {
+                if ($char === null) {
                     return PEAR::raiseError("Not valid gz file (unexpected end of archive reading filename)");
                 }
-                if(PEAR::isError($char)) {
+                if (PEAR::isError($char)) {
                     return $char;
                 }
                 $this->name .= $char;
@@ -98,12 +98,12 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
             $this->name = $this->getStandardURL($this->name);
         }
         $this->comment = "";
-        if($this->hasComment) {
-            while(($char = $this->source->getData(1)) !== "\0") {
-                if($char === null) {
+        if ($this->hasComment) {
+            while (($char = $this->source->getData(1)) !== "\0") {
+                if ($char === null) {
                     return PEAR::raiseError("Not valid gz file (unexpected end of archive reading comment)");
                 }
-                if(PEAR::isError($char)) {
+                if (PEAR::isError($char)) {
                     return $char;
                 }
                 $this->comment .= $char;
@@ -111,7 +111,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         }
 
         $this->data = $this->source->getData();
-        if(PEAR::isError($this->data)) {
+        if (PEAR::isError($this->data)) {
             return $this->data;
         }
 
@@ -122,13 +122,13 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         $this->data = gzinflate(substr($this->data,0,strlen($this->data)-8));
         $this->offset = 0;
 
-        if($size  != strlen($this->data)) {
+        if ($size != strlen($this->data)) {
             return PEAR::raiseError("Not valid gz file (size error {$size} != ".strlen($this->data).")");
         }
-        if($crc32 != crc32 ($this->data)) {
+        if ($crc32 != crc32($this->data)) {
             return PEAR::raiseError("Not valid gz file (checksum error)");
         }
-        return TRUE;
+        return true;
     }
     /**
      * @see File_Archive_Reader::getFilename()
@@ -151,13 +151,13 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
      */
     function getData($length = -1)
     {
-        if($length == -1) {
+        if ($length == -1) {
             $actualLength = strlen($this->data) - $this->offset;
         } else {
             $actualLength = min(strlen($this->data) - $this->offset, $length);
         }
 
-        if($actualLength == 0) {
+        if ($actualLength == 0) {
             return null;
         } else {
             $result = substr($this->data, $this->offset, $actualLength);

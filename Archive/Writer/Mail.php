@@ -90,11 +90,11 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
     {
         $this->mime = new Mail_mime();
         $this->mime->setTXTBody($message);
-        if(!empty($htmlMessage)) {
+        if (!empty($htmlMessage)) {
             $this->mime->setHTMLBody($htmlMessage);
         }
 
-        if($mail == null)
+        if ($mail == null)
             $this->mail = Mail::factory("mail");
         else
             $this->mail =& $mail;
@@ -104,22 +104,22 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
     }
 
     /**
-     * @see Mail_Mime::setHTMLBody
+     * @see Mail_Mime::setHTMLBody()
      */
     function setHTMLBody($data, $isfile = false)
     {
         return $this->mime->setHTMLBody($data, $isfile);
     }
     /**
-     * @see Mail_Mime::addHTMLImage
+     * @see Mail_Mime::addHTMLImage()
      */
-    function addHTMLImage($file, $c_type='application/octet-stream', $name='', $isfile=true)
+    function addHTMLImage($file, $c_type = 'application/octet-stream', $name = '', $isfile = true)
     {
         return $this->mime->addHTMLImage($file, $c_type, $name, $isfile);
     }
 
     /**
-     * @see File_Archive_Writer::writeData
+     * @see File_Archive_Writer::writeData()
      *
      * This function just put the data in $currentData until the end of file
      * At that time, addCurrentData is called to attach $currentData to the mail
@@ -134,7 +134,7 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
      */
     function addCurrentData()
     {
-        if($this->currentFilename == null) {
+        if ($this->currentFilename == null) {
             return;
         }
 
@@ -143,12 +143,12 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
         return $error;
     }
     /**
-     * @see File_Archive_Writer::newFile
+     * @see File_Archive_Writer::newFile()
      */
-    function newFile($filename, $stat, $mime="application/octet-stream")
+    function newFile($filename, $stat, $mime = "application/octet-stream")
     {
         $error = $this->addCurrentData();
-        uf(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
 
@@ -157,23 +157,23 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
     }
 
     /**
-     * @see File_Archive_Writer::close
+     * @see File_Archive_Writer::close()
      */
     function close()
     {
         $error = parent::close();
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
         $error = $this->addCurrentData();
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
 
         $body = $this->mime->get();
         $headers = $this->mime->headers($this->headers);
 
-        if(!$this->mail->send(
+        if (!$this->mail->send(
                 $this->to,
                 $headers,
                 $body)

@@ -56,22 +56,22 @@ class File_Archive_Writer_Output extends File_Archive_Writer
         $this->sendHeaders = $sendHeaders;
     }
     /**
-     * @see File_Archive_Writer::newFile
+     * @see File_Archive_Writer::newFile()
      */
-    function newFile($filename, $stat, $mime="application/octet-stream")
+    function newFile($filename, $stat = array(), $mime = "application/octet-stream")
     {
-        if($this->sendHeaders) {
+        if ($this->sendHeaders) {
             header("Content-type: $mime");
             header("Content-disposition: attachment; filename=$filename");
             $this->sendHeaders = FALSE;
         }
     }
     /**
-     * @see File_Archive_Writer::writeData
+     * @see File_Archive_Writer::writeData()
      */
     function writeData($data) { echo $data; }
     /**
-     * @see File_Archive_Writer::writeFile
+     * @see File_Archive_Writer::writeFile()
      */
     function writeFile($filename) { readfile($filename); }
 }

@@ -57,7 +57,7 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer_MemoryArchive
     function setCompressionLevel($compressionLevel) { $this->compressionLevel = $compressionLevel; }
 
     /**
-     * @see File_Archive_Writer_MemoryArchive::appendFileData
+     * @see File_Archive_Writer_MemoryArchive::appendFileData()
      */
     function appendFileData($filename, $stat, $data)
     {

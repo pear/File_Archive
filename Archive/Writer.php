@@ -42,7 +42,7 @@ class File_Archive_Writer
      * @param String $data filename the name of the file, eventually including a path
      * @stat Array $stat See PHP stat() function. None of the indexed are required
      */
-    function newFile($filename, $stat, $mime = "application/octet-stream")
+    function newFile($filename, $stat = array(), $mime = "application/octet-stream")
     {
         return PEAR::raiseError("Writer abstract function call (newFile)");
     }
@@ -66,12 +66,12 @@ class File_Archive_Writer
     function writeFile($filename)
     {
         $handle = fopen($filename, "r");
-        if(!is_resource($handle)) {
+        if (!is_resource($handle)) {
             return PEAR::raiseError("Unable to write to $filename");
         }
-        while(!feof($handle)) {
+        while (!feof($handle)) {
             $error = $this->writeData(fread($handle, 102400));
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
         }

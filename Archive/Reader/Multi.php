@@ -61,12 +61,12 @@ class File_Archive_Reader_Multi extends File_Archive_Reader_Relay
      */
     function next()
     {
-        while(array_key_exists($this->currentIndex, $this->sources)) {
+        while (array_key_exists($this->currentIndex, $this->sources)) {
             $this->source =& $this->sources[$this->currentIndex];
 
-            if(($error = $this->source->next()) === false) {
+            if (($error = $this->source->next()) === false) {
                 $error = $this->source->close();
-                if(PEAR::isError($error)) {
+                if (PEAR::isError($error)) {
                     return $error;
                 }
                 $this->currentIndex++;
@@ -81,8 +81,9 @@ class File_Archive_Reader_Multi extends File_Archive_Reader_Relay
      */
     function close()
     {
-        parent::close();
+        $error = parent::close();
         $this->currentIndex = 0;
+        return $error;
     }
 }
 

@@ -44,7 +44,7 @@ class Test extends PHPUnit_TestCase
     {
         $reader = File_Archive::read("http://poocl.la-grotte.org/downloads/PEAR2/poocl.tar/");
         $nbFiles = '';
-        while($reader->next())
+        while ($reader->next())
         {
             $nbFiles++;
         }
@@ -261,14 +261,14 @@ class Test extends PHPUnit_TestCase
 
         //Write the list of even number in [0..999]
         $writer->newFile("even.txt");
-        for($i=0; $i<1000; $i+=2)
+        for ($i=0; $i<1000; $i+=2)
         {
             $writer->writeData("$i\n");
         }
 
         //Write the list of odd number in [0..999]
         $writer->newFile("odd.txt");
-        for($i=1; $i<1000; $i+=2)
+        for ($i=1; $i<1000; $i+=2)
         {
             $writer->writeData("$i\n");
         }

@@ -144,12 +144,12 @@ class File_Archive
      *       Since it is impossible for some URLs to use is_dir or is_file, this function may not work with
      *       URLs containing folders which name ends with such an extension
      */
-    function read($URL, $symbolic=null, $uncompression = 0, $directoryDepth = -1)
+    function read($URL, $symbolic = null, $uncompression = 0, $directoryDepth = -1)
     {
         require_once "File/Archive/Reader/Uncompress.php";
         require_once "File/Archive/Reader/ChangeName.php";
 
-        if($directoryDepth >= 0) {
+        if ($directoryDepth >= 0) {
             $uncompressionLevel = min($uncompression, $directoryDepth);
         } else {
             $uncompressionLevel = $uncompression;
@@ -157,9 +157,9 @@ class File_Archive
 
         //Find the first file in $directory
         $std = File_Archive_Reader::getStandardURL($URL);
-        if($symbolic == null) {
+        if ($symbolic == null) {
             $slashPos = strrpos($std, '/');
-            if($slashPos === false) {
+            if ($slashPos === false) {
                 $realSymbolic = '';
             } else {
                 $realSymbolic = substr($std, $slashPos+1);
@@ -168,14 +168,14 @@ class File_Archive
             $realSymbolic = $symbolic;
         }
 
-        if(is_dir($URL)) {
+        if (is_dir($URL)) {
             require_once "File/Archive/Reader/Directory.php";
 
             $result = new File_Archive_Reader_Uncompress(
                 new File_Archive_Reader_Directory($std, '', $directoryDepth),
                 $uncompressionLevel
             );
-            if($directoryDepth >= 0) {
+            if ($directoryDepth >= 0) {
                 require_once "File/Archive/Predicate/MaxDepth.php";
 
                 $tmp = new File_Archive_Reader_Filter(
@@ -185,7 +185,7 @@ class File_Archive
                 unset($result);
                 $result =& $tmp;
             }
-            if(!empty($realSymbolic)) {
+            if (!empty($realSymbolic)) {
                 $tmp = new File_Archive_Reader_AddBaseName(
                     $realSymbolic,
                     $result
@@ -193,7 +193,7 @@ class File_Archive
                 unset($result);
                 $result =& $tmp;
             }
-        } else if(is_file($URL) && substr($URL, -1)!='/') {
+        } else if (is_file($URL) && substr($URL, -1)!='/') {
             require_once "File/Archive/Reader/File.php";
             return new File_Archive_Reader_File($URL, $realSymbolic);
         } else {
@@ -204,48 +204,48 @@ class File_Archive
 
             $pos = 0;
             do {
-                if($pos == strlen($realPath)) {
+                if ($pos == strlen($realPath)) {
                     return new File_Archive_Reader_File($std, $realSymbolic);
                 }
 
                 $pos = strpos($realPath, '/', $pos+1);
-                if($pos === false) {
+                if ($pos === false) {
                     $pos = strlen($realPath);
                 }
 
                 $file = substr($realPath, 0, $pos);
                 $dotPos = strrpos($file, '.');
                 $extension = '';
-                if($dotPos !== false) {
+                if ($dotPos !== false) {
                     $extension = substr($file, $dotPos+1);
                 }
-            } while(!File_Archive_Reader_Uncompress::isKnownExtension($extension) || is_dir($file));
+            } while (!File_Archive_Reader_Uncompress::isKnownExtension($extension) || is_dir($file));
 
             $parsedURL['path'] = $file;
             $file = '';
 
             //Rebuild the real URL with the smaller path
-            if(isset($parsedURL['scheme'])) {
+            if (isset($parsedURL['scheme'])) {
                 $file .= $parsedURL['scheme'].'://';
             }
-            if(isset($parsedURL['user'])) {
+            if (isset($parsedURL['user'])) {
                 $file .= $parsedURL['user'];
-                if(isset($parsedURL['pass'])) {
+                if (isset($parsedURL['pass'])) {
                     $file .= ':'.$parsedURL['pass'];
                 }
                 $file .= '@';
             }
-            if(isset($parsedURL['host'])) {
+            if (isset($parsedURL['host'])) {
                 $file .= $parsedURL['host'];
             }
-            if(isset($parsedURL['port'])) {
+            if (isset($parsedURL['port'])) {
                 $file .= ':'.$parsedURL['port'];
             }
             $file .= $parsedURL['path'];
-            if(isset($parsedURL['query'])) {
+            if (isset($parsedURL['query'])) {
                 $file .= '?'.$parsedURL['query'];
             }
-            if(isset($parsedURL['fragment'])) {
+            if (isset($parsedURL['fragment'])) {
                 $file .= '#'.$parsedURL['fragment'];
             }
 
@@ -255,14 +255,14 @@ class File_Archive
                 $uncompressionLevel
             );
             $isDir = $result->setBaseDir($std);
-            if(PEAR::isError($isDir)) {
+            if (PEAR::isError($isDir)) {
                 return PEAR::raiseError("File $URL not found");
             }
-            if($isDir && $symbolic==null) {
+            if ($isDir && $symbolic==null) {
                 $realSymbolic = '';
             }
 
-            if($directoryDepth >= 0) {
+            if ($directoryDepth >= 0) {
                 require_once "File/Archive/Predicate/MaxDepth.php";
 
                 $tmp = new File_Archive_Reader_Filter(
@@ -273,7 +273,7 @@ class File_Archive
                 $result =& $tmp;
             }
 
-            if($std != $realSymbolic) {
+            if ($std != $realSymbolic) {
                 $tmp = new File_Archive_Reader_ChangeBaseName(
                     $std,
                     $realSymbolic,
@@ -296,16 +296,16 @@ class File_Archive
     /**
      * @param array $sources Array of strings or readers that will be added to the multi reader
      *        If the parameter is a string, a reader will be built thanks to the read function
-     * @see File_Archive_Reader_Multi File_Archive::read
+     * @see File_Archive_Reader_Multi, File_Archive::read()
      */
     function readMulti(&$sources = array())
     {
         require_once "File/Archive/Reader/Multi.php";
         $result = new File_Archive_Reader_Multi();
-        foreach($sources as $index => $foo) {
-            if(is_string($sources[index])) {
+        foreach ($sources as $index => $foo) {
+            if (is_string($sources[index])) {
                 $URLreader = File_Archive::read($sources[index]);
-                if(PEAR::isError($URLreader)) {
+                if (PEAR::isError($URLreader)) {
                     return $URLreader;
                 }
                 $result->addSource(URLreader);
@@ -356,8 +356,9 @@ class File_Archive
         require_once "File/Archive/Predicate/And.php";
         $pred = new File_Archive_Predicate_And();
         $args = func_get_args();
-        foreach($args as $p)
+        foreach ($args as $p) {
             $pred->addPredicate($p);
+        }
         return $pred;
     }
     /**
@@ -368,7 +369,7 @@ class File_Archive
         require_once "File/Archive/Predicate/Or.php";
         $pred = new File_Archive_Predicate_Or();
         $args = func_get_args();
-        foreach($args as $p) {
+        foreach ($args as $p) {
             $pred->addPredicate($p);
         }
         return $pred;
@@ -495,18 +496,18 @@ class File_Archive
      * @param bool $autoClose If set to true, $innerWriter will be closed when the returned archive is close
      *        Default value is true.
      */
-    function toArchive($filename, &$innerWriter, $type=null, $stat = array(), $autoClose = true)
+    function toArchive($filename, &$innerWriter, $type = null, $stat = array(), $autoClose = true)
     {
-        if($type == null) {
+        if ($type == null) {
             $dotPos = strrpos($filename, '.');
-            if($dotPos !== false) {
+            if ($dotPos !== false) {
                 $type = substr($filename, $dotPos+1);
             } else {
                 return PEAR::raiseError("Unknown archive type for $filename (you should specify a third argument)");
             }
         }
         $type = ucfirst($type);
-        if($type == "Gz") {
+        if ($type == "Gz") {
             $type = "Gzip";
         }
         switch($type) {

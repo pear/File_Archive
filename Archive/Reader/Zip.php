@@ -73,10 +73,10 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     function nextWithFolders()
     {
         //Skip the data and the footer if they haven't been uncompressed
-        if($this->header != null && $this->data == null) {
+        if ($this->header != null && $this->data == null) {
             $toSkip = $this->header['CLen'];
             $error = $this->source->skip($toSkip);
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
         }
@@ -86,13 +86,13 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
 
         //Read the header
         $header = $this->source->getData(4);
-        if(PEAR::isError($header)) {
+        if (PEAR::isError($header)) {
             return $header;
         }
-        if($header == "\x50\x4b\x03\x04") {
+        if ($header == "\x50\x4b\x03\x04") {
             //New entry
             $header = $this->source->getData(26);
-            if(PEAR::isError($header)) {
+            if (PEAR::isError($header)) {
                 return $header;
             }
             $this->header = unpack(
@@ -100,20 +100,20 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
                 $header);
 
             //Check the compression method
-            if($this->header['Method'] != 0 &&
+            if ($this->header['Method'] != 0 &&
                $this->header['Method'] != 8) {
                 return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle compression method {$this->header['Method']}");
             }
-            if($this->header['Flag'] & 1) {
+            if ($this->header['Flag'] & 1) {
                 return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle encrypted files");
             }
-            if($this->header['Flag'] & 8) {
+            if ($this->header['Flag'] & 8) {
                 return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle bit flag 3 set");
             }
-            if($this->header['Flag'] & 32) {
+            if ($this->header['Flag'] & 32) {
                 return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle compressed patched data");
             }
-            if($this->header['Flag'] & 64) {
+            if ($this->header['Flag'] & 64) {
                 return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle strong encrypted files");
             }
 
@@ -132,7 +132,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             $this->currentFilename = $this->source->getData($this->header['File']);
 
             $error = $this->source->skip($this->header['Extra']);
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
 
@@ -149,16 +149,16 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
      */
     function next()
     {
-        if(!parent::next()) {
+        if (!parent::next()) {
             return false;
         }
 
         do {
             $result = $this->nextWithFolders();
-            if($result !== true) {
+            if ($result !== true) {
                 return $result;
             }
-        } while(substr($this->getFilename(), -1) == '/');
+        } while (substr($this->getFilename(), -1) == '/');
 
         return true;
     }
@@ -168,18 +168,18 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
      */
     function getData($length = -1)
     {
-        if($this->offset >= $this->currentStat[7]) {
+        if ($this->offset >= $this->currentStat[7]) {
             return null;
         }
 
-        if($length>=0) {
+        if ($length>=0) {
             $actualLength = min($length, $this->currentStat[7]-$this->offset);
         } else {
             $actualLength = $this->currentStat[7]-$this->offset;
         }
 
         $error = $this->uncompressData();
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
         $result = substr($this->data, $this->offset, $actualLength);
@@ -195,18 +195,18 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     }
     function uncompressData()
     {
-        if($this->data !== NULL)
+        if ($this->data !== NULL)
             return;
 
         $this->data = $this->source->getData($this->header['CLen']);
-        if(PEAR::isError($this->data)) {
+        if (PEAR::isError($this->data)) {
             return $this->data;
         }
-        if($this->header['Method'] == 8) {
+        if ($this->header['Method'] == 8) {
             $this->data = gzinflate($this->data);
         }
 
-        if(crc32($this->data) != $this->header['CRC']) {
+        if (crc32($this->data) != $this->header['CRC']) {
             return PEAR::raiseError("Zip archive : CRC fails on entry {$this->currentFilename}");
         }
     }

@@ -80,7 +80,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
     function setComment($comment) { $this->comment = $comment; }
 
     /**
-     * @see File_Archive_Writer_MemoryArchive::appendFileData
+     * @see File_Archive_Writer_MemoryArchive::appendFileData()
      * @access protected
      */
     function appendFileData($filename, $stat, $data)
@@ -104,7 +104,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
                    $data;
 
         $error = $this->innerWriter->writeData($zipData);
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
 
@@ -120,7 +120,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
 
     }
     /**
-     * @see File_Archive_Writer_MemoryArchive::sendFooter
+     * @see File_Archive_Writer_MemoryArchive::sendFooter()
      * @access protected
      */
     function sendFooter()
@@ -136,7 +136,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
         );
     }
     /**
-     * @see File_Archive_Writer::getMime
+     * @see File_Archive_Writer::getMime()
      */
     function getMime() { return "application/zip"; }
 }

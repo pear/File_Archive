@@ -34,7 +34,7 @@ require_once "File/Archive/Predicate.php";
 /**
  * Keep only the files which name follow a given regular expression
  *
- * @see        File_Archive_Predicate File_Archive_Reader_Filter ereg
+ * @see        File_Archive_Predicate, File_Archive_Reader_Filter ereg
  */
 class File_Archive_Predicate_Ereg extends File_Archive_Predicate
 {
@@ -48,7 +48,7 @@ class File_Archive_Predicate_Ereg extends File_Archive_Predicate
         $this->ereg = $ereg;
     }
     /**
-     * @see File_Archive_Predicate::isTrue
+     * @see File_Archive_Predicate::isTrue()
      */
     function isTrue(&$source)
     {

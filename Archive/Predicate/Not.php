@@ -34,7 +34,7 @@ require_once "File/Archive/Predicate.php";
 /**
  * Evaluates to true iif the predicate given in parameter evaluates to false
  *
- * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ * @see        File_Archive_Predicate, File_Archive_Reader_Filter
  */
 class File_Archive_Predicate_Not extends File_Archive_Predicate
 {
@@ -44,7 +44,7 @@ class File_Archive_Predicate_Not extends File_Archive_Predicate
         $this->pred = $pred;
     }
     /**
-     * @see File_Archive_Predicate::isTrue
+     * @see File_Archive_Predicate::isTrue()
      */
     function isTrue(&$source)
     {

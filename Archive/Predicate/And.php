@@ -37,7 +37,7 @@ require_once "File/Archive/Predicate.php";
  * Example:
  *  new File_Archive_Predicate_And($pred1, $pred2, $pred3)
  *
- * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ * @see        File_Archive_Predicate, File_Archive_Reader_Filter
  */
 class File_Archive_Predicate_And extends File_Archive_Predicate
 {
@@ -68,12 +68,12 @@ class File_Archive_Predicate_And extends File_Archive_Predicate
         $this->preds[] = $pred;
     }
     /**
-     * @see File_Archive_Predicate::isTrue
+     * @see File_Archive_Predicate::isTrue()
      */
     function isTrue(&$source)
     {
-        foreach($this->preds as $p) {
-            if(!$p->isTrue($source)) {
+        foreach ($this->preds as $p) {
+            if (!$p->isTrue($source)) {
                 return false;
             }
         }

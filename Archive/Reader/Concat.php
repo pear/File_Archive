@@ -52,11 +52,11 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
 
         //Compute the total length
         $this->stat[7] = 0;
-        while(($error = $source->next()) === true) {
+        while (($error = $source->next()) === true) {
             $sourceStat = $source->getStat();
             $this->stat[7] += $sourceStat[7];
         }
-        if(PEAR::isError($error) || PEAR::isError($source->close())) {
+        if (PEAR::isError($error) || PEAR::isError($source->close())) {
             die("Error in File_Archive_Reader_Concat constructor ({$error->getMessage()}), cannot continue");
         }
     }
@@ -66,7 +66,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
      */
     function next()
     {
-        if(!$this->opened) {
+        if (!$this->opened) {
             return $this->opened = $this->source->next();
         } else {
             return false;
@@ -89,31 +89,31 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
      */
     function getData($length = -1)
     {
-        if($length == 0) {
+        if ($length == 0) {
             return '';
         }
 
         $result = '';
-        while($length == -1 || strlen($result)<$length) {
+        while ($length == -1 || strlen($result)<$length) {
             $sourceData = $this->source->getData($length==-1 ? -1 : $length - strlen($result));
 
-            if(PEAR::isError($sourceData)) {
+            if (PEAR::isError($sourceData)) {
                 return $sourceData;
             }
 
-            if($sourceData == null) {
+            if ($sourceData == null) {
                 $error = $this->source->next();
-                if(PEAR::isError($error)) {
+                if (PEAR::isError($error)) {
                     return $error;
                 }
-                if(!$error) {
+                if (!$error) {
                     break;
                 }
             } else {
                 $result .= $sourceData;
             }
         }
-        return $result=='' ? null : $result;
+        return $result == '' ? null : $result;
     }
     /**
      * @see File_Archive_Reader::skip()
@@ -121,9 +121,9 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
     function skip($length)
     {
         $skipped = 0;
-        while($skipped < $length) {
+        while ($skipped < $length) {
             $sourceSkipped = $this->source->skip($length);
-            if(PEAR::isError($sourceSkipped)) {
+            if (PEAR::isError($sourceSkipped)) {
                 return $skipped;
             }
             $skipped += $sourceSkipped;
@@ -138,7 +138,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
         $error = $this->source->close();
         $this->opened = false;
 
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
     }

@@ -58,10 +58,10 @@ class File_Archive_Reader_Filter extends File_Archive_Reader_Relay
     {
         do {
             $error = $this->source->next();
-            if($error !== true) {
+            if ($error !== true) {
                 return $error;
             }
-        } while(!$this->predicate->isTrue($this->source));
+        } while (!$this->predicate->isTrue($this->source));
         return true;
     }
 }

@@ -66,8 +66,9 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     function skip($length)
     {
         $actualLength = min($this->leftLength, $length);
-        $this->source->skip($actualLength);
+        $error = $this->source->skip($actualLength);
         $length -= $actualLength;
+        return $error;
     }
 
     /**
@@ -78,7 +79,7 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
         $this->leftLength = 0;
         $this->currentFilename = NULL;
         $this->currentStat = NULL;
-        parent::close();
+        return parent::close();
     }
 
     /**
@@ -95,16 +96,20 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
      */
     function next()
     {
-        if(!parent::next()) {
-            return false;
+        $error = parent::next();
+        if ($error !== true) {
+            return $error;
         }
 
-        $this->source->skip($this->leftLength + $this->footerLength);
+        $error = $this->source->skip($this->leftLength + $this->footerLength);
+        if (PEAR::isError($error)) {
+            return $error;
+        }
         $rawHeader = $this->source->getData(512);
-        if(PEAR::isError($rawHeader)) {
+        if (PEAR::isError($rawHeader)) {
             return $rawHeader;
         }
-        if(strlen($rawHeader)<512 || $rawHeader == pack("a512", "")) {
+        if (strlen($rawHeader)<512 || $rawHeader == pack("a512", "")) {
             return false;
         }
 
@@ -123,21 +128,21 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
         $this->currentFilename = $this->getStandardURL($header['path'].$header['filename']);
 
         $this->leftLength = $this->currentStat[7];
-        if($this->leftLength % 512 == 0) {
+        if ($this->leftLength % 512 == 0) {
             $this->footerLength = 0;
         } else {
             $this->footerLength = 512 - $this->leftLength%512;
         }
 
         $checksum = 8*ord(" ");
-        for($i = 0; $i < 148; $i++) {
+        for ($i = 0; $i < 148; $i++) {
             $checksum += ord($rawHeader{$i});
         }
-        for($i = 156; $i < 512; $i++) {
+        for ($i = 156; $i < 512; $i++) {
             $checksum += ord($rawHeader{$i});
         }
 
-        if(octdec($header['checksum']) != $checksum) {
+        if (octdec($header['checksum']) != $checksum) {
             die('Checksum error on entry '.$this->currentFilename);
         }
 
@@ -148,13 +153,13 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
      */
     function getData($length = -1)
     {
-        if($length == -1) {
+        if ($length == -1) {
             $actualLength = $this->leftLength;
         } else {
             $actualLength = min($this->leftLength, $length);
         }
 
-        if($this->leftLength == 0) {
+        if ($this->leftLength == 0) {
             return NULL;
         } else {
             $data = $this->source->getData($actualLength);

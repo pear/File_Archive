@@ -50,65 +50,65 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
     }
 
     /**
-     * @see File_Archive_Writer::newFile
+     * @see File_Archive_Writer::newFile()
      */
-    function newFile($filename, $stat, $mime="application/octet-stream")
+    function newFile($filename, $stat = array(), $mime = "application/octet-stream")
     {
         $errorA = $this->a->newFile($filename, $stat, $mime);
         $errorB = $this->b->newFile($filename, $stat, $mime);
 
-        if(PEAR::isError($errorA)) {
+        if (PEAR::isError($errorA)) {
             return $errorA;
         }
-        if(PEAR::isError($errorB)) {
+        if (PEAR::isError($errorB)) {
             return $errorB;
         }
     }
 
     /**
-     * @see File_Archive_Writer::writeData
+     * @see File_Archive_Writer::writeData()
      */
     function writeData($data)
     {
         $errorA = $this->a->writeData($data);
         $errorB = $this->b->writeData($data);
 
-        if(PEAR::isError($errorA)) {
+        if (PEAR::isError($errorA)) {
             return $errorA;
         }
-        if(PEAR::isError($errorB)) {
+        if (PEAR::isError($errorB)) {
             return $errorB;
         }
     }
 
     /**
-     * @see File_Archive_Writer::writeFile
+     * @see File_Archive_Writer::writeFile()
      */
     function writeFile($filename)
     {
         $errorA = $this->a->writeFile($filename);
         $errorB = $this->b->writeFile($filename);
 
-        if(PEAR::isError($errorA)) {
+        if (PEAR::isError($errorA)) {
             return $errorA;
         }
-        if(PEAR::isError($errorB)) {
+        if (PEAR::isError($errorB)) {
             return $errorB;
         }
     }
 
     /**
-     * @see File_Archive_Writer::close
+     * @see File_Archive_Writer::close()
      */
     function close()
     {
         $errorA = $this->a->close();
         $errorB = $this->b->close();
 
-        if(PEAR::isError($errorA)) {
+        if (PEAR::isError($errorA)) {
             return $errorA;
         }
-        if(PEAR::isError($errorB)) {
+        if (PEAR::isError($errorB)) {
             return $errorB;
         }
     }

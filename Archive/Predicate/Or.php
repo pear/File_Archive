@@ -36,7 +36,7 @@ require_once "File/Archive/Predicate.php";
  * Evaluates to true iif one at least of the predicates
  * given as constructor parameters evaluate to true
  *
- * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ * @see        File_Archive_Predicate, File_Archive_Reader_Filter
  */
 class File_Archive_Predicate_Or extends File_Archive_Predicate
 {
@@ -68,12 +68,12 @@ class File_Archive_Predicate_Or extends File_Archive_Predicate
     }
 
     /**
-     * @see File_Archive_Predicate::isTrue
+     * @see File_Archive_Predicate::isTrue()
      */
     function isTrue(&$source)
     {
-        foreach($this->preds as $p) {
-            if($p->isTrue($source)) {
+        foreach ($this->preds as $p) {
+            if ($p->isTrue($source)) {
                 return true;
             }
         }

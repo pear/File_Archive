@@ -40,7 +40,7 @@ require_once "File/Archive/Predicate.php";
  *     new File_Archive_Predicate_Custom("strlen($name)<100")
  *     new File_Archive_Predicate_Custom("strlen($source->getFilename())<100")
  *
- * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ * @see        File_Archive_Predicate, File_Archive_Reader_Filter
  */
 class File_Archive_Predicate_Custom extends File_Archive_Predicate
 {
@@ -58,27 +58,27 @@ class File_Archive_Predicate_Custom extends File_Archive_Predicate
     function File_Archive_Predicate_Custom($expression)
     {
         $this->expression = $expression.";";
-        if(strpos($this->expression, "return") === false) {
+        if (strpos($this->expression, "return") === false) {
             $this->expression = "return ".$this->expression;
         }
-        $this->useName = (strpos($this->expression, "\$name") !== false);
-        $this->useStat = (strpos($this->expression, "\$stat") !== false);
-        $this->useMIME = (strpos($this->expression, "\$mime") !== false);
+        $this->useName = (strpos($this->expression, '$name') !== false);
+        $this->useStat = (strpos($this->expression, '$stat') !== false);
+        $this->useMIME = (strpos($this->expression, '$mime') !== false);
     }
     /**
-     * @see File_Archive_Predicate::isTrue
+     * @see File_Archive_Predicate::isTrue()
      */
     function isTrue(&$source)
     {
-        if($this->useName) {
+        if ($this->useName) {
             $name = $source->getFilename();
         }
-        if($this->useStat) {
+        if ($this->useStat) {
             $stat = $source->getStat();
             $size = $stat[7];
             $time = (isset($stat[9]) ? $stat[9] : null);
         }
-        if($this->useMIME) {
+        if ($this->useMIME) {
             $mime = $source->getMIME();
         }
         return eval($this->expression);

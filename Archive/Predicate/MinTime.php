@@ -34,7 +34,7 @@ require_once "File/Archive/Predicate.php";
 /**
  * Keep only the files modified after a given date (or with unknown modification date)
  *
- * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ * @see        File_Archive_Predicate, File_Archive_Reader_Filter
  */
 class File_Archive_Predicate_MinTime extends File_Archive_Predicate
 {
@@ -49,7 +49,7 @@ class File_Archive_Predicate_MinTime extends File_Archive_Predicate
 
     }
     /**
-     * @see File_Archive_Predicate::isTrue
+     * @see File_Archive_Predicate::isTrue()
      */
     function isTrue(&$source)
     {

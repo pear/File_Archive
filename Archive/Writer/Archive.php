@@ -54,7 +54,7 @@ class File_Archive_Writer_Archive extends File_Archive_Writer
      * @param Array $stat The stat of the archive (see the PHP stat() function). No element are required in this array
      * @param Bool $autoClose Indicate if the inner writer must be closed when closing this
      */
-    function File_Archive_Writer_Archive($filename, &$innerWriter, $stat=array(), $autoClose = TRUE)
+    function File_Archive_Writer_Archive($filename, &$innerWriter, $stat = array(), $autoClose = true)
     {
         $this->innerWriter =& $innerWriter;
         $this->autoClose = $autoClose;
@@ -70,11 +70,11 @@ class File_Archive_Writer_Archive extends File_Archive_Writer
     function getMime() { return "application/octet-stream"; }
 
     /**
-     * @see File_Archive_Writer::close
+     * @see File_Archive_Writer::close()
      */
     function close()
     {
-        if($this->autoClose) {
+        if ($this->autoClose) {
             return $this->innerWriter->close();
         }
     }

@@ -62,11 +62,11 @@ class File_Archive_Reader
 
         //TODO: not very efficient: close and re open the archive to start from the begining
         $error = $this->close();
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
-        while(($error = $this->next()) === true) {
-            if($this->getFilename() == $std) {
+        while (($error = $this->next()) === true) {
+            if ($this->getFilename() == $std) {
                 return true;
             }
         }
@@ -83,9 +83,9 @@ class File_Archive_Reader
     function getStandardURL($path)
     {
         $std = str_replace("\\", "/", $path);
-        while($std != ($std = preg_replace("/[^\/:?]+\/\.\.\//", "", $std))) ;
+        while ($std != ($std = preg_replace("/[^\/:?]+\/\.\.\//", "", $std))) ;
         $std = str_replace("/./", "", $std);
-        if(strncmp($std, "./", 2) == 0) {
+        if (strncmp($std, "./", 2) == 0) {
             return substr($std, 2);
         } else {
             return $std;
@@ -150,7 +150,7 @@ class File_Archive_Reader
     function skip($length)
     {
         $data = $this->getData($length);
-        if(PEAR::isError($data)) {
+        if (PEAR::isError($data)) {
             return $data;
         } else {
             return strlen($data);
@@ -170,18 +170,18 @@ class File_Archive_Reader
     function sendData(&$writer, $bufferSize = 102400)
     {
         $filename = $this->getDataFilename();
-        if($filename !== NULL) {
+        if ($filename !== NULL) {
             $error = $writer->writeFile($filename);
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
         } else {
-            while(($data = $this->getData($bufferSize)) !== null) {
-                if(PEAR::isError($data)) {
+            while (($data = $this->getData($bufferSize)) !== null) {
+                if (PEAR::isError($data)) {
                     return $data;
                 }
                 $error = $writer->writeData($data);
-                if(PEAR::isError($error) {
+                if (PEAR::isError($error)) {
                     return $error;
                 }
             }
@@ -195,7 +195,7 @@ class File_Archive_Reader
      */
     function extract(&$writer, $autoClose = true, $bufferSize = 102400)  //Default 100ko buffer
     {
-        while(($error = $this->next()) === true) {
+        while (($error = $this->next()) === true) {
             $filename = $this->getFilename();
             $stat = $this->getStat();
 
@@ -204,19 +204,19 @@ class File_Archive_Reader
                 $this->getStat(),
                 $this->getMime()
             );
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
             $error = $this->sendData($writer, $bufferSize);
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
         }
         $this->close();
-        if($autoClose) {
+        if ($autoClose) {
             $writer->close();
         }
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
     }
@@ -227,19 +227,19 @@ class File_Archive_Reader
      */
     function extractFile($filename, &$writer, $autoClose = true, $bufferSize = 102400)
     {
-        if(($error = $this->select($filename)) === true) {
+        if (($error = $this->select($filename)) === true) {
             $result = $this->sendData($writer, $bufferSize);
-            if(!PEAR::isError($result)) {
+            if (!PEAR::isError($result)) {
                 $result = true;
             }
-        } else if($error === false) {
+        } else if ($error === false) {
             $result = PEAR::raiseError("File $filename not found");
         } else {
             $result = $error;
         }
-        if($autoClose) {
+        if ($autoClose) {
             $error = $writer->close();
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
         }

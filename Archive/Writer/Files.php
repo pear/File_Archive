@@ -70,35 +70,36 @@ class File_Archive_Writer_Files extends File_Archive_Writer
     }
 
     /**
-     * @see File_Archive_Writer::newFile
+     * @see File_Archive_Writer::newFile()
      */
     function newFile($filename, $stat, $mime="application/octet-stream")
     {
-        if($this->handle !== null) {
+        if ($this->handle !== null) {
             fclose($this->handle);
         }
 
         $pos = strrpos($filename, "/");
-        if($pos !== false) {
+        if ($pos !== false) {
             $error = $this->mkdirr(substr($filename, 0, $pos));
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
         }
         $this->handle = fopen($filename, "w");
-        if(!is_resource($this->handle)) {
+        if (!is_resource($this->handle)) {
             return PEAR::raiseError("Unable to write to file $filename");
+        }
     }
     /**
-     * @see File_Archive_Writer::writeData
+     * @see File_Archive_Writer::writeData()
      */
     function writeData($data) { fwrite($this->handle, $data); }
     /**
-     * @see File_Archive_Writer::close
+     * @see File_Archive_Writer::close()
      */
     function close()
     {
-        if($this->handle !== null) {
+        if ($this->handle !== null) {
             fclose($this->handle);
         }
         $this->handle = null;

@@ -35,7 +35,7 @@ require_once "MIME/Type.php";
 /**
  * Keep only the files that have a specific MIME type
  *
- * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ * @see        File_Archive_Predicate, File_Archive_Reader_Filter
  */
 class File_Archive_Predicate_MIME extends File_Archive_Predicate
 {
@@ -46,25 +46,25 @@ class File_Archive_Predicate_MIME extends File_Archive_Predicate
      */
     function File_Archive_Predicate_MIME($mimes)
     {
-        if(is_string($mimes)) {
+        if (is_string($mimes)) {
             $this->mimes = explode(",",$mimes);
         } else {
             $this->mimes = $mimes;
         }
     }
     /**
-     * @see File_Archive_Predicate::isTrue
+     * @see File_Archive_Predicate::isTrue()
      */
     function isTrue(&$source)
     {
         $sourceMIME = $source->getMIME();
-        foreach($this->mimes as $mime) {
-            if(MIME_Type::isWildcard($mime)) {
+        foreach ($this->mimes as $mime) {
+            if (MIME_Type::isWildcard($mime)) {
                 $result = MIME_Type::wildcardMatch($mime, $sourceMIME);
             } else {
                 $result = ($mime == $sourceMIME);
             }
-            if($result !== false) {
+            if ($result !== false) {
                 return $result;
             }
         }

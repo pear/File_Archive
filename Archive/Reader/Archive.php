@@ -64,7 +64,7 @@ class File_Archive_Reader_Archive extends File_Archive_Reader
      */
     function next()
     {
-        if(!$this->sourceOpened && ($error = $this->source->next()) !== true) {
+        if (!$this->sourceOpened && ($error = $this->source->next()) !== true) {
             return $error;
         }
 
@@ -85,10 +85,10 @@ class File_Archive_Reader_Archive extends File_Archive_Reader
      */
     function close()
     {
-        if(!$this->sourceInitiallyOpened && $this->sourceOpened) {
+        if (!$this->sourceInitiallyOpened && $this->sourceOpened) {
             $error = $this->source->close();
             $this->sourceOpened = false;
-            if(PEAR::isError($error)) {
+            if (PEAR::isError($error)) {
                 return $error;
             }
         }

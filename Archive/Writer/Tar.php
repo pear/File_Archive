@@ -53,11 +53,11 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         $time = $stat[9];
         $link = "";
 
-        if($mode & 0x4000) {
+        if ($mode & 0x4000) {
             $type = 5;        // Directory
-        } else if($mode & 0x8000) {
+        } else if ($mode & 0x8000) {
             $type = 0;        // Regular
-        } else if($mode & 0xA000) {
+        } else if ($mode & 0xA000) {
             $type = 1;        // Link
             $link = @readlink($current);
         } else {
@@ -65,7 +65,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         }
 
         $pos = strrpos($filename, "/");
-        if($pos !== FALSE) {
+        if ($pos !== FALSE) {
             $path = substr($filename, 0, $pos+1);
             $path = preg_replace("/^(\.{1,2}(\/|\\\))+/","",$path);
 
@@ -97,10 +97,10 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
             "");
 
         $checksum = 8*ord(" ");
-        for($i = 0; $i < 148; $i++) {
+        for ($i = 0; $i < 148; $i++) {
             $checksum += ord($blockbeg{$i});
         }
-        for($i = 0; $i < 356; $i++) {
+        for ($i = 0; $i < 356; $i++) {
             $checksum += ord($blockend{$i});
         }
 
@@ -119,7 +119,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
     function tarFooter($stat)
     {
         $size = $stat[7];
-        if($size % 512 > 0) {
+        if ($size % 512 > 0) {
             return pack("a".(512 - $size%512), "");
         } else {
             return "";
@@ -127,7 +127,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
     }
 
     /**
-     * @see File_Archive_Writer_MemoryArchive::appendFile
+     * @see File_Archive_Writer_MemoryArchive::appendFile()
      * @access protected
      */
     function appendFile($filename, $dataFilename)
@@ -135,20 +135,20 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         $stat = stat($dataFilename);
 
         $error = $this->innerWriter->writeData($this->tarHeader($filename, $stat));
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
         $this->innerWriter->writeFile($dataFilename);
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
         $this->innerWriter->writeData($this->tarFooter($stat));
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
     }
     /**
-     * @see File_Archive_Writer_MemoryArchive::appendFileData
+     * @see File_Archive_Writer_MemoryArchive::appendFileData()
      * @access protected
      */
     function appendFileData($filename, $stat, $data)
@@ -157,20 +157,20 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         $stat[7] = $size;
 
         $error = $this->innerWriter->writeData($this->tarHeader($filename, $stat));
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
         $error = $this->innerWriter->writeData($data);
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
         $error = $this->innerWriter->writeData($this->tarFooter($stat));
-        if(PEAR::isError($error)) {
+        if (PEAR::isError($error)) {
             return $error;
         }
     }
     /**
-     * @see File_Archive_Writer_MemoryArchive::sendFooter
+     * @see File_Archive_Writer_MemoryArchive::sendFooter()
      * @access protected
      */
     function sendFooter()
@@ -178,7 +178,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         return $this->innerWriter->writeData(pack("a1024", ""));
     }
     /**
-     * @see File_Archive_Writer::getMime
+     * @see File_Archive_Writer::getMime()
      */
     function getMime() { return "application/x-tar"; }
 }
@@ -188,7 +188,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
  * A tar archive cannot contain files with name of folders longer than 100 chars
  * This filter removes them
  *
- * @see File_Archive_Predicate File_Archive_Reader_Filter
+ * @see File_Archive_Predicate, File_Archive_Reader_Filter
  */
 require_once "File/Archive/Predicate.php";
 class File_Archive_Predicate_TARCompatible extends File_Archive_Predicate

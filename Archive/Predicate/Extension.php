@@ -34,7 +34,7 @@ require_once "File/Archive/Predicate.php";
 /**
  * Keep only the files that have a specific extension
  *
- * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ * @see        File_Archive_Predicate, File_Archive_Reader_Filter
  */
 class File_Archive_Predicate_Extension extends File_Archive_Predicate
 {
@@ -45,21 +45,21 @@ class File_Archive_Predicate_Extension extends File_Archive_Predicate
      */
     function File_Archive_Predicate_Extension($extensions)
     {
-        if(is_string($extensions)) {
+        if (is_string($extensions)) {
             $this->extensions = explode(",",$extensions);
         } else {
             $this->extensions = $extensions;
         }
     }
     /**
-     * @see File_Archive_Predicate::isTrue
+     * @see File_Archive_Predicate::isTrue()
      */
     function isTrue(&$source)
     {
         $filename = $source->getFilename();
         $pos = strrpos($filename, '.');
         $extension = "";
-        if($pos !== FALSE) {
+        if ($pos !== FALSE) {
             $extension = strtolower(substr($filename, $pos+1));
         }
         $result = in_array($extension, $this->extensions);

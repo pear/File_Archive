@@ -89,7 +89,7 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
      */
     function next()
     {
-        if($this->alreadyRead) {
+        if ($this->alreadyRead) {
             return false;
         } else {
             $this->alreadyRead = true;
@@ -115,10 +115,10 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
      */
     function getData($length = -1)
     {
-        if($this->offset == strlen($this->memory)) {
+        if ($this->offset == strlen($this->memory)) {
             return null;
         }
-        if($length == -1) {
+        if ($length == -1) {
             $actualLength = strlen($this->memory) - $this->offset;
         } else {
             $actualLength = min($length, strlen($this->memory) - $this->offset);

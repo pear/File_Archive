@@ -34,7 +34,7 @@ require_once "File/Archive/Predicate.php";
 /**
  * Remove the URLs with a too high number of nested directories
  *
- * @see        File_Archive_Predicate File_Archive_Reader_Filter
+ * @see        File_Archive_Predicate, File_Archive_Reader_Filter
  */
 class File_Archive_Predicate_MaxDepth extends File_Archive_Predicate
 {
@@ -49,7 +49,7 @@ class File_Archive_Predicate_MaxDepth extends File_Archive_Predicate
         $this->maxDepth = $maxDepth;
     }
     /**
-     * @see File_Archive_Predicate::isTrue
+     * @see File_Archive_Predicate::isTrue()
      */
     function isTrue(&$source)
     {

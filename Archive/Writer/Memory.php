@@ -64,7 +64,7 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
     function writeData($d) { $this->data .= $d; }
 
     /**
-     * @see File_Archive_Writer::newFile
+     * @see File_Archive_Writer::newFile()
      */
     function newFile($filename, $stat, $mime = "application/octet-stream")
     {
@@ -101,7 +101,7 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
      *
      * Any unspecified parameter will be set to the value of the last file written in this writer
      */
-    function makeReader($filename = null, $stat=null, $mime=null)
+    function makeReader($filename = null, $stat = null, $mime = null)
     {
         require_once "File/Archive/Reader/Memory.php";
         return new File_Archive_Reader_Memory(
