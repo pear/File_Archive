@@ -2,6 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * Write the concatenation of the files in a buffer
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or
@@ -30,8 +32,7 @@
 require_once "File/Archive/Writer.php";
 
 /**
- * Write the concatenation of the files
- * in a buffer
+ * Write the concatenation of the files in a buffer
  */
 class File_Archive_Writer_Memory extends File_Archive_Writer
 {

@@ -2,6 +2,9 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * Base class for all the archiveWriters that can only work on complete files
+ * (the write data function may be called with small chunks of data)
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or

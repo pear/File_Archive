@@ -2,6 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * Evaluates to true iif the predicate given in parameter evaluates to false
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or

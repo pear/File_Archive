@@ -2,6 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * Compress a single file to Gzip format
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or
@@ -29,6 +31,9 @@
 
 require_once "MemoryArchive.php";
 
+/**
+ * Compress a single file to Gzip format
+ */
 class File_Archive_Writer_Gzip extends File_Archive_Writer_MemoryArchive
 {
     var $gzdata = "";

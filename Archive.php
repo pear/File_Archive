@@ -2,6 +2,9 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * Factory to access the most common File_Archive features
+ * It uses lazy include, so you dont have to include the files from File/Archive/* directories
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or
@@ -35,7 +38,7 @@ require_once "PEAR.php";
 
 /**
  * Factory to access the most common File_Archive features
- * It uses lazy include, so you don't have to include the files from File/Archive/* directories
+ * It uses lazy include, so you dont have to include the files from File/Archive/* directories
  */
 class File_Archive
 {

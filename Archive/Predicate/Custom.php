@@ -2,6 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * Custom predicate built by supplying a string expression
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or

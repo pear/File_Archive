@@ -2,6 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * Reader that represents a single file
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or

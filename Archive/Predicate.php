@@ -2,6 +2,11 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * A predicate is an object that can evaluate to true or false depending on the
+ * file currently read by a File_Archive_Reader
+ *
+ * @see File_Archive_Reader_Filter
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or

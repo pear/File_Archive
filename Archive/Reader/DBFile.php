@@ -2,6 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * This reader will display the files contained in an SQL request
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or

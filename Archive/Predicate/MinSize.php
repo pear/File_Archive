@@ -2,6 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * Keep only the files larger than a given size
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or

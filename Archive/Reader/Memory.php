@@ -2,6 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * A reader that takes its input from a memory buffer
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or

@@ -2,6 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * Filter out the files that do not respect a given predicat
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or
@@ -30,9 +32,7 @@
 require_once "Relay.php";
 
 /**
- * Base class for all the filters
- * A filter is a reader that takes its input from another reader and only keep
- * files according to a certain predicate.
+ * Filter out the files that do not respect a given predicat
  */
 class File_Archive_Reader_Filter extends File_Archive_Reader_Relay
 {

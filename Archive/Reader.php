@@ -2,6 +2,10 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * Abstract base class for all the readers
+ *
+ * A reader is a compilation of serveral files that can be read
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or

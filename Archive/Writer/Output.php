@@ -2,6 +2,10 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
+ * Writer to the standard output
+ * It will concatenate the files that it receive
+ * It may send some headers, but will do so only for the first file
+ *
  * PHP versions 4 and 5
  *
  * This library is free software; you can redistribute it and/or
