@@ -46,7 +46,7 @@ class File_Archive_Predicate_MinSize extends File_Archive_Predicate
     {
         $this->minSize = $minSize;
     }
-    function isTrue($source)
+    function isTrue(&$source)
     {
         $stat = $source->getStat();
         return !isset($stat[7]) || $stat[7]>=$this->minSize;

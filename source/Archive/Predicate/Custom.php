@@ -51,7 +51,7 @@ class File_Archive_Predicate_Custom extends File_Archive_Predicate
         }
 
     }
-    function isTrue($source)
+    function isTrue(&$source)
     {
         return eval($this->expression);
     }

@@ -36,7 +36,7 @@ require_once "File/Archive/Predicate.php";
   */
 class File_Archive_Predicate_False extends File_Archive_Predicate
 {
-    function isTrue($source) { return false; }
+    function isTrue(&$source) { return false; }
 }
 
 ?>

@@ -277,6 +277,11 @@ class File_Archive
         require_once "File/Archive/Predicate/Eregi.php";
         return new File_Archive_Predicate_Eregi($ereg);
     }
+    function predCustom($expression)
+    {
+        require_once "File/Archive/Predicate/Custom.php";
+        return new File_Archive_Predicate_Custom($expression);
+    }
 
     function toMail($to, $headers, $message, &$mail = null)
     {

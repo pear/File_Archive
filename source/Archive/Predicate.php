@@ -36,7 +36,7 @@ require_once "Reader.php";
   */
 class File_Archive_Predicate
 {
-    function isTrue($source) { return PEAR::raiseError("Abstract function call"); }
+    function isTrue(&$source) { return PEAR::raiseError("Abstract function call"); }
 }
 
 ?>

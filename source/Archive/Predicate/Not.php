@@ -37,13 +37,13 @@ require_once "File/Archive/Predicate.php";
 class File_Archive_Predicate_Not extends File_Archive_Predicate
 {
     var $pred;
-    function File_Archive_Reader_Predicate_And($pred)
+    function File_Archive_Predicate_Not($pred)
     {
         $this->pred = $pred;
     }
-    function isTrue($source)
+    function isTrue(&$source)
     {
-        return !pred->isTrue($source);
+        return !$this->pred->isTrue($source);
     }
 }
 

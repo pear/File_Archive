@@ -42,11 +42,11 @@ class File_Archive_Predicate_Eregi extends File_Archive_Predicate
       * $ereg is the regular expression
       * $source is the filtered source
       */
-    function File_Archive_Predicate_Eregi($ereg, &$souce)
+    function File_Archive_Predicate_Eregi($ereg)
     {
         $this->ereg = $ereg;
     }
-    function isTrue($source)
+    function isTrue(&$source)
     {
         return eregi($this->ereg, $source->getFilename());
     }

@@ -48,7 +48,7 @@ class File_Archive_Predicate_And extends File_Archive_Predicate
     {
         $this->preds[] = $pred;
     }
-    function isTrue($source)
+    function isTrue(&$source)
     {
         foreach($this->preds as $p)
         {

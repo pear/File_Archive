@@ -47,7 +47,7 @@ class File_Archive_Predicate_MinTime extends File_Archive_Predicate
         $this->minTime = $minTime;
 
     }
-    function isTrue($source)
+    function isTrue(&$source)
     {
         $stat = $source->getStat();
         return !isset($stat[9]) || $stat[9]>=$this->minTime;

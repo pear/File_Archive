@@ -46,7 +46,7 @@ class File_Archive_Predicate_Ereg extends File_Archive_Predicate
     {
         $this->ereg = $ereg;
     }
-    function isTrue($source)
+    function isTrue(&$source)
     {
         return ereg($this->ereg, $source->getFilename());
     }

@@ -49,7 +49,7 @@ class File_Archive_Predicate_Extension extends File_Archive_Predicate
             $this->extensions = $extensions;
         }
     }
-    function isTrue($source)
+    function isTrue(&$source)
     {
         $filename = $source->getFilename();
         $pos = strrpos($filename, '.');
