@@ -205,7 +205,7 @@ class Test extends PHPUnit_TestCase
     {
         $filename = "test.$extension";
 
-        $source = File_Archive::read('test.php', 'test.php');
+        $source = File_Archive::read('test.php');
         $compressed = File_Archive::toMemory();
         $source->extract(
             File_Archive::toArchive(
@@ -227,9 +227,20 @@ class Test extends PHPUnit_TestCase
         $this->assertEquals(file_get_contents('test.php'), $uncompressed->getData());
     }
     function testTar() { $this->_testArchive('tar', 'tar'); }
-//    function testZip() { $this->_testArchive('zip', 'zip'); }
+    function testZip() { $this->_testArchive('zip', 'zip'); }
     function testGzip() { $this->_testArchive('gzip', 'gz'); }
     function testTgz() { $this->_testArchive('tgz', 'tgz'); }
+    function testWriteZip()
+    {
+        $source = File_Archive::readMulti();
+        $source->addSource(File_Archive::read('test.php'));
+        $source->addSource(File_Archive::readMemory("This is a dynamic file put in the ZIP archive", "dynamic.txt"));
+        $source->extract(
+            File_Archive::toArchive('zip', 'test.zip',
+                File_Archive::toFiles()
+            )
+        );
+    }
 
     function testMultiWriter()
     {

@@ -37,21 +37,21 @@ require_once "Archive.php";
  */
 class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
 {
-    var $currentFilename = NULL;
-    var $currentStat = NULL;
-    var $compLength = 0;
+    var $currentFilename = null;
+    var $currentStat = null;
+    var $header = null;
     var $offset = 0;
-    var $data = NULL;
+    var $data = null;
 
     /**
      * @see File_Archive_Reader::close()
      */
     function close()
     {
-        $this->currentFilename = NULL;
-        $this->currentStat = NULL;
+        $this->currentFilename = null;
+        $this->currentStat = null;
         $this->compLength = 0;
-        $this->data = NULL;
+        $this->data = null;
 
         parent::close();
     }
@@ -74,33 +74,51 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             return false;
         }
 
-        //Skip the data if they haven't been uncompressed and the footer
-        if($this->currentStat != NULL && $this->data == NULL)
-            $this->source->skip($this->compLength);
-        else if($this->currentStat != NULL)
-            $this->source->skip(0);
+        //Skip the data and the footer if they haven't been uncompressed
+        if($this->header != null && $this->data == null) {
+            $toSkip = $this->header['CLen'];
+            $this->source->skip($toSkip);
+        }
+
+        $this->offset = 0;
+        $this->data = null;
 
         //Read the header
-        $header = $this->source->getData(30);
-        switch(substr($header, 0, 4))
-        {
-        case "\x50\x4b\x03\x04":
+        if($this->source->getData(4) == "\x50\x4b\x03\x04") {
             //New entry
-            //TODO: read time
-            $time = substr($header, 10, 4);
-            $temp = unpack("VCRC/VCLen/VNLen/vfile", substr($header, 14));
+            $this->header = unpack(
+                "vVersion/vFlag/vMethod/vTime/vDate/VCRC/VCLen/VNLen/vFile/vExtra",
+                $this->source->getData(26));
 
-            $this->compLength = $temp['CLen'];
-            $this->currentStat = array(7=>$temp['NLen']);
-            $this->currentFilename = $this->source->getData($temp['file']);
-            $this->offset = 0;
-            $this->data = NULL;
-            return TRUE;
-        case "\x50\x4b\x01\x02":
+            //Check the compression method
+            if($this->header['Method'] != 0 &&
+               $this->header['Method'] != 8) {
+                return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle compression method {$this->header['Method']}");
+            }
+            if($this->header['Flag'] & 1) {
+                return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle encrypted files");
+            }
+            if($this->header['Flag'] & 8) {
+                return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle bit flag 3 set");
+            }
+            if($this->header['Flag'] & 32) {
+                return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle compressed patched data");
+            }
+            if($this->header['Flag'] & 64) {
+                return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle strong encrypted files");
+            }
+
+            //TODO: put time / date in stats
+            $this->currentStat = array(7=>$this->header['NLen']);
+
+            $this->currentFilename = $this->source->getData($this->header['File']);
+
+            $this->source->skip($this->header['Extra']);
+
+            return true;
+        } else {
             //Begining of central area
-            return FALSE;
-        default:
-            die("Not valid zip file");
+            return false;
         }
     }
     /**
@@ -108,16 +126,23 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
      */
     function getData($length = -1)
     {
-        if($this->offset >= $this->currentStat[7])
-            return NULL;
+        if($this->offset >= $this->currentStat[7]) {
+            return null;
+        }
 
-        if($length>=0)
+        if($length>=0) {
             $actualLength = min($length, $this->currentStat[7]-$this->offset);
-        else
+        } else {
             $actualLength = $this->currentStat[7]-$this->offset;
+        }
 
-        die("Function ZIP::getData not available in this version (extraction of ZIP archive not yet implemented)");
-
+        $error = $this->uncompressData();
+        if(PEAR::isError($error)) {
+            return $error;
+        }
+        $result = substr($this->data, $this->offset, $actualLength);
+        $this->offset += $actualLength;
+        return $result;
     }
     /**
      * @see File_Archive_Reader::skip()
@@ -126,6 +151,19 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     {
         $this->offset = min($this->offset + $length, $this->currentStat[7]);
     }
+    function uncompressData()
+    {
+        if($this->data !== NULL)
+            return;
 
+        $this->data = $this->source->getData($this->header['CLen']);
+        if($this->header['Method'] == 8) {
+            $this->data = gzinflate($this->data);
+        }
+
+        if(crc32($this->data) != $this->header['CRC']) {
+            return PEAR::raiseError("Zip archive : CRC fails on entry {$this->currentFilename}");
+        }
+    }
 }
 ?>

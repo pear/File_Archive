@@ -101,8 +101,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
                    $mtime.
                    pack("VVVvv",$crc32,$complength,$normlength,strlen($filename),0x00).
                    $filename.
-                   $data.
-                   pack("VVV",$crc32,$complength,$normlength);
+                   $data;
 
         $this->innerWriter->writeData($zipData);
 
