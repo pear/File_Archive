@@ -35,8 +35,9 @@ require_once "File/Archive/Predicate.php";
  * Custom predicate built by supplying a string expression
  *
  * Example:
- *     new File_Archive_Predicate_Custom("return strlen($source->getFilename())<100;")
- *     new File_Archive_Predicate_Custom("strlen($source->getFilename())<100;")
+ *     new File_Archive_Predicate_Custom("return strlen($name)<100;")
+ *     new File_Archive_Predicate_Custom("strlen($name)<100;")
+ *     new File_Archive_Predicate_Custom("strlen($name)<100")
  *     new File_Archive_Predicate_Custom("strlen($source->getFilename())<100")
  *
  * @see        File_Archive_Predicate File_Archive_Reader_Filter
@@ -44,6 +45,9 @@ require_once "File/Archive/Predicate.php";
 class File_Archive_Predicate_Custom extends File_Archive_Predicate
 {
     var $expression;
+    var $useName;
+    var $useStat;
+    var $useMIME;
 
     /**
      * @param string $expression PHP code that evaluates too a boolean
@@ -57,13 +61,26 @@ class File_Archive_Predicate_Custom extends File_Archive_Predicate
         if(strpos($this->expression, "return") === false) {
             $this->expression = "return ".$this->expression;
         }
-
+        $this->useName = (strpos($this->expression, "\$name") !== false);
+        $this->useStat = (strpos($this->expression, "\$stat") !== false);
+        $this->useMIME = (strpos($this->expression, "\$mime") !== false);
     }
     /**
      * @see File_Archive_Predicate::isTrue
      */
     function isTrue(&$source)
     {
+        if($this->useName) {
+            $name = $source->getFilename();
+        }
+        if($this->useStat) {
+            $stat = $source->getStat();
+            $size = $stat[7];
+            $time = (isset($stat[9]) ? $stat[9] : null);
+        }
+        if($this->useMIME) {
+            $mime = $source->getMIME();
+        }
         return eval($this->expression);
     }
 }

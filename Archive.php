@@ -314,10 +314,10 @@ class File_Archive
     /**
      * @see File_Archive_Reader_Concat
      */
-    function readConcat(&$source, $filename)
+    function readConcat(&$source, $filename, $stat=array(), $mime=null)
     {
         require_once "File/Archive/Reader/Concat.php";
-        return new File_Archive_Reader_Concat($source, $filename);
+        return new File_Archive_Reader_Concat($source, $filename, $stat, $mime);
     }
 
     /**
