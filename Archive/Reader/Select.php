@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * Keep only one precise file
+ * Reader that keeps the files selected by File_Archive::select function
  *
  * PHP versions 4 and 5
  *
@@ -29,37 +29,34 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "File/Archive/Predicate.php";
+require_once "Relay.php";
 
 /**
- * Keep only one precise file
+ * Reader that keeps the files selected by File_Archive::select function
  */
-class File_Archive_Predicate_Select extends File_Archive_Predicate
+class File_Archive_Reader_Select extends File_Archive_Reader_Relay
 {
+    /**
+     * @var File_Archive_Reader_Predicat
+     * @access private
+     */
     var $filename;
 
-    function File_Archive_Predicate_Select($filename)
+    /**
+     * $source is the reader to filter
+     */
+    function File_Archive_Reader_Select($filename, &$source)
     {
+        parent::File_Archive_Reader_Relay($source);
         $this->filename = $filename;
-        if(substr($this->filename, -1) == '/') {
-            $this->filename = substr($this->filename, 0, -1);
-        }
     }
 
     /**
-     * @see File_Archive_Predicate::isTrue()
+     * @see File_Archive_Reader::next()
      */
-    function isTrue(&$source)
+    function next()
     {
-        $sourceName = $source->getFilename();
-
-        return  empty($this->filename) ||
-
-                //$this->filename is a file
-                $this->filename == $sourceName ||
-
-                //$this->filename is a directory
-                strncmp($this->filename.'/', $sourceName, strlen($this->filename)+1) == 0;
+        return $this->source->select($this->filename, false);
     }
 }
 

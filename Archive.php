@@ -284,13 +284,10 @@ class File_Archive
             } else {
                 //Select in the source the file $file
 
-                require_once "File/Archive/Reader/Filter.php";
-                require_once "File/Archive/Predicate/Select.php";
+                require_once "File/Archive/Reader/Select.php";
+
                 $result = new File_Archive_Reader_Uncompress(
-                            new File_Archive_Reader_Filter(
-                              new File_Archive_Predicate_Select($file),
-                              $source
-                            ),
+                            new File_Archive_Reader_Select($file, $source),
                             $uncompressionLevel
                           );
             }

@@ -51,23 +51,34 @@ class File_Archive_Reader
     }
 
     /**
-     * Move to the next file whose name is $filename
+     * Move to the next file whose name is in directory $filename
+     * or is exactly $filename
      *
      * @param string $filename Name of the file to find in the archive
+     * @param bool $close If true, close the reader and search from the first file
      * @return bool whether the file was found in the archive or not
      */
-    function select($filename)
+    function select($filename, $close = true)
     {
         $std = $this->getStandardURL($filename);
 
-        //TODO: not very efficient:
-        //close and re open the archive to start from the begining
-        $error = $this->close();
-        if (PEAR::isError($error)) {
-            return $error;
+        if($close) {
+            $error = $this->close();
+            if (PEAR::isError($error)) {
+                return $error;
+            }
         }
         while (($error = $this->next()) === true) {
-            if ($this->getFilename() == $std) {
+            $sourceName = $this->getFilename();
+            if (
+                  empty($std) ||
+
+                //$std is a file
+                  $std == $sourceName ||
+
+                //$std is a directory
+                strncmp($std.'/', $sourceName, strlen($std)+1) == 0
+               ) {
                 return true;
             }
         }

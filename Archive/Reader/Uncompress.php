@@ -241,13 +241,15 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     /**
      * @see File_Archive_Reader::select()
      */
-    function select($filename)
+    function select($filename, $close = true)
     {
         $std = $this->getStandardURL($filename);
 
-        $error = $this->close();
-        if (PEAR::isError($error)) {
-            return $error;
+        if($close) {
+            $error = $this->close();
+            if (PEAR::isError($error)) {
+                return $error;
+            }
         }
 
         while (($error = $this->source->next()) === true) {
