@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<package version="1.0">
+ <name>File_Archive</name>
+ <summary>
+  File_Archive will let you manipulate easily the tar, gz and zip files
+ </summary>
+ <description>
+  File_Archive will let you manipulate easily the tar, gz and zip files.
+  This library is strongly object oriented. It makes it very easy to use, writing simple code, yet the library is very powerfull.
+  File_Archive is made of two objects : readers and writers. Are currently implemented readers from file, directory, tar, gz archives or database. You can write to file(s), mail, tar, gz or zip archives.
+ </description>
+ <license>LGPL</license>
+ <maintainers>
+  <maintainer>
+   <user>VincentLascaux</user>
+   <name>Vincent Lascaux</name>
+   <email>vincent.lascaux@centraliens.net</email>
+   <role>lead</role>
+  </maintainer>
+ </maintainers>
+
+ <release>
+  <version>0.1.0</version>
+  <date>2005-02-20</date>
+  <state>alpha</state>
+  <notes>First release of File_Archive</notes>
+  <filelist>
+   <dir name="File" role="php">
+    <file>Archive.php</file>
+    <dir name="Archive" role="php">
+     <file>Predicate.php</file>
+     <file>Reader.php</file>
+     <file>Writer.php</file>
+     <dir name="Predicate" role="php">
+      <file>And.php</file>
+      <file>Custom.php</file>
+      <file>Ereg.php</file>
+      <file>Eregi.php</file>
+      <file>Extension.php</file>
+      <file>False.php</file>
+      <file>MaxDepth.php</file>
+      <file>MinSize.php</file>
+      <file>MinTime.php</file>
+      <file>Not.php</file>
+      <file>Or.php</file>
+      <file>True.php</file>
+     </dir>
+     <dir name="Reader" role="php">
+      <file>Archive.php</file>
+      <file>ChangeName.php</file>
+      <file>Concat.php</file>
+      <file>Directory.php</file>
+      <file>File.php</file>
+      <file>Filter.php</file>
+      <file>Gzip.php</file>
+      <file>Memory.php</file>
+      <file>MimeList.php</file>
+      <file>Multi.php</file>
+      <file>Relay.php</file>
+      <file>Tar.php</file>
+      <file>Uncompress.php</file>
+      <file>Zip.php</file>
+     </dir>
+     <dir name="Writer" role="php">
+      <file>Archive.php</file>
+      <file>Files.php</file>
+      <file>Gzip.php</file>
+      <file>Mail.php</file>
+      <file>Memory.php</file>
+      <file>MemoryArchive.php</file>
+      <file>Multi.php</file>
+      <file>Output.php</file>
+      <file>Tar.php</file>
+      <file>Zip.php</file>
+     </dir>
+    </dir>
+    <dir name="tests" role="test">
+     <file name="test.php"/>
+    </dir>
+   </dir>
+  </filelist>
+  
+  <deps>
+   <dep type="php" rel="ge" version="4.3.0" />
+   <dep type="pkg" rel="has">MIME_Type</dep>
+   <dep type="pkg" rel="has" optional="yes">Mail_Mime</dep>
+   <dep type="pkg" rel="has" optional="yes">Mail</dep>
+  </deps>
+  
+ </release>
+</package>
