@@ -106,8 +106,17 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
                 return PEAR::raiseError("File_Archive_Reader_Zip doesn't handle strong encrypted files");
             }
 
-            //TODO: put time / date in stats
-            $this->currentStat = array(7=>$this->header['NLen']);
+            $this->currentStat = array(
+                7=>$this->header['NLen'],
+                9=>mktime(
+                    ($this->header['Time'] & 0xF800) >> 11,         //hour
+                    ($this->header['Time'] & 0x07E0) >> 5,          //minute
+                    ($this->header['Time'] & 0x001F) >> 1,          //second
+                    ($this->header['Date'] & 0x01E0) >> 5,          //month
+                    ($this->header['Date'] & 0x001F)     ,          //day
+                   (($this->header['Date'] & 0xFE00) >> 9) + 1980   //year
+                )
+            );
 
             $this->currentFilename = $this->source->getData($this->header['File']);
 
