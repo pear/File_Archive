@@ -7,7 +7,8 @@
  <description>
   File_Archive will let you manipulate easily the tar, gz and zip files.
   This library is strongly object oriented. It makes it very easy to use, writing simple code, yet the library is very powerfull.
-  File_Archive is made of two objects : readers and writers. Are currently implemented readers from file, directory, tar, gz archives or database. You can write to file(s), mail, tar, gz or zip archives.
+  File_Archive is made of two objects : readers and writers. Are currently implemented readers from file, directory, tar, gz and zip archives.
+  You can write to file(s), send mails with files attached, or create tar, gz or zip archives.
  </description>
  <license>LGPL</license>
  <maintainers>
