@@ -302,6 +302,14 @@ class File_Archive
         require_once "File/Archive/Reader/Multi.php";
         return new File_Archive_Reader_Multi();
     }
+    /**
+     * @see File_Archive_Reader_Concat
+     */
+    function readConcat(&$source, $filename)
+    {
+        require_once "File/Archive/Reader/Concat.php";
+        return new File_Archive_Reader_Concat($source, $filename);
+    }
 
     /**
      * @see File_Archive_Reader_Filter

@@ -75,7 +75,7 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
      * @param array  $stat are the statistics of the file. The size will be recomputed from $memory
      * @param string $mime is the mime type of the file
      */
-    function File_Archive_Reader_Memory(&$memory, $filename, $stat=array(), $mime="application/octet-stream")
+    function File_Archive_Reader_Memory(&$memory, $filename, $stat=array(), $mime=null)
     {
         $this->memory = &$memory;
         $this->filename = $this->getStandardURL($filename);
@@ -108,7 +108,7 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::getMime()
      */
-    function getMime() { return $this->mime; }
+    function getMime() { return $this->mime!=null ? $this->mime : parent::getMime(); }
 
     /**
      * @see File_Archive_Reader::getData()

@@ -73,6 +73,23 @@ class Test extends PHPUnit_TestCase
 
         $reader->close();
     }
+    function testConcatReader()
+    {
+        $source = File_Archive::readMulti();
+        $source->addSource(File_Archive::readMemory("ABCDE", "fo"));
+        $source->addSource(File_Archive::readMemory("FGHIJ", "ob"));
+        $source->addSource(File_Archive::readMemory("KLMNO", "ar"));
+        $reader = File_Archive::readConcat($source, "foobar");
+
+        $this->assertTrue($reader->next());
+        $this->assertEquals("ABC", $reader->getData(3));
+        $this->assertEquals("DEF", $reader->getData(3));
+        $this->assertEquals("GHIJKLMNO", $reader->getData());
+        $this->assertFalse($reader->next());
+
+        $reader->close();
+    }
+
     function testFilter()
     {
         $reader = File_Archive::filter(File_Archive::predFalse(), File_Archive::read('.'));
