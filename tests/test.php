@@ -30,11 +30,20 @@ class Test extends PHPUnit_TestCase
         $this->assertFalse($reader->next());
         $reader->close();
     }
+    function testURLReader()
+    {
+        $reader = File_Archive::read("http://www.google.com", "google.html");
+
+        $this->assertTrue($reader->next());
+
+        $data = $reader->getData();
+        $this->assertFalse(empty($data));
+    }
     function testMultiReader()
     {
         $reader = File_Archive::readMulti();
 
-        $reader->addSource(File_Archive::read("test.php"));
+        $reader->addSource(File_Archive::read("test.php", "test.php"));
         $reader->addSource(File_Archive::readMemory("A", "A.txt"));
 
         $this->assertTrue($reader->next());

@@ -84,6 +84,21 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     }
 
     /**
+     * Check if File_Archive_Reader_Uncompress can read an archive with a specific extension
+     *
+     * @param string $extension the extension of the archive to read
+     * @return bool whether this file can be read by File_Archive_Reader_Uncompress
+     * @static
+     */
+    function isKnownExtension($extension)
+    {
+        return $extension == 'tar' ||
+               $extension == 'zip' ||
+               $extension == 'gz' ||
+               $extension == 'tgz';
+    }
+
+    /**
      * Attempt to change the current source (if the current file is an archive)
      * If this is the case, push the current source onto the stack and make the good archive reader
      * the current source

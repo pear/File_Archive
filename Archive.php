@@ -43,7 +43,7 @@ require_once "PEAR.php";
 class File_Archive
 {
     /**
-     * Returns a reader to read the URL $directory
+     * Returns a reader to read the URL $URL
      * If the URL is a directory, it will recursively read that directory
      * If $uncompressionLevel is not null, the archives (files with extension tar, zip, gz or tgz) will
      *  be considered as directories (up to a depth of $uncompressionLevel if $uncompressionLevel > 0)
@@ -67,7 +67,7 @@ class File_Archive
      *             i.txt
      * </pre>
      *
-     * read('.') will return a reader that gives access to following files (recursively read current dir):
+     * readUncompress('.') will return a reader that gives access to following files (recursively read current dir):
      * <pre>
      * a.txt
      * b.tar
@@ -75,7 +75,7 @@ class File_Archive
      * dir2/dir3/h.tar
      * </pre>
      *
-     * read('.', 'myBaseDir') will return the following reader:
+     * readUncompress('.', 'myBaseDir') will return the following reader:
      * <pre>
      * myBaseDir/a.txt
      * myBaseDir/b.tar
@@ -83,7 +83,7 @@ class File_Archive
      * myBaseDir/dir2/dir3/h.tar
      * </pre>
      *
-     * read('.', '', -1) will return the following reader (uncompress everything)
+     * readUncompress('.', '', -1) will return the following reader (uncompress everything)
      * <pre>
      * a.txt
      * b.tar/c.txt
@@ -93,7 +93,7 @@ class File_Archive
      * dir2/dir3/h.tar/i.txt
      * </pre>
      *
-     * read('.', '', 1) will uncompress only one level (so d.tgz will not be uncompressed):
+     * readUncompress('.', '', 1) will uncompress only one level (so d.tgz will not be uncompressed):
      * <pre>
      * a.txt
      * b.tar/c.txt
@@ -102,20 +102,20 @@ class File_Archive
      * dir2/dir3/h.tar/i.txt
      * </pre>
      *
-     * read('.', '', 0, 0) will not recurse into subdirectories
+     * readUncompress('.', '', 0, 0) will not recurse into subdirectories
      * <pre>
      * a.txt
      * b.tar
      * </pre>
      *
-     * read('.', '', 0, 1) will recurse only one level in subdirectories
+     * readUncompress('.', '', 0, 1) will recurse only one level in subdirectories
      * <pre>
      * a.txt
      * b.tar
      * dir2/g.txt
      * </pre>
      *
-     * read('.', '', -1, 2) will uncompress everything and recurse in only 2 levels in subdirectories
+     * readUncompress('.', '', -1, 2) will uncompress everything and recurse in only 2 levels in subdirectories
      * or archives
      * <pre>
      * a.txt
@@ -125,7 +125,7 @@ class File_Archive
      * </pre>
      *
      * The recursion level is determined by the real path, not the symbolic one. So
-     * read('.', 'myBaseDir', -1, 2) will result to the same files:
+     * readUncompress('.', 'myBaseDir', -1, 2) will result to the same files:
      * <pre>
      * myBaseDir/a.txt
      * myBaseDir/b.tar/c.txt
@@ -135,8 +135,13 @@ class File_Archive
      *
      * To read a single file, you can do read("a.txt", "public_name.txt")
      * Take care that if no public name is provided, the default one is empty
+     *
+     * Note: This function uncompress files reading their extension
+     *       The compressed files must have a tar, zip, gz or tgz extension
+     *       Since it is impossible for some URLs to use is_dir or is_file, this function may not work with
+     *       URLs containing folders which name ends with such an extension
      */
-    function read($directory, $symbolic='', $uncompression = 0, $directoryDepth = -1)
+    function read($URL, $symbolic='', $uncompression = 0, $directoryDepth = -1)
     {
         require_once "File/Archive/Reader/Uncompress.php";
         require_once "File/Archive/Reader/ChangeName.php";
@@ -148,8 +153,8 @@ class File_Archive
         }
 
         //Find the first file in $directory
-        $std = File_Archive_Reader::getStandardURL($directory);
-        if(is_dir($directory)) {
+        $std = File_Archive_Reader::getStandardURL($URL);
+        if(is_dir($URL)) {
             require_once "File/Archive/Reader/Directory.php";
 
             $result = new File_Archive_Reader_Uncompress(
@@ -174,34 +179,71 @@ class File_Archive
                 unset($result);
                 $result =& $tmp;
             }
-        } else if(is_file($directory)) {
+        } else if(is_file($URL)) {
             require_once "File/Archive/Reader/File.php";
-            return new File_Archive_Reader_File($directory, $symbolic);
+            return new File_Archive_Reader_File($URL, $symbolic);
         } else {
             require_once "File/Archive/Reader/File.php";
+
+            $parsedURL = parse_url($std);
+            $realPath = isset($parsedURL['path']) ? $parsedURL['path'] : '';
 
             $pos = 0;
             do
             {
-                if($pos == strlen($std)) {
-                    return PEAR::raiseError("File $directory not found");
+                if($pos == strlen($realPath)) {
+                    return new File_Archive_Reader_File($std, $symbolic);
                 }
 
-                $pos = strpos($std, '/', $pos+1);
+                $pos = strpos($realPath, '/', $pos+1);
                 if($pos === false) {
-                    $pos = strlen($std);
+                    $pos = strlen($realPath);
                 }
 
-                $file = substr($std, 0, $pos);
-            } while(!is_file($file));
+                $file = substr($realPath, 0, $pos);
+                $dotPos = strrpos($file, '.');
+                $extension = '';
+                if($dotPos !== false) {
+                    $extension = substr($file, $pos+1);
+                }
+            } while(!File_Archive_Reader_Uncompress::isKnownExtension($extension) || is_dir($file));
 
+            $parsedURL['path'] = $file;
+            $file = '';
+
+            //Rebuild the real URL with the smaller path
+            if(isset($parsedURL['scheme'])) {
+                $file .= $parsedURL['scheme'].'//';
+            }
+            if(isset($parsedURL['user'])) {
+                $file .= $parsedURL['user'];
+                if(isset($parsedURL['pass'])) {
+                    $file .= ':'.$parsedURL['pass'];
+                }
+                $file .= '@';
+            }
+            if(isset($parsedURL['hostname'])) {
+                $file .= $parsedURL['hostname'];
+            }
+            if(isset($parsedURL['port'])) {
+                $file .= ':'.$parsedURL['port'];
+            }
+            $file .= $parsedURL['path'];
+            if(isset($parsedURL['query'])) {
+                $file .= '?'.$parsedURL['query'];
+            }
+            if(isset($parsedURL['fragment'])) {
+                $file .= '#'.$parsedURL['fragment'];
+            }
+
+            // Build the reader
             $result = new File_Archive_Reader_Uncompress(
                 new File_Archive_Reader_File($file),
                 $uncompressionLevel
             );
             $error = $result->setBaseDir($std);
             if(PEAR::isError($error)) {
-                return PEAR::raiseError("File $directory not found");
+                return PEAR::raiseError("File $URL not found");
             }
 
             if($directoryDepth >= 0) {

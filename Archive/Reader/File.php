@@ -37,20 +37,33 @@ require_once "File/Archive/Reader.php";
 class File_Archive_Reader_File extends File_Archive_Reader
 {
     /**
-     * @var Object Handle to the file being read
+     * @var object Handle to the file being read
      * @access private
      */
     var $handle = null;
     /**
-     * @var String Name of the physical file being read
+     * @var string Name of the physical file being read
      * @access private
      */
     var $filename;
     /**
-     * @var String Name of the file returned by the reader
+     * @var string Name of the file returned by the reader
      * @access private
      */
     var $symbolic;
+    /**
+     * @var array Stats of the file
+     *            Will only be set after a call to $this->getStat()
+     * @access private
+     */
+    var $stat = null;
+    /**
+     * @var File_Archive_Reader_Memory If we can't use stat on the URL, we need to read the whole
+     *      file to compute its length. In this case $memory won't be null, and store the content
+     *      of the file
+     * @access private
+     */
+    var $memory = null;
 
     /**
      * $filename is the physical file to read
@@ -91,7 +104,9 @@ class File_Archive_Reader_File extends File_Archive_Reader
             return false;
         }
         $this->handle = fopen($this->filename, "r");
+        $this->memory = null;
         if($this->handle === false) {
+            $this->handle = null;
             return PEAR::raiseError("File {$this->filename} not found");
         } else {
             return true;
@@ -110,7 +125,25 @@ class File_Archive_Reader_File extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::getStat() stat()
      */
-    function getStat() { return stat($this->filename); }
+    function getStat()
+    {
+        if($this->stat == null) {
+            $this->stat = @stat($this->filename);
+
+            //If we can't use the stat function
+            if($this->stat === false) {
+                $alreadyRead = ftell($this->handle);
+
+                //Put the whole file content in memory
+                require_once "Memory.php";
+                $this->memory = new File_Archive_Reader_Memory($this->getData(), $this->symbolic);
+
+                $this->stat = $this->memory->getStat();
+                $this->stat = array(7 => $this->stat[7] + $alreadyRead);
+            }
+        }
+        return $this->stat;
+    }
 
     //TODO: use the PEAR library to find the MIME extension of the file
     // function getMime()
@@ -120,12 +153,19 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function getData($length = -1)
     {
+        if($this->memory != null) {
+            return $this->memory->getData($length);
+        }
+
         if(feof($this->handle)) {
             return null;
         }
         if($length == -1) {
-            // filesize + 1 to prevent the fread(handle, 0) bug
-            return fread($this->handle, filesize($this->filename)+1);
+            $contents = '';
+            while (!feof($this->handle)) {
+                $contents .= fread($this->handle, 8192);
+            }
+            return $contents;
         } else {
             return fread($this->handle, $length);
         }
@@ -135,6 +175,10 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function skip($length)
     {
+        if($this->memory != null) {
+            return $this->memory->skip($length);
+        }
+
         $before = ftell($this->handle);
         fseek($this->handle, $length, SEEK_CUR);
         return ftell($this->handle) - $before;
