@@ -248,7 +248,7 @@ class Test extends PHPUnit_TestCase
 
         $source = File_Archive::read("$filename/test.php", null, -1, -1, $compressed->makeReader());
         while ($source->next()) {
-            echo $source->getFilename()."\n";
+            echo "Filename: ".$source->getFilename()."\n";
         }
         $source->close();
         $source->extract(File_Archive::toMemory($uncompressed));

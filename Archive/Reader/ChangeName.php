@@ -101,7 +101,8 @@ class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
     {
         $name = parent::getFilename();
         if (empty($this->oldBaseName) ||
-          !strncmp($name, $this->oldBaseName.'/', strlen($this->oldBaseName)+1)) {
+          !strncmp($name, $this->oldBaseName.'/', strlen($this->oldBaseName)+1) ||
+           strcmp($name, $this->oldBaseName) == 0) {
             return $this->newBaseName.
                    (
                     empty($this->newBaseName) ||

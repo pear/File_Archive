@@ -164,7 +164,8 @@ class File_Archive
         require_once "File/Archive/Reader/ChangeName.php";
 
         //No need to un compress more than $directoryDepth
-        //That's not perfect, and some archives will still be uncompressed just //to be filtered out :(
+        //That's not perfect, and some archives will still be uncompressed just
+        //to be filtered out :(
         if ($directoryDepth >= 0) {
             $uncompressionLevel = min($uncompression, $directoryDepth);
         } else {
