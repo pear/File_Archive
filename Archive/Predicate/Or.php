@@ -39,6 +39,7 @@ class File_Archive_Predicate_Or extends File_Archive_Predicate
 {
     /**
      * @var Array List of File_Archive_Predicate objects given as an argument
+     * @access private
      */
     var $preds;
 

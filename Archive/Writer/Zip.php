@@ -35,22 +35,26 @@ require_once "MemoryArchive.php";
 class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
 {
     /**
-     * @var Int Compression level
+     * @var int Compression level
+     * @access private
      */
     var $compressionLevel = 9;
 
     /**
-     * @var Int Current position in the writer
+     * @var int Current position in the writer
+     * @access private
      */
     var $offset = 0;
 
     /**
-     * @var String Optionnal comment to add to the zip
+     * @var string Optionnal comment to add to the zip
+     * @access private
      */
     var $comment = "";
 
     /**
-     * @var Data written at the end of the ZIP file
+     * @var string Data written at the end of the ZIP file
+     * @access private
      */
     var $central = "";
 
@@ -75,6 +79,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
 
     /**
      * @see File_Archive_Writer_MemoryArchive::appendFileData
+     * @access protected
      */
     function appendFileData($filename, $stat, $data)
     {
@@ -112,6 +117,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
     }
     /**
      * @see File_Archive_Writer_MemoryArchive::sendFooter
+     * @access protected
      */
     function sendFooter()
     {

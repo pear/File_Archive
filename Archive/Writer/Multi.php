@@ -37,6 +37,7 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
 {
     /**
      * @var File_Archive_Writer_Writer Data will be copied to these two writers
+     * @access private
      */
     var $a, $b;
 

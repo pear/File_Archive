@@ -36,26 +36,32 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
 {
     /**
      * @var String Name of the file exported by this reader
+     * @access private
      */
     var $filename;
     /**
      * @var Array Stat of the file exported by this reader
+     * @access private
      */
     var $stat;
     /**
      * @var String MIME type of the file exported by this reader
+     * @access private
      */
     var $mime;
     /**
      * @var String Memory buffer that contains the data of the file
+     * @access private
      */
     var $memory;
     /**
      * @var Int Current position in the file
+     * @access private
      */
     var $offset = 0;
     /**
      * @var Boolean Has the file already been read
+     * @access private
      */
     var $alreadyRead = false;
 

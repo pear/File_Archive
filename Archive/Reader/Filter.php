@@ -38,6 +38,7 @@ class File_Archive_Reader_Filter extends File_Archive_Reader_Relay
 {
     /**
      * @var File_Archive_Reader_Predicat
+     * @access private
      */
     var $predicate;
 

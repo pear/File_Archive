@@ -44,20 +44,23 @@ class File_Archive_Reader_DBFile extends File_Archive_Reader_Relay
 {
     /**
      * @var Object Handle to the set of results being processed
-     * The rows must contain an URL in first pos
+     *             The rows must contain an URL in first pos and optionally
+     *              a public name in second pos
+     * @access private
      */
     var $res = null;
 
     /**
      * @var Integer Current row number
+     * @access private
      */
     var $currentRowPos = 0;
 
     /**
      * @param Object $res Handle to the set of results being processed
-     * The rows must contain an URL in first pos
-     *
-     * This parameter is returned by DB::query
+     *               The rows must contain an URL in first pos and optionally
+     *                a public name in second pos
+     * @see DB::query
      */
     function File_Archive_Reader_DBFile($res)
     {

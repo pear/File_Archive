@@ -36,11 +36,13 @@ class File_Archive_Writer_Files extends File_Archive_Writer
 {
     /**
      * @var Object Handle to the file where the data are currently written
+     * @access private
      */
     var $handle = null;
 
     /**
      * Ensure that $pathname exists, or create it if it does not
+     * @access private
      */
     function mkdirr($pathname)
     {

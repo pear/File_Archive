@@ -36,10 +36,12 @@ class File_Archive_Reader_Multi extends File_Archive_Reader_Relay
 {
     /**
      * @var Array All the sources regrouped in this reader
+     * @access private
      */
     var $sources = array();
     /**
      * @var Int Index of the source being read currently
+     * @access private
      */
     var $currentIndex = 0;
 

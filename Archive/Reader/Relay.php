@@ -38,6 +38,7 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
 {
     /**
      * @var File_Archive_Reader This reader will have the same comportment as $source
+     * @access protected
      */
     var $source;
 

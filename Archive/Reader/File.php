@@ -36,14 +36,17 @@ class File_Archive_Reader_File extends File_Archive_Reader
 {
     /**
      * @var Object Handle to the file being read
+     * @access private
      */
     var $handle = null;
     /**
      * @var String Name of the physical file being read
+     * @access private
      */
     var $filename;
     /**
      * @var String Name of the file returned by the reader
+     * @access private
      */
     var $symbolic;
 

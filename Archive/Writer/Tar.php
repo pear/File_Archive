@@ -40,6 +40,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
      * @param string $filename name of the file
      * @param array $stat statistics of the file
      * @return string A 512 byte header for the file
+     * @access private
      */
     function tarHeader($filename, $stat)
     {
@@ -109,6 +110,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
      * @param array $stat the statistics of the file
      * @return string A string made of less than 512 characteres to fill the last
      *                512 byte long block
+     * @access private
      */
     function tarFooter($stat)
     {
@@ -122,6 +124,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
 
     /**
      * @see File_Archive_Writer_MemoryArchive::appendFile
+     * @access protected
      */
     function appendFile($filename, $dataFilename)
     {
@@ -133,6 +136,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
     }
     /**
      * @see File_Archive_Writer_MemoryArchive::appendFileData
+     * @access protected
      */
     function appendFileData($filename, $stat, $data)
     {
@@ -145,13 +149,14 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
     }
     /**
      * @see File_Archive_Writer_MemoryArchive::sendFooter
+     * @access protected
      */
     function sendFooter()
     {
         $this->innerWriter->writeData(pack("a1024", ""));
     }
     /**
-     * @see File_Archive_Writer::appendFile
+     * @see File_Archive_Writer::getMime
      */
     function getMime() { return "application/x-tar"; }
 }

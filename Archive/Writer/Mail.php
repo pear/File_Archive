@@ -38,36 +38,43 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
 {
     /**
      * @var Mail_mime object
+     * @access private
      */
     var $mime;
 
     /**
      * @var Mail object used to send email (built thanks to the factory)
+     * @access private
      */
     var $mail;
 
     /**
      * @var Array or String An array or a string with comma separated recipients
+     * @access private
      */
     var $to;
 
     /**
      * @var Array The headers that will be passed to the Mail_mime object
+     * @access private
      */
     var $headers;
 
     /**
      * @var String Data read from the current file so far
+     * @access private
      */
     var $currentData = null;
 
     /**
      * @var String Name of the file being attached
+     * @access private
      */
     var $currentFilename = null;
 
     /**
      * @var String MIME of the file being attached
+     * @access private
      */
     var $currentMime = null;
 

@@ -37,16 +37,19 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
 {
     /**
      * @var String URL of the directory that must be read
+     * @access private
      */
     var $directory;
     /**
      * @var Int The subdirectories will be read up to a depth of maxRecurs
-     * If maxRecurs == 0, the subdirectories will not be read
-     * If maxRecurs == -1, the depth is considered infinite
+     *          If maxRecurs == 0, the subdirectories will not be read
+     *          If maxRecurs == -1, the depth is considered infinite
+     * @access private
      */
     var $maxRecurs;
     /**
      * @var Object Handle returned by the openedDirectory function
+     * @access private
      */
     var $directoryHandle = null;
 

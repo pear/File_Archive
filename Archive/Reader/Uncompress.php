@@ -37,33 +37,40 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
 {
     /**
      * @var Array Stack of readers
+     * @access private
      */
     var $readers = array();
 
     /**
      * @var File_Archive_Reader Reader from which all started (usefull to be able to close)
+     * @access private
      */
     var $startReader;
 
     /**
-     * @var Int Maximum depth of uncompression after the basicDir (that may contain some uncompression also)
-     * -1 means no limit
+     * @var Int Maximum depth of uncompression after the basicDir
+     *          (that may contain some uncompression also)
+     *          -1 means no limit
+     * @access private
      */
     var $uncompressionLevel;
 
     /**
      * @var Int Depth of uncompression of the basicDir
+     * @access private
      */
     var $baseDirCompressionLevel = null;
 
     /**
      * @var String Only files starting with $baseDir will be reported
+     * @access private
      */
     var $baseDir = "";
 
     /**
      * @var Bool True if the current file has not been reported
-     * (used in setBaseDir to report an error if no file has been found)
+     *           (used in setBaseDir to report an error if no file has been found)
+     * @access private
      */
     var $currentFileDisplayed = true;
 
@@ -81,6 +88,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
      * A file is considered as an archive if its extension is one of tar, gz, zip, tgz
      *
      * @return bool whether the source has been pushed or not
+     * @access private
      */
     function push()
     {

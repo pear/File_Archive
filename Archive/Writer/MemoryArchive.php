@@ -38,22 +38,27 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
 {
     /**
      * @var File_Archive_Writer_Memory A buffer where the data will be put waiting for the file to be complete
+     * @access private
      */
     var $memoryWriter = null;
     /**
      * @var String Name of the file which data are coming
+     * @access private
      */
     var $currentFilename = null;
     /**
      * @var Array Stats of the file which data are coming
+     * @access private
      */
     var $currentStat = null;
     /**
      * @var String URL of the file being treated if it is a physical file
+     * @access private
      */
     var $currentDataFile = null;
     /**
      * @var Int Number of times newFile function has been called
+     * @access protected
      */
     var $nbFiles = 0;
 
@@ -97,6 +102,8 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
      * Indicate that all the data have been read from the current file
      * and send it to appendFileData
      * Send the current data to the appendFileData function
+     *
+     * @access private
      */
     function flush()
     {
@@ -135,6 +142,8 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
      * The subclass must treat the data $data
      * $data is the entire data of the filename $filename
      * $stat is the stat of the file
+     *
+     * @access protected
      */
     function appendFileData($filename, $stat, $data) { }
 
@@ -142,17 +151,23 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
     /**
      * The subclass may rewrite the sendHeader function if it needs to execute code
      * before the first file
+     *
+     * @access protected
      */
     function sendHeader() { }
     /**
      * The subclass may rewrite the sendFooter function if it needs to execute code
      * before closing the archive
+     *
+     * @access protected
      */
     function sendFooter() { }
     /**
      * The subclass may rewrite this class if it knows an efficient way to treat a physical file
      * This function is equivalent to $this->appendFileData($filename, stat($dataFilename), file_get_contents($dataFilename));
      * but may be more efficient
+     *
+     * @access protected
      */
     function appendFile($filename, $dataFilename)
     {

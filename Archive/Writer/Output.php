@@ -38,7 +38,9 @@ class File_Archive_Writer_Output extends File_Archive_Writer
 {
     /**
      * @var Bool If true, the Content-type and Content-disposition headers will be sent
-     * The file will be considered as an attachment and the MIME will be deduced from its extension
+     *           The file will be considered as an attachment and the MIME will be deduced
+     *           from its extension
+     * @access private
      */
     var $sendHeaders;
 

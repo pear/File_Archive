@@ -36,21 +36,25 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
 {
     /**
      * @var String Name of the file being read
+     * @access private
      */
     var $currentFilename = NULL;
     /**
      * @var Array Stats of the file being read
-     * In TAR reader, indexes 2, 4, 5, 7, 9 are set
+     *            In TAR reader, indexes 2, 4, 5, 7, 9 are set
+     * @access private
      */
     var $currentStat = NULL;
     /**
      * @var Integer Number of bytes that still have to be read before the end of file
+     * @access private
      */
     var $leftLength = 0;
     /**
      * @var Integer Size of the footer
-     * A TAR file is made of chunks of 512 bytes. If 512 does not divide the file size a footer
-     * is added ([header][512 byte chunk]...[512 byte chunk][end of data|footer])
+     *              A TAR file is made of chunks of 512 bytes. If 512 does not divide
+     *              the file size a footer is added
+     * @access private
      */
     var $footerLength = 0;
 
