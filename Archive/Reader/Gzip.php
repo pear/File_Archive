@@ -111,10 +111,10 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         $this->offset = 0;
 
         if($size  != strlen($this->data)) {
-            return PEAR::raiseError(("Not valid gz file (size error {$size} != ".strlen($this->data).")");
+            return PEAR::raiseError("Not valid gz file (size error {$size} != ".strlen($this->data).")");
         }
         if($crc32 != crc32 ($this->data)) {
-            return PEAR::raiseError(("Not valid gz file (checksum error)");
+            return PEAR::raiseError("Not valid gz file (checksum error)");
         }
         return TRUE;
     }
