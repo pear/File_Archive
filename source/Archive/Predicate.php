@@ -27,38 +27,16 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "File/Archive/Reader.php";
+require_once "Reader.php";
 
 /**
-  * Base class for all the archive readers (that read from a single file)
+  * A predicate is an object that can evaluate to true or false depending on the
+  * file currently read by a File_Archive_Reader
+  * It is used by filters
   */
-class File_Archive_Reader_Archive extends File_Archive_Reader
+class File_Archive_Predicate
 {
-    var $source = null;
-    var $sourceOpened = false;
-
-//ABSTRACT
-    function next()
-    {
-        if(!$this->sourceOpened && !$this->source->next()) {
-            return false;
-        }
-
-        $this->sourceOpened = true;
-        return true;
-    }
-
-//PUBLIC
-    function File_Archive_Reader_Archive(&$source, $sourceOpened = false)
-    {
-        $this->source =& $source;
-        $this->sourceOpened = $sourceOpened;
-    }
-    function close()
-    {
-        $this->source->close();
-        $this->sourceOpened = false;
-    }
+    function isTrue($source) { return PEAR::raiseError("Abstract function call"); }
 }
 
 ?>

@@ -1,24 +1,31 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-// +----------------------------------------------------------------------+
-// | This library is free software; you can redistribute it and/or        |
-// | modify it under the terms of the GNU Lesser General Public           |
-// | License as published by the Free Software Foundation; either         |
-// | version 2.1 of the License, or (at your option) any later version.   |
-// |                                                                      |
-// | This library is distributed in the hope that it will be useful,      |
-// | but WITHOUT ANY WARRANTY; without even the implied warranty of       |
-// | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    |
-// | Lesser General Public License for more details.                      |
-// |                                                                      |
-// | You should have received a copy of the GNU Lesser General Public     |
-// | License along with this library; if not, write to the Free Software  |
-// | Foundation, Inc., 59 Temple Place, Suite 330,Boston,MA 02111-1307 USA|
-// +----------------------------------------------------------------------+
-// | Authors: Vincent Lascaux <vincent.lascaux at centraliens.net>        |
-// +----------------------------------------------------------------------+
-//
-// $Id$
+
+/**
+ * PHP versions 4 and 5
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330,Boston,MA 02111-1307 USA
+ *
+ * @category   File Formats
+ * @package    File_Archive
+ * @author     Vincent Lascaux <vincentlascaux@php.net>
+ * @copyright  1997-2005 The PHP Group
+ * @license    http://www.gnu.org/copyleft/lesser.html  LGPL
+ * @version    CVS: $Id$
+ * @link       http://pear.php.net/package/File_Archive
+ */
 
 require_once "PEAR.php";
 
@@ -121,10 +128,10 @@ class File_Archive
                 $uncompressionLevel
             );
             if($directoryDepth >= 0) {
-                require_once "File/Archive/Predicat/MaxDepth.php";
+                require_once "File/Archive/Predicate/MaxDepth.php";
 
                 $tmp = new File_Archive_Reader_Filter(
-                    new File_Archive_Predicat_MaxDepth($directoryDepth),
+                    new File_Archive_Predicate_MaxDepth($directoryDepth),
                     $result
                 );
                 unset($result);
@@ -169,10 +176,10 @@ class File_Archive
             }
 
             if($directoryDepth >= 0) {
-                require_once "File/Archive/Predicat/MaxDepth.php";
+                require_once "File/Archive/Predicate/MaxDepth.php";
 
                 $tmp = new File_Archive_Reader_Filter(
-                    new File_Archive_Predicat($directoryDepth + substr_count(substr($std, $pos+1), '/')),
+                    new File_Archive_Predicate($directoryDepth + substr_count(substr($std, $pos+1), '/')),
                     $result
                 );
                 unset($result);
@@ -202,73 +209,73 @@ class File_Archive
         return new File_Archive_Reader_Multi();
     }
 
-    function filter($predicat, $source)
+    function filter($predicate, $source)
     {
         require_once "File/Archive/Reader/Filter.php";
-        return new File_Archive_Reader_Filter($predicat, $source);
+        return new File_Archive_Reader_Filter($predicate, $source);
     }
     function predTrue()
     {
-        require_once "File/Archive/Predicat/True.php";
-        return new File_Archive_Predicat_True();
+        require_once "File/Archive/Predicate/True.php";
+        return new File_Archive_Predicate_True();
     }
     function predFalse()
     {
-        require_once "File/Archive/Predicat/False.php";
-        return new File_Archive_Predicat_False();
+        require_once "File/Archive/Predicate/False.php";
+        return new File_Archive_Predicate_False();
     }
     function predAnd()
     {
-        require_once "File/Archive/Predicat/And.php";
-        $pred = new File_Archive_Predicat_And();
+        require_once "File/Archive/Predicate/And.php";
+        $pred = new File_Archive_Predicate_And();
         $args = func_get_args();
         foreach($args as $p)
-            $pred->addPredicat($p);
+            $pred->addPredicate($p);
         return $pred;
     }
     function predOr()
     {
-        require_once "File/Archive/Predicat/Or.php";
-        $pred = new File_Archive_Predicat_Or();
+        require_once "File/Archive/Predicate/Or.php";
+        $pred = new File_Archive_Predicate_Or();
         $args = func_get_args();
         foreach($args as $p)
-            $pred->addPredicat($p);
+            $pred->addPredicate($p);
         return $pred;
     }
     function predNot($pred)
     {
-        require_once "File/Archive/Predicat/Not.php";
-        return new File_Archive_Predicat_Not($pred);
+        require_once "File/Archive/Predicate/Not.php";
+        return new File_Archive_Predicate_Not($pred);
     }
     function predMinSize($size)
     {
-        require_once "File/Archive/Predicat/MinSize.php";
-        return new File_Archive_Predicat_MinSize($size);
+        require_once "File/Archive/Predicate/MinSize.php";
+        return new File_Archive_Predicate_MinSize($size);
     }
     function predMinTime($time)
     {
-        require_once "File/Archive/Predicat/MinTime.php";
-        return new File_Archive_Predicat_MinTime($time);
+        require_once "File/Archive/Predicate/MinTime.php";
+        return new File_Archive_Predicate_MinTime($time);
     }
     function predMaxDepth($depth)
     {
-        require_once "File/Archive/Predicat/MaxDepth.php";
-        return new File_Archive_Predicat_MaxDepth($depth);
+        require_once "File/Archive/Predicate/MaxDepth.php";
+        return new File_Archive_Predicate_MaxDepth($depth);
     }
     function predExtension($list)
     {
-        require_once "File/Archive/Predicat/Extension.php";
-        return new File_Archive_Predicat_Extension($list);
+        require_once "File/Archive/Predicate/Extension.php";
+        return new File_Archive_Predicate_Extension($list);
     }
     function predEreg($ereg)
     {
-        require_once "File/Archive/Predicat/Ereg.php";
-        return new File_Archive_Predicat_Ereg($ereg);
+        require_once "File/Archive/Predicate/Ereg.php";
+        return new File_Archive_Predicate_Ereg($ereg);
     }
     function predEregi($ereg)
     {
-        require_once "File/Archive/Predicat/Eregi.php";
-        return new File_Archive_Predicat_Eregi($ereg);
+        require_once "File/Archive/Predicate/Eregi.php";
+        return new File_Archive_Predicate_Eregi($ereg);
     }
 
     function toMail($to, $headers, $message, &$mail = null)
