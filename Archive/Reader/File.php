@@ -155,7 +155,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function getMime()
     {
-        $result = MIME_Type::autoDetect($this->getFilename());
+        $result = MIME_Type::autoDetect($this->getDataFilename());
         if (PEAR::isError($result)) {
             return parent::getMime();
         } else {

@@ -56,7 +56,7 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
      *        variable while using this writer (you can safely use all the
      *        functions of the archive, like clear for example)
      */
-    function File_Archive_Writer_Memory(&$data = null)
+    function File_Archive_Writer_Memory(&$data)
     {
         $this->data =& $data;
         $this->data = '';

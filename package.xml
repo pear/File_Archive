@@ -21,11 +21,17 @@
  </maintainers>
 
  <release>
-  <version>0.2.0</version>
-  <date>2005-02-24</date>
+  <version>0.3.0</version>
+  <date>2005-04-08</date>
   <state>beta</state>
   <notes>
-   + Add BZip2 reader and writer
+    + Bug 3894
+    + The File_Archive::read function does no longer take the optional source parameter
+      A File_Archive::readSource function has been created that takes the source parameter
+    + The mail parameter in File_Archive::toMail is now mandatory, but giving a null variable will
+      result in using Mail::factory("mail")
+    + The File_Archive::toMemory function does no longer take a variable argument
+      A File_Archive::toVariable function has been created for that
   </notes>
   <filelist>
    <dir name="File" role="php">
@@ -100,6 +106,7 @@
  </release>
  
  <changelog>
+  <release> 
    <version>0.2.0</version>
    <date>2005-02-24</date>
    <state>beta</state>

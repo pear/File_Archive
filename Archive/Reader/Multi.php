@@ -47,6 +47,11 @@ class File_Archive_Reader_Multi extends File_Archive_Reader_Relay
      */
     var $currentIndex = 0;
 
+    function File_Archive_Reader_Multi()
+    {
+        parent::File_Archive_Reader_Relay($tmp = null);
+    }
+
     /**
      * Add a new reader to the list of readers
      * @param File_Archive_Reader $source The source to add

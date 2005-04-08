@@ -246,8 +246,8 @@ class Test extends PHPUnit_TestCase
 
         require_once "File/Archive/Reader/Uncompress.php";
 
-        $source = File_Archive::read("$filename/test.php", null, -1, -1, $compressed->makeReader());
-        $source->extract(File_Archive::toMemory($uncompressed));
+        $source = File_Archive::readSource($compressed->makeReader(), "$filename/test.php");
+        $source->extract(File_Archive::toVariable($uncompressed));
 
         $this->assertEquals(file_get_contents('test.php'), $uncompressed);
     }
@@ -259,7 +259,7 @@ class Test extends PHPUnit_TestCase
     function testWriteBZip2()
     {
         //Build the writer
-        $writer = File_Archive::toArchive('example1.tbz');
+        $writer = File_Archive::toArchive('example1.tbz', File_Archive::toFiles());
 
         //Write the list of even number in [0..999]
         $writer->newFile("even.txt");
@@ -290,49 +290,6 @@ class Test extends PHPUnit_TestCase
         );
         $this->assertEquals($a->getData(), "ABCDEF");
         $this->assertEquals($b->getData(), "ABCDEF");
-    }
-
-    function testStreamReader()
-    {
-        $source = File_Archive::readMemory("ABCDEF", "A.txt");
-        $name = File_Archive::registerStream($source);
-
-        $handle = fopen("filearchive://$name/A.txt", "r");
-        $this->assertEquals("ABC", fread($handle, 3));
-        $this->assertEquals("DEF", fread($handle, 5));
-        fclose($handle);
-
-        File_Archive::unregisterStream($name);
-    }
-
-    function testStreamWriter()
-    {
-        $name = File_Archive::registerStream(
-            File_Archive::toArchive(
-                "test.tar",
-                $compressed = File_Archive::toMemory()
-            )
-        );
-
-        $handle = fopen("filearchive://$name/test.txt", "w");
-        fwrite($handle, "This is a test");
-        fclose($handle);
-
-        $handle = fopen("filearchive://$name/test2.txt", "w");
-        fwrite($handle, "This is a second test");
-        fclose($handle);
-
-        File_Archive::unregisterStream($name);
-
-        $source = File_Archive::read('test.tar/', null, -1, -1, $compressed->makeReader());
-
-        $this->assertTrue($source->next());
-        $this->assertEquals("test.txt", $source->getFilename());
-        $this->assertEquals("This is a test", $source->getData());
-        $this->assertTrue($source->next());
-        $this->assertEquals("test2.txt", $source->getFilename());
-        $this->assertEquals("This is a second test", $source->getData());
-        $this->assertFalse($source->next());
     }
 }
 

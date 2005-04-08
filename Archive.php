@@ -142,8 +142,8 @@ class File_Archive
      * myBaseDir/dir2/g.txt
      * </pre>
      *
-     * You can use the source parameter to create a reader that reads the given URL from
-     * a specific reader instead of reading from system files.
+     * Use readSource to do the same thing, reading from a specified reader instead of
+     * reading from the system files
      *
      * To read a single file, you can do read('a.txt', 'public_name.txt')
      * If no public name is provided, the default one is the name of the file
@@ -156,9 +156,8 @@ class File_Archive
      *       function may not work with
      *       URLs containing folders which name ends with such an extension
      */
-    function read($URL, $symbolic = null,
-                  $uncompression = 0, $directoryDepth = -1,
-                  &$source=null)
+    function readSource(&$source, $URL, $symbolic = null,
+                  $uncompression = 0, $directoryDepth = -1)
     {
         require_once "File/Archive/Reader/Uncompress.php";
         require_once "File/Archive/Reader/ChangeName.php";
@@ -333,6 +332,13 @@ class File_Archive
         }
         return $result;
     }
+    function read($URL, $symbolic = null,
+                  $uncompression = 0, $directoryDepth = -1)
+    {
+        $source = null;
+        return File_Archive::readSource($source, $URL, $symbolic, $uncompression, $directoryDepth);
+    }
+
     /**
      * Contains only one file with data read from a memory buffer
      *
@@ -595,7 +601,7 @@ class File_Archive
      * @param string $message Text body of the mail
      * @see File_Archive_Writer_Mail
      */
-    function toMail($to, $headers, $message, &$mail = null)
+    function toMail($to, $headers, $message, $mail = null)
     {
         require_once "File/Archive/Writer/Mail.php";
         return new File_Archive_Writer_Mail($to, $headers, $message, $mail);
@@ -616,15 +622,26 @@ class File_Archive
     /**
      * Send the content of the files to a memory buffer
      *
+     * toMemory returns a writer where the data will be written.
+     * In this case, the data is accessible using the getData member
+     *
+     * toVariable returns a writer that will write into the given
+     * variable
+     *
      * @param out $data if specified, the data will be written to this buffer
      *        Else, you can retrieve the buffer with the
      *        File_Archive_Writer_Memory::getData() function
      * @see   File_Archive_Writer_Memory
      */
-    function toMemory(&$data = null)
+    function toMemory()
+    {
+        $v = '';
+        return File_Archive::toVariable($v);
+    }
+    function toVariable(&$v)
     {
         require_once "File/Archive/Writer/Memory.php";
-        return new File_Archive_Writer_Memory($data);
+        return new File_Archive_Writer_Memory($v);
     }
     /**
      * Duplicate the writing operation on two writers
@@ -664,7 +681,7 @@ class File_Archive
      * @param bool $autoClose If set to true, $innerWriter will be closed when
      *        the returned archive is close. Default value is true.
      */
-    function toArchive($filename, &$innerWriter = null, $type = null,
+    function toArchive($filename, &$innerWriter, $type = null,
                        $stat = array(), $autoClose = true)
     {
         $shortcuts = array("tgz"   , "tbz"    );
