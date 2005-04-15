@@ -282,6 +282,11 @@ class Test extends PHPUnit_TestCase
         //Close the writer
         $writer->close();
     }
+    function testTarDirectories()
+    {
+        $source = File_Archive::read('../Archive');
+        $source->extract(File_Archive::toArchive('up.tar', File_Archive::toFiles()));
+    }
 
     function testMultiWriter()
     {

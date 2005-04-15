@@ -204,6 +204,9 @@ class File_Archive
                 $result =& $tmp;
             }
             if (!empty($realSymbolic)) {
+                if ($symbolic == null) {
+                    $realSymbolic = '';
+                }
                 $tmp = new File_Archive_Reader_AddBaseName(
                     $realSymbolic,
                     $result

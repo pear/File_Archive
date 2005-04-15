@@ -41,6 +41,19 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      * @access private
      */
     var $handle = null;
+    var $basePath;
+
+    function File_Archive_Writer_Files($base = '')
+    {
+        if($base == null || $base == '')
+            $this->basePath = '';
+        else {
+            if(substr($base, -1) == '/')
+                $this->basePath = $base;
+            else
+                $this->basePath = $base.'/';
+        }
+    }
 
     /**
      * Ensure that $pathname exists, or create it if it does not
@@ -81,6 +94,8 @@ class File_Archive_Writer_Files extends File_Archive_Writer
         if ($this->handle !== null) {
             fclose($this->handle);
         }
+
+        $filename = $this->basePath.$filename;
 
         $pos = strrpos($filename, "/");
         if ($pos !== false) {
