@@ -365,7 +365,7 @@ class File_Archive
      *        built thanks to the read function
      * @see   File_Archive_Reader_Multi, File_Archive::read()
      */
-    function readMulti(&$sources = array())
+    function readMulti($sources = array())
     {
         require_once "File/Archive/Reader/Multi.php";
         $result = new File_Archive_Reader_Multi();
