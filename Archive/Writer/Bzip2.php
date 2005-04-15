@@ -29,14 +29,18 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "MemoryArchive.php";
+require_once "Archive.php";
 
 /**
  * Compress a single file to Bzip2 format
  */
-class File_Archive_Writer_Bzip2 extends File_Archive_Writer_MemoryArchive
+class File_Archive_Writer_Bzip2 extends File_Archive_Writer_Archive
 {
     var $compressionLevel=9;
+    var $bzfile;
+    var $tmpName;
+    var $nbFiles = 0;
+
     /**
      * Set the compression level
      *
@@ -56,26 +60,37 @@ class File_Archive_Writer_Bzip2 extends File_Archive_Writer_MemoryArchive
     function newFile($filename, $stat = array(),
                      $mime = "application/octet-stream")
     {
-        $result = parent::newFile($filename, $stat, $mime);
-        if ($result !== true) {
-            return $result;
-        }
         if($this->nbFiles > 1) {
             return PEAR::raiseError("A Bzip2 archive can only contain one single file.".
                                     "Use Tbz archive to be able to write several files");
         }
+        $this->nbFiles++;
+
+        $this->tmpName = tempnam('.', 'far');
+        $this->bzfile = bzopen($this->tmpName, 'w'.$this->compressionLevel);
+
         return true;
     }
 
 
     /**
-     * @see File_Archive_Writer_MemoryArchive::appendFileData()
+     * Actually write the tmp file to the inner writer
+     * Close and delete temporary file
+     *
+     * @see File_Archive_Writer::close();
      */
-    function appendFileData($filename, $stat, $data)
+    function close()
     {
-        return $this->innerWriter->writeData(
-            bzcompress($data, $this->compressionLevel)
-        );
+        gzclose($this->bzfile);
+        $this->innerWriter->writeFile($this->tmpName);
+        unlink($this->tmpName);
+
+        return parent::close();
+    }
+
+    function writeData($data)
+    {
+        bzwrite($this->bzfile, $data);
     }
 }
 

@@ -236,6 +236,7 @@ class Test extends PHPUnit_TestCase
         $filename = "test.$extension";
 
         $source = File_Archive::read('test.php');
+        $generated = $extension=='gz' || $extension=='bz2' ? 'test' : 'test.php';
 
         $source->extract(
             File_Archive::toArchive(
@@ -246,7 +247,9 @@ class Test extends PHPUnit_TestCase
 
         require_once "File/Archive/Reader/Uncompress.php";
 
-        $source = File_Archive::readSource($compressed->makeReader(), "$filename/test.php");
+        $source = File_Archive::readSource($compressed->makeReader(), "$filename/$generated");
+        if(PEAR::isError($source))
+            var_dump($source);
         $source->extract(File_Archive::toVariable($uncompressed));
 
         $this->assertEquals(file_get_contents('test.php'), $uncompressed);
@@ -255,7 +258,8 @@ class Test extends PHPUnit_TestCase
     function testZip() { $this->_testArchive('zip'); }
     function testGzip() { $this->_testArchive('gz'); }
     function testTgz() { $this->_testArchive('tgz'); }
-    function testTbz() { $this->_testArchive('tbz');}
+    function testTbz() { $this->_testArchive('tbz'); }
+    function testBZ2() { $this->_testArchive('bz2'); }
     function testWriteBZip2()
     {
         //Build the writer

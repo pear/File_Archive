@@ -40,7 +40,6 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
     var $offset = 0;
     var $alreadyRead = false;
 
-    var $name = null;
     var $comment = null;
     var $hasName = false;
     var $hasComment = false;
@@ -81,31 +80,8 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         }
 
         $temp = decbin($id['flags']);
-        $this->hasName = ($temp & 0x8);
         $this->hasComment = ($temp & 0x4);
 
-        $this->name = "";
-        if ($this->hasName) {
-            while (($char = $this->source->getData(1)) !== "\0") {
-                if ($char === null) {
-                    return PEAR::raiseError(
-                        "Not valid gz file (unexpected end of archive ".
-                        "reading filename)"
-                    );
-                }
-                if (PEAR::isError($char)) {
-                    return $char;
-                }
-                $this->name .= $char;
-            }
-            $this->name = $this->getStandardURL($this->name);
-        } else {
-            $this->name = $this->source->getFilename();
-            $pos = strrpos($name, ".");
-            if ($pos !== false && $pos !== 0) {
-                $this->name = substr($this->name, 0, $pos);
-            }
-        }
         $this->comment = "";
         if ($this->hasComment) {
             while (($char = $this->source->getData(1)) !== "\0") {
@@ -145,13 +121,24 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         }
         return true;
     }
+
     /**
+     * Return the name of the single file contained in the archive
+     * deduced from the name of the archive (the extension is removed)
+     *
      * @see File_Archive_Reader::getFilename()
      */
     function getFilename()
     {
-        return $this->name;
+        $name = $this->source->getFilename();
+        $pos = strrpos($name, ".");
+        if ($pos === false || $pos === 0) {
+            return $name;
+        } else {
+            return substr($name, 0, $pos);
+        }
     }
+
     /**
      * @see File_Archive_Reader::getStat()
      */
