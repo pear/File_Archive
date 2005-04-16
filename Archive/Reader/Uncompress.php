@@ -189,6 +189,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
             //Remove the readers we have completly read from the stack
             do {
                 while (($error = $this->source->next()) === false) {
+                    $this->source->close();
                     if (empty($this->readers)) {
                         return false;
                     }
@@ -279,6 +280,11 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
      */
     function close()
     {
+        for($i=0; $i<count($this->readers); ++$i) {
+            $this->readers[$i]->close();
+        }
+
+
         $this->readers = array();
         $error = parent::close();
         $this->source =& $this->startReader;

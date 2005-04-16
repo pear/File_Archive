@@ -53,7 +53,6 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_Archive
      */
     function tarHeader($filename, $stat)
     {
-        echo "header ($filename)\n";
         $mode = isset($stat[2]) ? $stat[2] : 0x8000;
         $uid  = isset($stat[4]) ? $stat[4] : 0;
         $gid  = isset($stat[5]) ? $stat[5] : 0;
@@ -126,7 +125,6 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_Archive
      */
     function tarFooter($size)
     {
-        echo "footer\n";
         if ($size % 512 > 0) {
             return pack("a".(512 - $size%512), "");
         } else {

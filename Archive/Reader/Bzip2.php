@@ -30,23 +30,27 @@
  */
 
 require_once "Archive.php";
+require_once "File/Archive/Writer/Files.php";
 
 /**
  * Uncompress a file that was compressed in the Bzip2 format
  */
 class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
 {
-    var $data = null;
-    var $offset = 0;
     var $alreadyRead = false;
+    var $bzfile = null;
+    var $tmpName = null;
 
     /**
      * @see File_Archive_Reader::close()
      */
     function close()
     {
-        $this->data = null;
-        $this->offset = 0;
+        if($this->bzfile != null)
+            bzclose($this->bzfile);
+        if($this->tmpName != null)
+            unlink($this->tmpName);
+
         $this->alreadyRead = false;
         return parent::close();
     }
@@ -65,13 +69,22 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
         }
         $this->alreadyRead = true;
 
-        $this->data = $this->source->getData();
-        if (PEAR::isError($this->data)) {
-            return $this->data;
-        }
+        $dataFilename = $this->source->getDataFilename();
+        if ($dataFilename != null)
+        {
+            $this->tmpName = null;
+            $this->bzfile = bzopen($dataFilename, 'r');
+        } else {
+            $this->tmpName = tempnam('.', 'far');
 
-        $this->data = bzdecompress($this->data);
-        $this->offset = 0;
+            //Generate the tmp data
+            $dest = new File_Archive_Writer_Files();
+            $dest->newFile($this->tmpName);
+            $this->source->sendData($dest);
+            $dest->close();
+
+            $this->bzfile = bzopen($this->tmpName, 'r');
+        }
 
         return true;
     }
@@ -92,40 +105,24 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
         }
     }
     /**
-     * @see File_Archive_Reader::getStat()
-     */
-    function getStat()
-    {
-        return array(
-            7 => strlen($this->data)
-        );
-    }
-    /**
      * @see File_Archive_Reader::getData()
      */
     function getData($length = -1)
     {
         if ($length == -1) {
-            $actualLength = strlen($this->data) - $this->offset;
+            $data = '';
+            do
+            {
+                $newData = bzread($this->bzfile);
+                $data .= $newData;
+            } while($newData != '');
+        } else if ($length == 0) {
+            return '';
         } else {
-            $actualLength = min(strlen($this->data) - $this->offset, $length);
+            $data = bzread($this->bzfile, $length);
         }
 
-        if ($actualLength == 0) {
-            return null;
-        } else {
-            $result = substr($this->data, $this->offset, $actualLength);
-            $this->offset += $actualLength;
-            return $result;
-        }
-    }
-    /**
-     * @see File_Archive_Reader::skip()
-     */
-    function skip($length)
-    {
-        $this->offset += $length;
-        return $length;
+        return $data == '' ? null : $data;
     }
 }
 

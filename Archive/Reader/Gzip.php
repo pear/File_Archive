@@ -30,27 +30,27 @@
  */
 
 require_once "Archive.php";
+require_once "File/Archive/Writer/Files.php";
 
 /**
  * Uncompress a file that was compressed in the Gzip format
  */
 class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
 {
-    var $data = null;
-    var $offset = 0;
     var $alreadyRead = false;
-
-    var $comment = null;
-    var $hasName = false;
-    var $hasComment = false;
+    var $gzfile = null;
+    var $tmpName = null;
 
     /**
      * @see File_Archive_Reader::close()
      */
     function close()
     {
-        $this->data = null;
-        $this->offset = 0;
+        if($this->gzfile != null)
+            gzclose($this->gzfile);
+        if($this->tmpName != null)
+            unlink($this->tmpName);
+
         $this->alreadyRead = false;
         return parent::close();
     }
@@ -69,59 +69,25 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         }
         $this->alreadyRead = true;
 
-        $header = $this->source->getData(10);
-        if (PEAR::isError($header)) {
-            return $header;
+        $dataFilename = $this->source->getDataFilename();
+        if ($dataFilename != null)
+        {
+            $this->tmpName = null;
+            $this->gzfile = gzopen($dataFilename, 'r');
+        } else {
+            $this->tmpName = tempnam('.', 'far');
+
+            //Generate the tmp data
+            $dest = new File_Archive_Writer_Files();
+            $dest->newFile($this->tmpName);
+            $this->source->sendData($dest);
+            $dest->close();
+
+            $this->gzfile = gzopen($this->tmpName, 'r');
         }
 
-        $id = unpack("H2id1/H2id2/C1tmp/C1flags",substr($header,0,4));
-        if ($id['id1'] != "1f" || $id['id2'] != "8b") {
-            return PEAR::raiseError("Not valid gz file (wrong header)");
-        }
-
-        $temp = decbin($id['flags']);
-        $this->hasComment = ($temp & 0x4);
-
-        $this->comment = "";
-        if ($this->hasComment) {
-            while (($char = $this->source->getData(1)) !== "\0") {
-                if ($char === null) {
-                    return PEAR::raiseError(
-                        "Not valid gz file (unexpected end of archive ".
-                        "reading comment)"
-                    );
-                }
-                if (PEAR::isError($char)) {
-                    return $char;
-                }
-                $this->comment .= $char;
-            }
-        }
-
-        $this->data = $this->source->getData();
-        if (PEAR::isError($this->data)) {
-            return $this->data;
-        }
-
-        $temp = unpack("Vcrc32/Visize",substr($this->data,-8));
-        $crc32 = $temp['crc32'];
-        $size = $temp['isize'];
-
-        $this->data = gzinflate(substr($this->data,0,strlen($this->data)-8));
-        $this->offset = 0;
-
-        if ($size != strlen($this->data)) {
-            return PEAR::raiseError(
-                "Not valid gz file (size error {$size} != ".
-                strlen($this->data).")"
-            );
-        }
-        if ($crc32 != crc32($this->data)) {
-            return PEAR::raiseError("Not valid gz file (checksum error)");
-        }
         return true;
     }
-
     /**
      * Return the name of the single file contained in the archive
      * deduced from the name of the archive (the extension is removed)
@@ -138,42 +104,25 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
             return substr($name, 0, $pos);
         }
     }
-
-    /**
-     * @see File_Archive_Reader::getStat()
-     */
-    function getStat()
-    {
-        return array(
-            7 => strlen($this->data)
-        );
-    }
     /**
      * @see File_Archive_Reader::getData()
      */
     function getData($length = -1)
     {
         if ($length == -1) {
-            $actualLength = strlen($this->data) - $this->offset;
+            $data = '';
+            do
+            {
+                $newData = gzread($this->gzfile, 8196);
+                $data .= $newData;
+            } while($newData != '');
+        } else if ($length == 0) {
+            return '';
         } else {
-            $actualLength = min(strlen($this->data) - $this->offset, $length);
+            $data = gzread($this->gzfile, $length);
         }
 
-        if ($actualLength == 0) {
-            return null;
-        } else {
-            $result = substr($this->data, $this->offset, $actualLength);
-            $this->offset += $actualLength;
-            return $result;
-        }
-    }
-    /**
-     * @see File_Archive_Reader::skip()
-     */
-    function skip($length)
-    {
-        $this->offset += $length;
-        return $length;
+        return $data == '' ? null : $data;
     }
 }
 

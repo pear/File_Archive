@@ -247,7 +247,9 @@ class Test extends PHPUnit_TestCase
 
         require_once "File/Archive/Reader/Uncompress.php";
 
-        $source = File_Archive::readSource($compressed->makeReader(), "$filename/$generated");
+        $compressedReader = $compressed->makeReader();
+        $source = File_Archive::readSource($compressedReader, "$filename/$generated");
+
         if(PEAR::isError($source))
             echo ($extension);
         $source->extract(File_Archive::toVariable($uncompressed));
