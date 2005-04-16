@@ -117,7 +117,7 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
         $header = unpack(
             "a100filename/a8mode/a8uid/a8gid/a12size/a12mtime/".
             "a8checksum/a1type/a100linkname/a6magic/a2version/".
-            "a32uname/a32gname/a8devmajor/a8devminor/a155path",
+            "a32uname/a32gname/a8devmajor/a8devminor/a155prefix",
             $rawHeader);
         $this->currentStat = array(
             2 => octdec($header['mode']),
@@ -126,9 +126,15 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
             7 => octdec($header['size']),
             9 => octdec($header['mtime'])
             );
-        $this->currentFilename = $this->getStandardURL(
-                        $header['path'] . $header['filename']
-                    );
+        if ($header['magic'] == 'ustar') {
+            $this->currentFilename = $this->getStandardURL(
+                            $header['prefix'] . $header['filename']
+                        );
+        } else {
+            $this->currentFilename = $this->getStandardURL(
+                            $header['filename']
+                        );
+        }
 
         $this->leftLength = $this->currentStat[7];
         if ($this->leftLength % 512 == 0) {

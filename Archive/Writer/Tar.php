@@ -71,19 +71,14 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_Archive
             $type = 9;        // Unknown
         }
 
-        $pos = strrpos($filename, "/");
-        if ($pos !== FALSE) {
-            $path = substr($filename, 0, $pos+1);
-            $path = preg_replace("/^(\.{1,2}(\/|\\\))+/","",$path);
-
-            $file = substr($filename, $pos+1);
-        } else {
-            $path = "";
-            $file = $filename;
+        $filePrefix = '';
+        if (strlen($filename) > 100) {
+            $filePrefix = substr($filename, 0, 100);
+            $filename = substr($filename, 100);
         }
 
         $blockbeg = pack("a100a8a8a8a12a12",
-            $file,
+            $filename,
             decoct($mode),
             sprintf("%6s ",decoct($uid)),
             sprintf("%6s ",decoct($gid)),
@@ -100,7 +95,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_Archive
             "Unknown",
             "",
             "",
-            $path,
+            $filePrefix,
             "");
 
         $checksum = 8*ord(" ");
@@ -208,7 +203,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_Archive
 
 
 /**
- * A tar archive cannot contain files with name of folders longer than 100 chars
+ * A tar archive cannot contain files with name of folders longer than 255 chars
  * This filter removes them
  *
  * @see File_Archive_Predicate, File_Archive_Reader_Filter
@@ -218,8 +213,7 @@ class File_Archive_Predicate_TARCompatible extends File_Archive_Predicate
 {
     function isTrue($source)
     {
-        $pos = strrpos($source->getFilename(), "/");
-        return ($pos<100) && (strlen($filename) - $pos < 155);
+        return strlen($source->getFilename()) <= 255;
     }
 }
 
