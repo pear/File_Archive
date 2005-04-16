@@ -75,6 +75,10 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_Archive
         if (strlen($filename) > 100) {
             $filePrefix = substr($filename, 0, 100);
             $filename = substr($filename, 100);
+        } else if (strlen($filename) > 255) {
+            return PEAR::raise_error(
+                "$filename is too long to be put in a tar archive"
+            );
         }
 
         $blockbeg = pack("a100a8a8a8a12a12",

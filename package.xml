@@ -21,17 +21,28 @@
  </maintainers>
 
  <release>
-  <version>0.3.0</version>
-  <date>2005-04-08</date>
-  <state>beta</state>
+  <version>1.0</version>
+  <date>2005-04-17</date>
+  <state>stable</state>
   <notes>
-    + Bug 3894
-    + The File_Archive::read function does no longer take the optional source parameter
-      A File_Archive::readSource function has been created that takes the source parameter
-    + The mail parameter in File_Archive::toMail is now mandatory, but giving a null variable will
-      result in using Mail::factory("mail")
-    + The File_Archive::toMemory function does no longer take a variable argument
-      A File_Archive::toVariable function has been created for that
+    + Bug 4159 (PHP4 compatibility)
+    + Bug 4165 (Better USTAR handling in tar files)
+    + The package now use temporary files to reduce the amount of memory used
+      when reading or writing large archives. The following indicates the current
+      memory usage of the different reader / writers
+      - Tar writer: constant memory usage
+      - GZip writer: constant memory usage, temporary file
+      - BZ2 writer: constant memory usage, temporary file
+      - ZIP writer: size of the largest file written to the archive
+      
+      - Tar reader: constant memory usage
+      - GZip reader: constant memory usage, temporary file
+      - BZ2 reader: constant memory usage, temporary file
+      - ZIP reader: size of the largest file read from the archive
+      
+      The temporary files are created in the current directory. Their name start with
+      far, their extension is tmp. They are automatically deleted when the reader / writer
+      is closed.
   </notes>
   <filelist>
    <dir name="File" role="php">
@@ -106,6 +117,21 @@
  </release>
  
  <changelog>
+  <release>
+   <version>0.3.0</version>
+   <date>2005-04-08</date>
+   <state>beta</state>
+   <notes>
+     + Bug 3894
+     + The File_Archive::read function does no longer take the optional source parameter
+       A File_Archive::readSource function has been created that takes the source parameter
+     + The mail parameter in File_Archive::toMail is now mandatory, but giving a null variable will
+       result in using Mail::factory("mail")
+     + The File_Archive::toMemory function does no longer take a variable argument
+       A File_Archive::toVariable function has been created for that
+   </notes>
+  </release>
+  
   <release> 
    <version>0.2.0</version>
    <date>2005-02-24</date>
