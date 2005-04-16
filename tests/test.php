@@ -249,7 +249,7 @@ class Test extends PHPUnit_TestCase
 
         $source = File_Archive::readSource($compressed->makeReader(), "$filename/$generated");
         if(PEAR::isError($source))
-            var_dump($source);
+            echo ($extension);
         $source->extract(File_Archive::toVariable($uncompressed));
 
         $this->assertEquals(file_get_contents('test.php'), $uncompressed);

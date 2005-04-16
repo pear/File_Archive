@@ -124,10 +124,8 @@ class File_Archive_Reader
      * Returns an array of statistics about the file
      * (see the PHP stat function for more information)
      *
-     * The only element that must be present in the array
-     * is the size (index 7)
-     * All the other element may not be present if the reader
-     * doesnt know about it
+     * The returned array may be empty, even if readers should try
+     * their best to return as many data as possible
      */
     function getStat() { return array(); }
 
@@ -224,9 +222,6 @@ class File_Archive_Reader
     function extract(&$writer, $autoClose = true, $bufferSize = 102400)
     {
         while (($error = $this->next()) === true) {
-            $filename = $this->getFilename();
-            $stat = $this->getStat();
-
             $error = $writer->newFile(
                 $this->getFilename(),
                 $this->getStat(),

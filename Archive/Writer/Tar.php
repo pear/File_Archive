@@ -29,13 +29,20 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "MemoryArchive.php";
+require_once "Archive.php";
 
 /**
  * Write the files as a TAR archive
  */
-class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
+class File_Archive_Writer_Tar extends File_Archive_Writer_Archive
 {
+    var $buffer;
+    var $useBuffer;
+
+    var $filename = null;
+    var $stats = null;
+
+
     /**
      * Creates the TAR header for a file
      *
@@ -46,6 +53,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
      */
     function tarHeader($filename, $stat)
     {
+        echo "header ($filename)\n";
         $mode = isset($stat[2]) ? $stat[2] : 0x8000;
         $uid  = isset($stat[4]) ? $stat[4] : 0;
         $gid  = isset($stat[5]) ? $stat[5] : 0;
@@ -111,14 +119,14 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
     /**
      * Creates the TAR footer for a file
      *
-     * @param  array $stat the statistics of the file
+     * @param  int $size the size of the data that has been written to the TAR
      * @return string A string made of less than 512 characteres to fill the
      *         last 512 byte long block
      * @access private
      */
-    function tarFooter($stat)
+    function tarFooter($size)
     {
-        $size = $stat[7];
+        echo "footer\n";
         if ($size % 512 > 0) {
             return pack("a".(512 - $size%512), "");
         } else {
@@ -126,64 +134,73 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_MemoryArchive
         }
     }
 
-    /**
-     * @see    File_Archive_Writer_MemoryArchive::appendFile()
-     * @access protected
-     */
-    function appendFile($filename, $dataFilename)
+    function flush()
     {
-        $stat = stat($dataFilename);
+        if ($this->filename != null) {
+            if ($this->useBuffer) {
+                $this->stats[7] = strlen($this->buffer);
 
-        $error = $this->innerWriter->writeData(
-                    $this->tarHeader($filename, $stat)
-                 );
-        if (PEAR::isError($error)) {
-            return $error;
+                $this->innerWriter->writeData(
+                    $this->tarHeader($this->filename, $this->stats)
+                );
+                $this->innerWriter->writeData(
+                    $this->buffer
+                );
+            }
+            $this->innerWriter->writeData(
+                $this->tarFooter($this->stats[7])
+            );
         }
-        $error = $this->innerWriter->writeFile($dataFilename);
-        if (PEAR::isError($error)) {
-            return $error;
-        }
-        $error = $this->innerWriter->writeData(
-                    $this->tarFooter($stat)
-                 );
-        if (PEAR::isError($error)) {
-            return $error;
+        $this->buffer = "";
+    }
+
+    function newFile($filename, $stats = array(),
+                     $mime = "application/octet-stream")
+    {
+        $this->flush();
+
+        $this->useBuffer = !isset($stats[7]);
+        $this->filename = $filename;
+        $this->stats = $stats;
+
+        if(!$this->useBuffer) {
+            return $this->innerWriter->writeData(
+                $this->tarHeader($filename, $stats)
+            );
         }
     }
-    /**
-     * @see File_Archive_Writer_MemoryArchive::appendFileData()
-     * @access protected
-     */
-    function appendFileData($filename, $stat, $data)
-    {
-        $size = strlen($data);
-        $stat[7] = $size;
 
-        $error = $this->innerWriter->writeData(
-                    $this->tarHeader($filename, $stat)
-                 );
-        if (PEAR::isError($error)) {
-            return $error;
-        }
-        $error = $this->innerWriter->writeData($data);
-        if (PEAR::isError($error)) {
-            return $error;
-        }
-        $error = $this->innerWriter->writeData(
-                    $this->tarFooter($stat)
-                 );
-        if (PEAR::isError($error)) {
-            return $error;
-        }
+    /**
+     * @see File_Archive_Writer::close()
+     */
+    function close()
+    {
+        $this->flush();
+        $this->innerWriter->writeData(pack("a1024", ""));
+        parent::close();
     }
     /**
-     * @see File_Archive_Writer_MemoryArchive::sendFooter()
-     * @access protected
+     * @see File_Archive_Writer::writeData()
      */
-    function sendFooter()
+    function writeData($data)
     {
-        return $this->innerWriter->writeData(pack("a1024", ""));
+        if ($this->useBuffer) {
+            $this->buffer .= $data;
+        } else {
+            $this->innerWriter->writeData($data);
+        }
+
+    }
+    /**
+     * @see File_Archive_Writer::writeFile()
+     */
+    function writeFile($filename)
+    {
+        if ($this->useBuffer) {
+            $this->buffer .= file_get_contents($filename);
+        } else {
+            $this->innerWriter->writeFile($filename);
+        }
     }
     /**
      * @see File_Archive_Writer::getMime()
