@@ -102,58 +102,61 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
             return $error;
         }
 
-        $error = $this->source->skip($this->leftLength + $this->footerLength);
-        if (PEAR::isError($error)) {
-            return $error;
-        }
-        $rawHeader = $this->source->getData(512);
-        if (PEAR::isError($rawHeader)) {
-            return $rawHeader;
-        }
-        if (strlen($rawHeader)<512 || $rawHeader == pack("a512", "")) {
-            return false;
-        }
+        do
+        {
+            $error = $this->source->skip($this->leftLength + $this->footerLength);
+            if (PEAR::isError($error)) {
+                return $error;
+            }
+            $rawHeader = $this->source->getData(512);
+            if (PEAR::isError($rawHeader)) {
+                return $rawHeader;
+            }
+            if (strlen($rawHeader)<512 || $rawHeader == pack("a512", "")) {
+                return false;
+            }
 
-        $header = unpack(
-            "a100filename/a8mode/a8uid/a8gid/a12size/a12mtime/".
-            "a8checksum/a1type/a100linkname/a6magic/a2version/".
-            "a32uname/a32gname/a8devmajor/a8devminor/a155prefix",
-            $rawHeader);
-        $this->currentStat = array(
-            2 => octdec($header['mode']),
-            4 => octdec($header['uid']),
-            5 => octdec($header['gid']),
-            7 => octdec($header['size']),
-            9 => octdec($header['mtime'])
-            );
-        if ($header['magic'] == 'ustar') {
-            $this->currentFilename = $this->getStandardURL(
-                            $header['prefix'] . $header['filename']
-                        );
-        } else {
-            $this->currentFilename = $this->getStandardURL(
-                            $header['filename']
-                        );
-        }
+            $header = unpack(
+                "a100filename/a8mode/a8uid/a8gid/a12size/a12mtime/".
+                "a8checksum/a1type/a100linkname/a6magic/a2version/".
+                "a32uname/a32gname/a8devmajor/a8devminor/a155prefix",
+                $rawHeader);
+            $this->currentStat = array(
+                2 => octdec($header['mode']),
+                4 => octdec($header['uid']),
+                5 => octdec($header['gid']),
+                7 => octdec($header['size']),
+                9 => octdec($header['mtime'])
+                );
+            if ($header['magic'] == 'ustar') {
+                $this->currentFilename = $this->getStandardURL(
+                                $header['prefix'] . $header['filename']
+                            );
+            } else {
+                $this->currentFilename = $this->getStandardURL(
+                                $header['filename']
+                            );
+            }
 
-        $this->leftLength = $this->currentStat[7];
-        if ($this->leftLength % 512 == 0) {
-            $this->footerLength = 0;
-        } else {
-            $this->footerLength = 512 - $this->leftLength%512;
-        }
+            $this->leftLength = $this->currentStat[7];
+            if ($this->leftLength % 512 == 0) {
+                $this->footerLength = 0;
+            } else {
+                $this->footerLength = 512 - $this->leftLength%512;
+            }
 
-        $checksum = 8*ord(" ");
-        for ($i = 0; $i < 148; $i++) {
-            $checksum += ord($rawHeader{$i});
-        }
-        for ($i = 156; $i < 512; $i++) {
-            $checksum += ord($rawHeader{$i});
-        }
+            $checksum = 8*ord(" ");
+            for ($i = 0; $i < 148; $i++) {
+                $checksum += ord($rawHeader{$i});
+            }
+            for ($i = 156; $i < 512; $i++) {
+                $checksum += ord($rawHeader{$i});
+            }
 
-        if (octdec($header['checksum']) != $checksum) {
-            die('Checksum error on entry '.$this->currentFilename);
-        }
+            if (octdec($header['checksum']) != $checksum) {
+                die('Checksum error on entry '.$this->currentFilename);
+            }
+        } while ($header['type'] != 0);
 
         return true;
     }
