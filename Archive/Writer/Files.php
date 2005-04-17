@@ -114,6 +114,27 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      */
     function writeData($data) { fwrite($this->handle, $data); }
     /**
+     * @see File_Archive_Writer::newFromTempFile()
+     */
+    function newFromTempFile($tmpfile, $filename, $stat = array(), $mime = "application/octet-stream")
+    {
+        $complete = $this->basePath.$filename;
+        $pos = strrpos($complete, "/");
+        if ($pos !== false) {
+            $error = $this->mkdirr(substr($complete, 0, $pos));
+            if (PEAR::isError($error)) {
+                return $error;
+            }
+        }
+
+        if (!@unlink($complete) ||
+            !@rename($tmpfile, $complete)) {
+            parent::newFromTempFile($tmpfile, $filename, $stat, $mime);
+        }
+    }
+
+
+    /**
      * @see File_Archive_Writer::close()
      */
     function close()

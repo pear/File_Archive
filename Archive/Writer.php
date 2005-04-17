@@ -49,6 +49,27 @@ class File_Archive_Writer
     }
 
     /**
+     * Create a new file in the writer with the content of the physical file $filename
+     * and then unlink $filename.
+     * newFromTempFile($tmpfile, $filename, $stat, $mime) is equivalent to
+     * newFile($filename, $stat, $mime); writeFile($tmpfile); unlink($tmpfile);
+     * but can be more efficient.
+     * A typical use is for File_Archive_Writer_Files: it renames the temporary
+     * file instead of copy/delete
+     *
+     * @param string $tmpfile Name of the physical file that contains data and will be unlinked
+     * @param string $filename Name of the file, eventually including a path
+     * @param array $stat Its Statistics. None of the indexes are required
+     * @param string $mime MIME type of the file
+     */
+    function newFromTempFile($tmpfile, $filename, $stat = array(), $mime = "application/octet-stream")
+    {
+        $this->newFile($filename, $stat, $mime);
+        $this->writeFile($tmpfile);
+        unlink($tmpfile);
+    }
+
+    /**
      * Append the specified data to the writer
      *
      * @param String $data the data to append to the writer

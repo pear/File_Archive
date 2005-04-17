@@ -36,11 +36,34 @@ require_once "Archive.php";
  */
 class File_Archive_Writer_Gzip extends File_Archive_Writer_Archive
 {
-    var $comment = "";
-    var $compressionLevel = 9;
+    var $compressionLevel=9;
     var $gzfile;
     var $tmpName;
     var $nbFiles = 0;
+
+    var $innerWriter;
+    var $autoClose;
+    var $filename;
+    var $stat;
+
+    /**
+     * @param string $filename Name to give to the archive
+     * @param File_Archive_Writer $innerWriter The inner writer to which the
+     *        compressed data will be written
+     * @param array $stat The stat of the archive (see the PHP stat() function).
+     *        No element are required in this array
+     * @param bool $autoClose Indicate if the inner writer must be closed when
+     *        closing this
+     */
+    function File_Archive_Writer_Gzip($filename, &$innerWriter,
+                                      $stat = array(), $autoClose = true)
+    {
+        $this->innerWriter =& $innerWriter;
+        $this->autoClose = $autoClose;
+
+        $this->filename = $filename;
+        $this->stat = $stat;
+    }
 
     /**
      * Set the compression level
@@ -56,13 +79,13 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer_Archive
     /**
      * @see File_Archive_Writer::newFile()
      *
-     * Check that one single file is written in the GZip archive
+     * Check that one single file is written in the BZip2 archive
      */
     function newFile($filename, $stat = array(),
                      $mime = "application/octet-stream")
     {
         if($this->nbFiles > 1) {
-            return PEAR::raiseError("A GZip archive can only contain one single file.".
+            return PEAR::raiseError("A Bzip2 archive can only contain one single file.".
                                     "Use Tbz archive to be able to write several files");
         }
         $this->nbFiles++;
@@ -72,21 +95,29 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer_Archive
 
         return true;
     }
+
+
     /**
      * Actually write the tmp file to the inner writer
      * Close and delete temporary file
      *
-     * @see File_Archive_Writer::close();
+     * @see File_Archive_Writer::close()
      */
     function close()
     {
         gzclose($this->gzfile);
-        $this->innerWriter->writeFile($this->tmpName);
-        unlink($this->tmpName);
+        $this->innerWriter->newFromTempFile(
+            $this->tmpName, $this->filename, $this->stat, 'application/x-compressed'
+        );
 
-        return parent::close();
+        if ($this->autoClose) {
+            return $this->innerWriter->close();
+        }
     }
 
+    /**
+     * @see File_Archive_Writer::writeData()
+     */
     function writeData($data)
     {
         gzwrite($this->gzfile, $data);

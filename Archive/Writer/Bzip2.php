@@ -29,17 +29,41 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "Archive.php";
+require_once "File/Archive/Writer.php";
 
 /**
  * Compress a single file to Bzip2 format
  */
-class File_Archive_Writer_Bzip2 extends File_Archive_Writer_Archive
+class File_Archive_Writer_Bzip2 extends File_Archive_Writer
 {
     var $compressionLevel=9;
     var $bzfile;
     var $tmpName;
     var $nbFiles = 0;
+
+    var $innerWriter;
+    var $autoClose;
+    var $filename;
+    var $stat;
+
+    /**
+     * @param string $filename Name to give to the archive
+     * @param File_Archive_Writer $innerWriter The inner writer to which the
+     *        compressed data will be written
+     * @param array $stat The stat of the archive (see the PHP stat() function).
+     *        No element are required in this array
+     * @param bool $autoClose Indicate if the inner writer must be closed when
+     *        closing this
+     */
+    function File_Archive_Writer_Bzip2($filename, &$innerWriter,
+                                       $stat = array(), $autoClose = true)
+    {
+        $this->innerWriter =& $innerWriter;
+        $this->autoClose = $autoClose;
+
+        $this->filename = $filename;
+        $this->stat = $stat;
+    }
 
     /**
      * Set the compression level
@@ -77,17 +101,23 @@ class File_Archive_Writer_Bzip2 extends File_Archive_Writer_Archive
      * Actually write the tmp file to the inner writer
      * Close and delete temporary file
      *
-     * @see File_Archive_Writer::close();
+     * @see File_Archive_Writer::close()
      */
     function close()
     {
-        gzclose($this->bzfile);
-        $this->innerWriter->writeFile($this->tmpName);
-        unlink($this->tmpName);
+        bzclose($this->bzfile);
+        $this->innerWriter->newFromTempFile(
+            $this->tmpName, $this->filename, $this->stat, 'application/x-compressed'
+        );
 
-        return parent::close();
+        if ($this->autoClose) {
+            return $this->innerWriter->close();
+        }
     }
 
+    /**
+     * @see File_Archive_Writer::writeData()
+     */
     function writeData($data)
     {
         bzwrite($this->bzfile, $data);
