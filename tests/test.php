@@ -302,6 +302,12 @@ class Test extends PHPUnit_TestCase
         $this->assertEquals($a->getData(), "ABCDEF");
         $this->assertEquals($b->getData(), "ABCDEF");
     }
+    function testReadArchive()
+    {
+        $source = File_Archive::readArchive('tar', File_Archive::read('up.rtar'));
+        while($source->next())
+            echo $source->getFilename()."\n";
+    }
 }
 
 $test = new PHPUnit_TestSuite("Test");

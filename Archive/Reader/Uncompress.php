@@ -87,25 +87,6 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     }
 
     /**
-     * Check if File_Archive_Reader_Uncompress can read an archive with a
-     * specific extension
-     *
-     * @param string $extension the extension of the archive to read
-     * @return bool whether this file can be read by
-     *         File_Archive_Reader_Uncompress
-     * @static
-     */
-    function isKnownExtension($extension)
-    {
-        return $extension == 'tar' ||
-               $extension == 'zip' ||
-               $extension == 'gz'  ||
-               $extension == 'tgz' ||
-               $extension == 'tbz' ||
-               $extension == 'bz2';
-    }
-
-    /**
      * Attempt to change the current source (if the current file is an archive)
      * If this is the case, push the current source onto the stack and make the
      * good archive reader the current source. A file is considered as an
@@ -137,32 +118,12 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         while (($extension = array_pop($extensions)) !== null) {
             $nbUncompressions++;
             unset($next);
-            switch($extension) {
-            case "tar":
-                require_once "Tar.php";
-                $next = new File_Archive_Reader_Tar($reader, $nbUncompressions == 1);
-                unset($reader); $reader =& $next;
-                break;
-            case "gz":
-            case "gzip":
-                require_once "Gzip.php";
-                $next = new File_Archive_Reader_Gzip($reader, $nbUncompressions == 1);
-                unset($reader); $reader =& $next;
-                break;
-            case "zip":
-                require_once "Zip.php";
-                $next = new File_Archive_Reader_Zip($reader, $nbUncompressions == 1);
-                unset($reader); $reader =& $next;
-                break;
-            case "bz2":
-            case "bzip2":
-                require_once "Bzip2.php";
-                $next = new File_Archive_Reader_Bzip2($reader, $nbUncompressions == 1);
-                unset($reader); $reader =& $next;
-                break;
-            default:
+            $next = File_Archive::readArchive($extension, $reader, $nbUncompressions == 1);
+            if ($next === false) {
                 $extensions = array();
-                break;
+            } else {
+                unset($reader);
+                $reader =& $next;
             }
         }
         if ($nbUncompressions == 1) {

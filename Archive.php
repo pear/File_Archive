@@ -247,7 +247,7 @@ class File_Archive
                     $extension = substr($file, $dotPos+1);
                 }
             } while ($pos < strlen($realPath) &&
-                (!File_Archive_Reader_Uncompress::isKnownExtension($extension) ||
+                (!File_Archive::isKnownExtension($extension) ||
                  (is_dir($file) && $source==null)));
 
             //Build the URL back, with the new path to a file with an archive extension
@@ -343,6 +343,64 @@ class File_Archive
     }
 
     /**
+     * Check if a file with a specific extension can be read as an archive
+     * with File_Archive::read*
+     * This function is case sensitive.
+     *
+     * @param string $extension the checked extension
+     * @return bool whether this file can be understood reading its extension
+     *         Currently, supported extensions are tar, zip, gz, tgz, tbz, bz2
+     *         and bzip2
+     */
+    function isKnownExtension($extension)
+    {
+        return $extension == 'tar' ||
+               $extension == 'zip' ||
+               $extension == 'gz'  ||
+               $extension == 'tgz' ||
+               $extension == 'tbz' ||
+               $extension == 'bz2' ||
+               $extension == 'bzip2';
+    }
+
+    /**
+     * Create a reader that will read the single file source $source as
+     * a specific archive
+     *
+     * @param string $extension determines the kind of archive $source contains
+     *        $extension is case sensitive
+     * @param File_Archive_Reader $source stores the archive
+     * @param bool $sourceOpened specifies if the archive is already opened
+     *        if false, next will be called on source
+     *        Closing the returned archive will close $source iif $sourceOpened
+     *        is true
+     * @return A File_Archive_Reader that uncompresses the archive contained in
+     *         $source interpreting it as a $extension archive
+     *         If $extension is not handled return false
+     */
+    function readArchive($extension, $source, $sourceOpened = false)
+    {
+        switch($extension) {
+        case 'tar':
+            require_once "File/Archive/Reader/Tar.php";
+            return new File_Archive_Reader_Tar($source, $sourceOpened);
+        case 'gz':
+        case 'gzip':
+            require_once "File/Archive/Reader/Gzip.php";
+            return new File_Archive_Reader_Gzip($source, $sourceOpened);
+        case 'zip':
+            require_once "File/Archive/Reader/Zip.php";
+            return new File_Archive_Reader_Zip($source, $sourceOpened);
+        case 'bz2':
+        case 'bzip2':
+            require_once "File/Archive/Reader/Bzip2.php";
+            return new File_Archive_Reader_Bzip2($source, $sourceOpened);
+        default:
+            return false;
+        }
+    }
+
+    /**
      * Contains only one file with data read from a memory buffer
      *
      * @param string $memory content of the file
@@ -358,6 +416,7 @@ class File_Archive
         require_once "File/Archive/Reader/Memory.php";
         return new File_Archive_Reader_Memory($memory, $filename, $stat, $mime);
     }
+
     /**
      * Contains several other sources. Take care the sources don't have several
      * files with the same filename. The sources are given as a parameter, or
@@ -747,43 +806,6 @@ class File_Archive
             $currentFilename = implode(".", $extensions);
         }
         return $writer;
-    }
-
-    /**
-     * Register a stream that allows an interface between File_Archive and PHP streams
-     * After having called this function, the streams of the form
-     * filearchive://reader/path/to/file and
-     * filearchive://writer/path/to/file
-     * will be available (the first one in "r" mode, the second one in "w" mode).
-     * reader and writer are values returned by the registerStream function
-     *
-     * @param File_Archive_Reader or File_Archive_Writer $object Reader or writer to register
-     * @return string Value to put in the URL to refere to the registered reader / writer
-     *         The complete URL is of the form file_archive://value/path/to/file where
-     *         value is the value returned by this function
-     */
-    function registerStream(&$object)
-    {
-        require_once "File/Archive/Stream.php";
-
-        global $File_Archive_Streams;
-        $index = count($File_Archive_Streams);
-        $File_Archive_Streams[$index] =& $object;
-        return $index;
-    }
-
-    /**
-     * Unregister the name returned by registerStream to free memory and resources
-     * After this call, the streams of type filearchive://$name/ will no longer be valid
-     */
-    function unregisterStream($name, $autoClose = true)
-    {
-        global $File_Archive_Streams;
-        if ($autoClose) {
-            $File_Archive_Streams[$name]->close();
-        }
-        unset($File_Archive_Streams[$name]);
-
     }
 }
 
