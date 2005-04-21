@@ -2,10 +2,9 @@
 <package version="1.0">
  <name>File_Archive</name>
  <summary>
-  File_Archive will let you manipulate easily the tar, gz and zip files
+  File_Archive will let you manipulate easily the tar, gz, bz2 and zip files
  </summary>
  <description>
-  File_Archive will let you manipulate easily the tar, gz and zip files.
   This library is strongly object oriented. It makes it very easy to use, writing simple code, yet the library is very powerfull.
   File_Archive is made of two objects : readers and writers. Are currently implemented readers from file, directory, tar, gz, zip and bzip2 archives.
   You can write to file(s), send mails with files attached, or create tar, gz, zip, bzip2 archives.
@@ -21,28 +20,14 @@
  </maintainers>
 
  <release>
-  <version>1.0.0</version>
-  <date>2005-04-17</date>
+  <version>1.0.1</version>
+  <date>2005-04-21</date>
   <state>stable</state>
   <notes>
-    + Bug 4159 (PHP4 compatibility)
-    + Bug 4165 (Better USTAR handling in tar files)
-    + The package now use temporary files to reduce the amount of memory used
-      when reading or writing large archives. The following indicates the current
-      memory usage of the different reader / writers
-      - Tar writer: constant memory usage
-      - GZip writer: constant memory usage, temporary file
-      - BZ2 writer: constant memory usage, temporary file
-      - ZIP writer: size of the largest file written to the archive
-      
-      - Tar reader: constant memory usage
-      - GZip reader: constant memory usage, temporary file
-      - BZ2 reader: constant memory usage, temporary file
-      - ZIP reader: size of the largest file read from the archive
-      
-      The temporary files are created in the current directory. Their name start with
-      far, their extension is tmp. They are automatically deleted when the reader / writer
-      is closed.
+    + Bug 4192 (&lt;? instead of &lt;?php in some source files)
+    + Functions File_Archive::isKnownExtension and File_Archive:;readArchive
+      added. They allow to specify the type of an archive. This is usefull is the extension
+      of the file doesn't reflect its real type.
   </notes>
   <filelist>
    <dir name="File" role="php">
@@ -117,6 +102,31 @@
  </release>
  
  <changelog>
+  <release>
+   <version>1.0.0</version>
+   <date>2005-04-17</date>
+   <state>stable</state>
+   <notes>
+     + Bug 4159 (PHP4 compatibility)
+     + Bug 4165 (Better USTAR handling in tar files)
+     + The package now use temporary files to reduce the amount of memory used
+       when reading or writing large archives. The following indicates the current
+       memory usage of the different reader / writers
+       - Tar writer: constant memory usage
+       - GZip writer: constant memory usage, temporary file
+       - BZ2 writer: constant memory usage, temporary file
+       - ZIP writer: size of the largest file written to the archive
+       
+       - Tar reader: constant memory usage
+       - GZip reader: constant memory usage, temporary file
+       - BZ2 reader: constant memory usage, temporary file
+       - ZIP reader: size of the largest file read from the archive
+       
+       The temporary files are created in the current directory. Their name start with
+       far, their extension is tmp. They are automatically deleted when the reader / writer
+       is closed.
+   </notes>
+  </release>
   <release>
    <version>0.3.0</version>
    <date>2005-04-08</date>
