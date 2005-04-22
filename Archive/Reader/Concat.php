@@ -59,7 +59,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
         }
         if (PEAR::isError($error) || PEAR::isError($source->close())) {
             die("Error in File_Archive_Reader_Concat constructor ".
-                "({$error->getMessage()}), cannot continue");
+                '('.$error->getMessage().'), cannot continue');
         }
     }
 
