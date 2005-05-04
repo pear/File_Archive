@@ -53,8 +53,9 @@ class File_Archive_Writer_Archive extends File_Archive_Writer
 
     /**
      * @param String $filename Name to give to the archive (the name will
-     * probably be used by the inner writer)
-     *
+     *        be used by the inner writer)
+     *        If $filename is null, the innerWriter is considered already
+     *        opened (and thus newFile will not be called)
      * @param File_Archive_Writer $innerWriter The inner writer to which the
      *        compressed data will be written
      * @param array $stat The stat of the archive (see the PHP stat() function).
@@ -67,7 +68,9 @@ class File_Archive_Writer_Archive extends File_Archive_Writer
     {
         $this->innerWriter =& $innerWriter;
         $this->autoClose = $autoClose;
-        $this->innerWriter->newFile($filename, $stat, $this->getMime());
+        if ($filename != null) {
+            $this->innerWriter->newFile($filename, $stat, $this->getMime());
+        }
     }
 
 //MUST REWRITE FUNCTIONS

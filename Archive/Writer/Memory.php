@@ -55,11 +55,14 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
      *        actual data of the writer. You should not modify manually this
      *        variable while using this writer (you can safely use all the
      *        functions of the archive, like clear for example)
+     * @param int keptData is the offset from where to start writing in $data
+     *        Any data located after $seek will be erased
+     *        The default value is 0
      */
-    function File_Archive_Writer_Memory(&$data)
+    function File_Archive_Writer_Memory(&$data, $seek = 0)
     {
         $this->data =& $data;
-        $this->data = '';
+        $this->data = substr($data, 0, $seek);
     }
 
     function writeData($d) { $this->data .= $d; }

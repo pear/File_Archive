@@ -40,6 +40,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
     var $alreadyRead = false;
     var $bzfile = null;
     var $tmpName = null;
+    var $pos = 0;
 
     /**
      * @see File_Archive_Reader::close()
@@ -52,6 +53,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
             unlink($this->tmpName);
 
         $this->alreadyRead = false;
+        $this->pos = 0;
         return parent::close();
     }
 
@@ -111,19 +113,58 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
     {
         if ($length == -1) {
             $data = '';
-            do
-            {
+            do {
                 $newData = bzread($this->bzfile);
                 $data .= $newData;
             } while($newData != '');
+            $this->pos += strlen($data);
         } else if ($length == 0) {
             return '';
         } else {
             $data = bzread($this->bzfile, $length);
+            $this->pos += strlen($data);
         }
 
         return $data == '' ? null : $data;
     }
+
+
+    /**
+     * @see File_Archive_Reader::makeWriter
+     */
+/*    function makeWriter()
+    {
+        require_once "File/Archive/Writer/Bzip2.php";
+
+        $toRead = $this->pos;
+
+        if ($this->alreadyRead) {
+            $this->close();
+            $this->next();
+        }
+
+        $innerWriter = $this->source->makeWriter();
+        $writer = new File_Archive_Writer_Bzip2(
+            $this->source->getFilename(),
+            $innerWriter,
+            $this->source->getStat()
+            );
+
+        if ($this->alreadyRead) {
+            $writer->newFile(
+                $this->getFilename(),
+                $this->getStat(),
+                $this->getMime());
+            while ($toRead > 0) {
+                $data = $this->getData($toRead > 102400 ? 102400 : $toRead);
+                $toRead -= strlen($data);
+                $writer->writeData($data);
+            }
+            $this->close();
+        }
+
+        return $writer;
+    } */
 }
 
 ?>

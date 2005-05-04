@@ -142,14 +142,17 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
      */
     function close()
     {
-        $error = $this->source->close();
         $this->opened = false;
-
-        if (PEAR::isError($error)) {
-            return $error;
-        }
+        return $this->source->close();
     }
 
+    /**
+     * @see File_Archive_Reader::makeWriter
+     */
+    function makeWriter($seek = 0)
+    {
+        return $this->source->makeWriter($seek);
+    }
 }
 
 ?>

@@ -99,6 +99,11 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
 
         while ($this->source == null ||
              !$this->source->next()) {
+
+            if ($this->source != null) {
+                $this->source->close();
+            }
+
             $file = readdir($this->directoryHandle);
             if ($file == '.' || $file == '..') {
                 continue;
@@ -121,10 +126,38 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
 
         return true;
     }
+
     /**
      * @see File_Archive_Reader::getFilename()
      */
     function getFilename() { return $this->symbolic . parent::getFilename(); }
+
+    /**
+     * @see File_Archive_Reader::makeWriter
+     */
+    function makeWriter($seek = 0)
+    {
+        require_once "File/Archive/Writer/Files.php";
+
+        if ($this->source == null) {
+            $writer = new File_Archive_Writer_Files($directory);
+        } else {
+            $writer = $this->source->makeWriter($seek);
+        }
+
+        $toUnlink = array();
+        while ($this->next()) {
+            $toUnlink[] = $this->getDataFilename();
+        }
+
+        foreach ($toUnlink as $filename) {
+            unlink($filename);
+        }
+
+        $this->close();
+
+        return $writer;
+    }
 }
 
 ?>

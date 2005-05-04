@@ -54,12 +54,17 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
      */
     var $leftLength = 0;
     /**
-     * @var Integer Size of the footer
-     *              A TAR file is made of chunks of 512 bytes. If 512 does not
-     *              divide the file size a footer is added
+     * @var int Size of the footer
+     *          A TAR file is made of chunks of 512 bytes. If 512 does not
+     *          divide the file size a footer is added
      * @access private
      */
     var $footerLength = 0;
+    /**
+     * @var int nb bytes to seek back in order to reach the end of the archive
+     *          or null if the end of the archive has not been reached
+     */
+    var $seekToEnd = null;
 
     /**
      * @see File_Archive_Reader::skip()
@@ -78,8 +83,9 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     function close()
     {
         $this->leftLength = 0;
-        $this->currentFilename = NULL;
-        $this->currentStat = NULL;
+        $this->currentFilename = null;
+        $this->currentStat = null;
+        $this->seekToEnd = null;
         return parent::close();
     }
 
@@ -101,6 +107,9 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
         if ($error !== true) {
             return $error;
         }
+        if ($this->seekToEnd !== null) {
+            return false;
+        }
 
         do
         {
@@ -113,6 +122,7 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
                 return $rawHeader;
             }
             if (strlen($rawHeader)<512 || $rawHeader == pack("a512", "")) {
+                $this->seekToEnd = strlen($rawHeader);
                 return false;
             }
 
@@ -160,6 +170,7 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
 
         return true;
     }
+
     /**
      * @see File_Archive_Reader::getData()
      */
@@ -172,11 +183,32 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
         }
 
         if ($this->leftLength == 0) {
-            return NULL;
+            return null;
         } else {
             $data = $this->source->getData($actualLength);
             $this->leftLength -= $actualLength;
             return $data;
+        }
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriter
+     */
+    function makeWriter($seek = 0)
+    {
+        require_once "File/Archive/Writer/Tar.php";
+
+        $seekToEnd = $this->seekToEnd;
+        if (!$this->sourceOpened) {
+            $this->next();
+        }
+
+        if ($this->seekToEnd != null) {
+            $this->close();
+            return new File_Archive_Writer_Tar(null, $source->makeWriter(- $this->seekToEnd));
+        } else {
+            $this->close();
+            return new File_Archive_Writer_Tar(null, $source->makeWriter());
         }
     }
 }

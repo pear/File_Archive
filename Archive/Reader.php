@@ -275,6 +275,33 @@ class File_Archive_Reader
         }
         return $result;
     }
+
+    /**
+     * Returns a writer that will start writing at the current pos in the source
+     * Any data (from current file or any other file) located after current pos
+     * will be erased. No file will be erased though (so for file and directory
+     * readers, the file and directory will not be deleted)
+     * $this->close will be called. $this should not be used until the returned writer
+     * has been closed
+     *
+     * @param int seek The new writer will be opened seek bytes after the current position
+     *        Seek can be positive or negative
+     *        If current file pos + seek < 0 or current file pos + seek > current file size,
+     *        we have an undefined behaviour
+     */
+    function makeWriter($seek = 0)
+    {
+        return PEAR::raiseError("Reader abstract function call (makeWriter)");
+    }
+
+    /**
+     * @return a writer that will allow to append files to an existing archive
+     */
+    function makeAppendWriter()
+    {
+        while ($this->next()) { }
+        return $this->makeWriter();
+    }
 }
 
 ?>

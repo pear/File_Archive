@@ -96,7 +96,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
      * @see File_Archive_Reader::next()
      *
      * The first time next is called, it will open the file handle and return
-     * true. Then if will return false
+     * true. Then it will return false
      * Raise an error if the file does not exist
      */
     function next()
@@ -204,6 +204,29 @@ class File_Archive_Reader_File extends File_Archive_Reader
         } else {
             return ftell($this->handle) - $before;
         }
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriter
+     */
+    function makeWriter($seek = 0)
+    {
+        require_once "File/Archive/Writer/Files.php";
+
+        $writer = new File_Archive_Writer_Files();
+
+        if ($this->handle != null) {
+            $file = $this->getDataFilename();
+            $stat = $this->getStat();
+            $mime = $this->getMime();
+            $pos = ftell($this->handle);
+
+            $this->close();
+
+            $writer->openFile($file, $pos, $stat, $mime);
+        }
+
+        return $writer;
     }
 }
 

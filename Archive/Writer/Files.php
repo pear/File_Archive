@@ -55,6 +55,11 @@ class File_Archive_Writer_Files extends File_Archive_Writer
         }
     }
 
+    function getFilename($filename)
+    {
+        return $this->basePath.$filename;
+    }
+
     /**
      * Ensure that $pathname exists, or create it if it does not
      * @access private
@@ -87,15 +92,34 @@ class File_Archive_Writer_Files extends File_Archive_Writer
     }
 
     /**
-     * @see File_Archive_Writer::newFile()
+     * Open a file for writing from a given position
      */
-    function newFile($filename, $stat = array(), $mime="application/octet-stream")
+    function openFile($filename, $pos = 0, $stat = array(), $mime = "application/octet-stream")
     {
         if ($this->handle !== null) {
             fclose($this->handle);
         }
 
-        $filename = $this->basePath.$filename;
+        $this->handle = fopen($filename, 'r+');
+        if (!is_resource($this->handle)) {
+            return PEAR::raiseError("Unable to open file $filename");
+        }
+
+        if (fseek($this->handle, $pos) == -1) {
+            fread($this->handle, $pos);
+        }
+    }
+
+    /**
+     * @see File_Archive_Writer::newFile()
+     */
+    function newFile($filename, $stat = array(), $mime = "application/octet-stream")
+    {
+        if ($this->handle !== null) {
+            fclose($this->handle);
+        }
+
+        $filename = $this->getFilename($filename);
 
         $pos = strrpos($filename, "/");
         if ($pos !== false) {
@@ -118,7 +142,7 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      */
     function newFromTempFile($tmpfile, $filename, $stat = array(), $mime = "application/octet-stream")
     {
-        $complete = $this->basePath.$filename;
+        $complete = $this->getFilename($filename);
         $pos = strrpos($complete, "/");
         if ($pos !== false) {
             $error = $this->mkdirr(substr($complete, 0, $pos));

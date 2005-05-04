@@ -150,6 +150,17 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
         $this->offset = 0;
         $this->alreadyRead = false;
     }
+
+    /**
+     * @see File_Archive_Reader::makeWriter
+     */
+    function makeWriter($seek = 0)
+    {
+        require_once "File/Archive/Writer/Memory.php";
+        $writer = new File_Archive_Writer_Memory($this->memory, $this->offset);
+        $this->close();
+        return $writer;
+    }
 }
 
 ?>
