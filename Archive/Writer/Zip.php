@@ -40,7 +40,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
      * @var int Compression level
      * @access private
      */
-    var $compressionLevel = 9;
+    var $compressionLevel = 0;
 
     /**
      * @var int Current position in the writer
@@ -86,14 +86,13 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
     function setComment($comment) { $this->comment = $comment; }
 
     /**
-     * @see    File_Archive_Writer_MemoryArchive::appendFileData()
-     * @access protected
+     * @param int $time Unix timestamp of the date to convert
+     * @return the date formated as a ZIP date
      */
-    function appendFileData($filename, $stat, $data)
+    function getMTime($time)
     {
-        $filename = preg_replace("/^(\.{1,2}(\/|\\\))+/","",$filename);
-
-        $mtime = (isset($stat[9])? getdate($stat[9]) : getdate());
+        $mtime = ($time != null ? getdate($time) : getdate());
+        $mtime = getdate(mktime(0, 0, 0, 12, 32, 1997));
         $mtime = preg_replace(
                      "/(..){1}(..){1}(..){1}(..){1}/",
                      "\\x\\4\\x\\3\\x\\2\\x\\1",
@@ -104,7 +103,49 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
                             ($mtime['minutes']<<5)|
                             ($mtime['seconds']>>1)));
         eval('$mtime = "'.$mtime.'";');
+        return $mtime;
+    }
 
+    /**
+     * Inform the archive that $filename is present.
+     * Consequences are the same as appendFileData, but no data is output
+     * to the inner writer.
+     * This is used by File_Archive_Reader_Zip::makeWriter()
+     *
+     * @param string $filename name of the file
+     * @param array $stat stats of the file, indexes 9 and 7 must be present
+     * @param int $crc32 checksum of the file
+     * @param int $compLength length of the compressed data
+     */
+    function alreadyWrittenFile($filename, $stat, $crc32, $complength)
+    {
+        $filename = preg_replace("/^(\.{1,2}(\/|\\\))+/","",$filename);
+
+        $mtime = $this->getMTime(isset($stat[9]) ? $stat[9] : null);
+        $normlength = $stat[7];
+
+        $this->nbFiles++;
+
+        $this->central .= "\x50\x4b\x01\x02\x00\x00\x14\x00\x00\x00\x08\x00".
+                   $mtime.
+                   pack("VVVvvvvvVV",
+                       $crc32, $complength, $normlength,
+                       strlen($filename), 0x00,0x00,0x00,0x00,
+                       0x0000,$this->offset).
+                   $filename;
+
+        $this->offset += 30 + strlen($filename) + $complength;
+    }
+
+    /**
+     * @see    File_Archive_Writer_MemoryArchive::appendFileData()
+     * @access protected
+     */
+    function appendFileData($filename, $stat, $data)
+    {
+        $filename = preg_replace("/^(\.{1,2}(\/|\\\))+/","",$filename);
+
+        $mtime = $this->getMTime(isset($stat[9]) ? $stat[9] : null);
         $crc32 = crc32($data);
         $normlength = strlen($data);
         $data = gzcompress($data,$this->compressionLevel);

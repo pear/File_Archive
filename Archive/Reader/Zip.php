@@ -42,6 +42,8 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     var $header = null;
     var $offset = 0;
     var $data = null;
+    var $files = array();
+    var $seekToEnd = 0;
 
     /**
      * @see File_Archive_Reader::close()
@@ -52,6 +54,8 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         $this->currentStat = null;
         $this->compLength = 0;
         $this->data = null;
+        $this->seekToEnd = 0;
+        $this->files = array();
 
         return parent::close();
     }
@@ -74,6 +78,10 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
      */
     function nextWithFolders()
     {
+        if ($this->seekToEnd > 0) {
+            return false;
+        }
+
         //Skip the data and the footer if they haven't been uncompressed
         if ($this->header != null && $this->data == null) {
             $toSkip = $this->header['CLen'];
@@ -143,9 +151,16 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
                 return $error;
             }
 
+            $this->files[] = array('name' => $this->currentFilename,
+                            'stat' => $this->currentStat,
+                            'CRC' => $this->header['CRC'],
+                            'CLen' => $this->header['CLen']
+                           );
+
             return true;
         } else {
             //Begining of central area
+            $this->seekToEnd = 4;
             return false;
         }
     }
@@ -202,7 +217,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     }
     function uncompressData()
     {
-        if ($this->data !== NULL)
+        if ($this->data !== null)
             return;
 
         $this->data = $this->source->getData($this->header['CLen']);
@@ -214,9 +229,52 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         }
 
         if (crc32($this->data) != $this->header['CRC']) {
-            return PEAR::raiseError("Zip archive : CRC fails on entry ".
+            return PEAR::raiseError("Zip archive: CRC fails on entry ".
                                     $this->currentFilename);
         }
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriter
+     */
+    function makeWriter($seek = 0)
+    {
+        require_once "File/Archive/Writer/Zip.php";
+
+        if ($this->currentFilename == null) {
+            //The zip file was not even opened
+            $writer = new File_Archive_Writer_Zip(null, $this->source->makeWriter());
+        } else {
+            $filename = $this->getFilename();
+            $stat = $this->getStat();
+            $mime = $this->getMime();
+            $data = ($this->data == null ? '' : substr($this->data, 0, $this->offset));
+            if ($this->seekToEnd == 0) {
+                $seekToEnd = 26 + $this->header['File'] + $this->header['Extra'] + ($this->data == null ? 0 : $this->header['CRC']);
+            } else {
+                $seekToEnd = $this->seekToEnd;
+            }
+            $readToEnd = ($this->seekToEnd > 0);
+            $files = $this->files;
+
+            $this->close();
+            $writer = new File_Archive_Writer_Zip(null, $this->source->makeWriter(- $seekToEnd));
+
+            if (!empty($files) && !$readToEnd) {
+                //Last file will be rewritten
+                array_pop($files);
+            }
+            foreach ($files as $file) {
+                $writer->alreadyWrittenFile($file['name'], $file['stat'], $file['CRC'], $file['CLen']);
+            }
+
+            if (!$readToEnd) {
+                $writer->newFile($filename, $stat, $mime);
+                $writer->writeData($data);
+            }
+        }
+
+        return $writer;
     }
 }
 ?>

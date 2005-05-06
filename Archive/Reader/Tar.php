@@ -199,16 +199,14 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
         require_once "File/Archive/Writer/Tar.php";
 
         $seekToEnd = $this->seekToEnd;
-        if (!$this->sourceOpened) {
-            $this->next();
-        }
 
-        if ($this->seekToEnd != null) {
-            $writer = $this->source->makeWriter(- $this->seekToEnd);
+        $this->close();
+
+        if ($seekToEnd != null) {
+            $writer = $this->source->makeWriter(- $seekToEnd);
         } else {
             $writer = $this->source->makeWriter();
         }
-        $this->close();
         return new File_Archive_Writer_Tar(null, $writer);
     }
 }

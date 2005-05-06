@@ -75,6 +75,7 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
         $this->memoryWriter = new File_Archive_Writer_Memory($tmp = null);
         parent::File_Archive_Writer_Archive($filename, $t, $stat, $autoClose);
     }
+
     /**
      * @see File_Archive_Writer::newFile()
      */
