@@ -80,13 +80,13 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::close()
      */
-    function close()
+    function close($innerClose = true)
     {
         $this->leftLength = 0;
         $this->currentFilename = null;
         $this->currentStat = null;
         $this->seekToEnd = null;
-        return parent::close();
+        return parent::close($innerClose);
     }
 
     /**
@@ -198,15 +198,12 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     {
         require_once "File/Archive/Writer/Tar.php";
 
-        $seekToEnd = $this->seekToEnd;
-
-        $this->close();
-
-        if ($seekToEnd != null) {
-            $writer = $this->source->makeWriter(- $seekToEnd);
+        if ($this->seekToEnd != null) {
+            $writer = $this->source->makeWriter(- $this->seekToEnd);
         } else {
             $writer = $this->source->makeWriter();
         }
+        $this->close(false);
         return new File_Archive_Writer_Tar(null, $writer);
     }
 }

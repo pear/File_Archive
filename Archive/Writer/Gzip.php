@@ -29,12 +29,12 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "Archive.php";
+require_once "File/Archive/Writer.php";
 
 /**
  * Compress a single file to Gzip format
  */
-class File_Archive_Writer_Gzip extends File_Archive_Writer_Archive
+class File_Archive_Writer_Gzip extends File_Archive_Writer
 {
     var $compressionLevel=9;
     var $gzfile;
@@ -63,6 +63,10 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer_Archive
 
         $this->filename = $filename;
         $this->stat = $stat;
+
+        if ($this->filename == null) {
+            $this->newFile(null);
+        }
     }
 
     /**
@@ -79,14 +83,14 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer_Archive
     /**
      * @see File_Archive_Writer::newFile()
      *
-     * Check that one single file is written in the BZip2 archive
+     * Check that one single file is written in the GZip archive
      */
     function newFile($filename, $stat = array(),
                      $mime = "application/octet-stream")
     {
         if($this->nbFiles > 1) {
-            return PEAR::raiseError("A Bzip2 archive can only contain one single file.".
-                                    "Use Tbz archive to be able to write several files");
+            return PEAR::raiseError("A Gz archive can only contain one single file.".
+                                    "Use Tgz archive to be able to write several files");
         }
         $this->nbFiles++;
 
@@ -106,9 +110,15 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer_Archive
     function close()
     {
         gzclose($this->gzfile);
-        $this->innerWriter->newFromTempFile(
-            $this->tmpName, $this->filename, $this->stat, 'application/x-compressed'
-        );
+        if ($this->filename == null) {
+            //Assume innerWriter is already opened on a file...
+            $this->innerWriter->writeFile($this->tmpName);
+            unlink($this->tmpName);
+        } else {
+            $this->innerWriter->newFromTempFile(
+                $this->tmpName, $this->filename, $this->stat, 'application/x-compressed'
+            );
+        }
 
         if ($this->autoClose) {
             return $this->innerWriter->close();

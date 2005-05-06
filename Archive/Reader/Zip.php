@@ -48,7 +48,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::close()
      */
-    function close()
+    function close($innerClose = true)
     {
         $this->currentFilename = null;
         $this->currentStat = null;
@@ -57,7 +57,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         $this->seekToEnd = 0;
         $this->files = array();
 
-        return parent::close();
+        return parent::close($innerClose);
     }
 
     /**
@@ -245,35 +245,31 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             //The zip file was not even opened
             $writer = new File_Archive_Writer_Zip(null, $this->source->makeWriter());
         } else {
-            $filename = $this->getFilename();
-            $stat = $this->getStat();
-            $mime = $this->getMime();
-            $data = ($this->data == null ? '' : substr($this->data, 0, $this->offset));
             if ($this->seekToEnd == 0) {
                 $seekToEnd = 26 + $this->header['File'] + $this->header['Extra'] + ($this->data == null ? 0 : $this->header['CRC']);
             } else {
                 $seekToEnd = $this->seekToEnd;
             }
-            $readToEnd = ($this->seekToEnd > 0);
-            $files = $this->files;
 
-            $this->close();
             $writer = new File_Archive_Writer_Zip(null, $this->source->makeWriter(- $seekToEnd));
 
-            if (!empty($files) && !$readToEnd) {
+            if (!empty($this->files) && $this->seekToEnd == 0) {
                 //Last file will be rewritten
-                array_pop($files);
+                array_pop($this->files);
             }
-            foreach ($files as $file) {
+            foreach ($this->files as $file) {
                 $writer->alreadyWrittenFile($file['name'], $file['stat'], $file['CRC'], $file['CLen']);
             }
 
-            if (!$readToEnd) {
-                $writer->newFile($filename, $stat, $mime);
-                $writer->writeData($data);
+            if ($this->seekToEnd == 0) {
+                $writer->newFile($this->getFilename(),
+                                 $this->getStat(),
+                                 $this->getMime());
+                $writer->writeData($this->data == null ? '' : substr($this->data, 0, $this->offset + $seek));
             }
         }
 
+        $this->close(false);
         return $writer;
     }
 }

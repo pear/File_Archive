@@ -40,7 +40,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
      * @var int Compression level
      * @access private
      */
-    var $compressionLevel = 0;
+    var $compressionLevel = 9;
 
     /**
      * @var int Current position in the writer

@@ -63,6 +63,10 @@ class File_Archive_Writer_Bzip2 extends File_Archive_Writer
 
         $this->filename = $filename;
         $this->stat = $stat;
+
+        if ($this->filename == null) {
+            $this->newFile(null);
+        }
     }
 
     /**
@@ -106,9 +110,16 @@ class File_Archive_Writer_Bzip2 extends File_Archive_Writer
     function close()
     {
         bzclose($this->bzfile);
-        $this->innerWriter->newFromTempFile(
-            $this->tmpName, $this->filename, $this->stat, 'application/x-compressed'
-        );
+
+        if ($this->filename == null) {
+            //Assume innerWriter is already opened on a file...
+            $this->innerWriter->writeFile($this->tmpName);
+            unlink($this->tmpName);
+        } else {
+            $this->innerWriter->newFromTempFile(
+                $this->tmpName, $this->filename, $this->stat, 'application/x-compressed'
+            );
+        }
 
         if ($this->autoClose) {
             return $this->innerWriter->close();

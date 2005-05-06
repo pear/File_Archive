@@ -3,6 +3,8 @@
 require_once 'File/Archive.php';
 require_once 'PHPUnit.php';
 
+function var_dumped($x) { var_dump($x); return $x; }
+
 /*
  * Actually more to check that the syntax is OK
  * than the actual functionnality
@@ -235,7 +237,7 @@ class Test extends PHPUnit_TestCase
     {
         $filename = "test.$extension";
 
-        $source = File_Archive::read('test.php');
+        $source = File_Archive::readMulti(array('test.php', '../Archive'));
         $generated = $extension=='gz' || $extension=='bz2' ? 'test' : 'test.php';
 
         $source->extract(
@@ -257,14 +259,14 @@ class Test extends PHPUnit_TestCase
     }
     function testTar() { $this->_testArchive('tar'); }
     function testZip() { $this->_testArchive('zip'); }
-    function testGzip() { $this->_testArchive('gz'); }
+    function _testGzip() { $this->_testArchive('gz'); }
     function testTgz() { $this->_testArchive('tgz'); }
     function testTbz() { $this->_testArchive('tbz'); }
-    function testBZ2() { $this->_testArchive('bz2'); }
-    function testWriteBZip2()
+    function _testBZ2() { $this->_testArchive('bz2'); }
+    function testWriteGZip2()
     {
         //Build the writer
-        $writer = File_Archive::toArchive('example1.tbz', File_Archive::toFiles());
+        $writer = File_Archive::toArchive('example1.tgz', File_Archive::toFiles());
 
         //Write the list of even number in [0..999]
         $writer->newFile("even.txt");
@@ -286,10 +288,11 @@ class Test extends PHPUnit_TestCase
     function testDirectories()
     {
         $source = File_Archive::read('../Archive');
-        $source->extract(File_Archive::toArchive('up.zip', File_Archive::toFiles()));
+        $source->extract(File_Archive::toArchive('up.tbz', File_Archive::toFiles()));
 
-        $source = File_Archive::read('up.zip/');
+        $source = File_Archive::read('up.tbz/');
         $appendedData = File_Archive::read('test.php');
+
         $appendedData->extract($source->makeAppendWriter());
     }
 
