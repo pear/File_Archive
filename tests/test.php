@@ -30,7 +30,7 @@ class Test extends PHPUnit_TestCase
         $this->assertFalse($reader->next());
         $reader->close();
     }
-    function testURLReader()
+    function _testURLReader()
     {
         $reader = File_Archive::read("http://www.google.com", "google.html");
 
@@ -40,7 +40,7 @@ class Test extends PHPUnit_TestCase
         $this->assertFalse(empty($data));
         $reader->close();
     }
-    function testAdvancedURLReader()
+    function _testAdvancedURLReader()
     {
         $reader = File_Archive::read("http://poocl.la-grotte.org/downloads/PEAR2/poocl.tar/");
         $nbFiles = '';
@@ -51,7 +51,7 @@ class Test extends PHPUnit_TestCase
         $this->assertEquals(39, $nbFiles);
         $reader->close();
     }
-    function testDownloadAdvancedURL()
+    function _testDownloadAdvancedURL()
     {
         $reader = File_Archive::read("http://poocl.la-grotte.org/downloads/PEAR2/poocl.tar/File/Archive.php");
         $this->assertTrue($reader->next());
@@ -253,7 +253,6 @@ class Test extends PHPUnit_TestCase
         if(PEAR::isError($source))
             echo ($extension);
         $source->extract(File_Archive::toVariable($uncompressed));
-
         $this->assertEquals(file_get_contents('test.php'), $uncompressed);
     }
     function testTar() { $this->_testArchive('tar'); }
@@ -288,6 +287,10 @@ class Test extends PHPUnit_TestCase
     {
         $source = File_Archive::read('../Archive');
         $source->extract(File_Archive::toArchive('up.tar', File_Archive::toFiles()));
+
+        $source = File_Archive::read('up.tar/');
+        $appendedData = File_Archive::read('test.php');
+        $appendedData->extract($source->makeAppendWriter());
     }
 
     function testMultiWriter()
@@ -302,9 +305,9 @@ class Test extends PHPUnit_TestCase
         $this->assertEquals($a->getData(), "ABCDEF");
         $this->assertEquals($b->getData(), "ABCDEF");
     }
-    function testReadArchive()
+    function _testReadArchive()
     {
-        $source = File_Archive::readArchive('tar', File_Archive::read('up.rtar'));
+        $source = File_Archive::readArchive('tar', File_Archive::read('up.tar'));
         while($source->next())
             echo $source->getFilename()."\n";
     }

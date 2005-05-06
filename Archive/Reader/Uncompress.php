@@ -150,10 +150,10 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
             //Remove the readers we have completly read from the stack
             do {
                 while (($error = $this->source->next()) === false) {
-                    $this->source->close();
                     if (empty($this->readers)) {
                         return false;
                     }
+                    $this->source->close();
                     $this->source =& $this->readers[count($this->readers)-1];
                     unset($this->readers[count($this->readers)-1]);
                 }
@@ -202,6 +202,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         } else if (PEAR::isError($error)) {
             return $error;
         }
+        $this->startReader = $this->source;
+        $this->readers = array();
+
         $this->currentFileDisplayed = false;
         return strlen($this->getFilename())>strlen($baseDir);
     }

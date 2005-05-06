@@ -101,6 +101,7 @@ class File_Archive_Writer_Files extends File_Archive_Writer
         }
 
         $this->handle = fopen($filename, 'r+');
+
         if (!is_resource($this->handle)) {
             return PEAR::raiseError("Unable to open file $filename");
         }

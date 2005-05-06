@@ -204,12 +204,12 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
         }
 
         if ($this->seekToEnd != null) {
-            $this->close();
-            return new File_Archive_Writer_Tar(null, $source->makeWriter(- $this->seekToEnd));
+            $writer = $this->source->makeWriter(- $this->seekToEnd);
         } else {
-            $this->close();
-            return new File_Archive_Writer_Tar(null, $source->makeWriter());
+            $writer = $this->source->makeWriter();
         }
+        $this->close();
+        return new File_Archive_Writer_Tar(null, $writer);
     }
 }
 
