@@ -20,14 +20,11 @@
  </maintainers>
 
  <release>
-  <version>1.0.1</version>
-  <date>2005-04-21</date>
+  <version>1.1.0</version>
+  <date>2005-05-08</date>
   <state>stable</state>
   <notes>
-    + Bug 4192 (&lt;? instead of &lt;?php in some source files)
-    + Functions File_Archive::isKnownExtension and File_Archive:;readArchive
-      added. They allow to specify the type of an archive. This is usefull is the extension
-      of the file doesn't reflect its real type.
+    + Add the makeAppendWriter function on readers to allow to append data to an existing archive
   </notes>
   <filelist>
    <dir name="File" role="php">
@@ -102,6 +99,17 @@
  </release>
  
  <changelog>
+  <release>
+   <version>1.0.1</version>
+   <date>2005-04-21</date>
+   <state>stable</state>
+   <notes>
+     + Bug 4192 (&lt;? instead of &lt;?php in some source files)
+     + Functions File_Archive::isKnownExtension and File_Archive:;readArchive
+       added. They allow to specify the type of an archive. This is usefull is the extension
+       of the file doesn't reflect its real type.
+   </notes>
+  </release>
   <release>
    <version>1.0.0</version>
    <date>2005-04-17</date>

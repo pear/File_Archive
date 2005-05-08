@@ -631,11 +631,14 @@ class File_Archive
     /**
      * Custom predicate built by supplying a string expression
      *
-     * Example:
-     *   new File_Archive_Predicate_Custom("return strlen($name)<100;")
-     *   new File_Archive_Predicate_Custom("strlen($name)<100;")
-     *   new File_Archive_Predicate_Custom("strlen($name)<100")
-     *   new File_Archive_Predicate_Custom("strlen($source->getFilename())<100")
+     * Here are different ways to create a predicate that keeps only files
+     * with names shorter than 100 chars
+     * <sample>
+     *  File_Archive::predCustom("return strlen($name)<100;")
+     *  File_Archive::predCustom("strlen($name)<100;")
+     *  File_Archive::predCustom("strlen($name)<100")
+     *  File_Archive::predCustom("strlen($source->getFilename())<100")
+     * </sample>
      *
      * @param string $expression String containing an expression that evaluates
      *        to a boolean. If the expression doesn't contain a return

@@ -284,6 +284,20 @@ class File_Archive_Reader
      * $this->close will be called. $this should not be used until the returned writer
      * has been closed
      *
+     * Here is how to append a single file to an existing zip archive
+     * <sample>
+     *  $archive = File_Archive::read('archive.zip/');
+     *  $file = File_Archive::read('foo.txt');
+     *  $file->extract($source->makeAppendWriter());
+     * </sample>
+     *
+     * Append the content of a tgz archive to an existing zip archive
+     * <sample>
+     *  $archive = File_Archive::read('archive.zip/');
+     *  $file = File_Archive::read('archive.tgz/');
+     *  $file->extract($source->makeAppendWriter());
+     * </sample>
+     *
      * @param int seek The new writer will be opened seek bytes after the current position
      *        Seek can be positive or negative
      *        If current file pos + seek < 0 or current file pos + seek > current file size,
