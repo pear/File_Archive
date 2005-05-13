@@ -381,20 +381,32 @@ class File_Archive
     function readArchive($extension, $source, $sourceOpened = false)
     {
         switch($extension) {
+        case 'tgz':
+            return readArchive('tar',
+                    readArchive('gz', $source),
+                    $sourceOpened);
+        case 'tbz':
+            return readArchive('tar',
+                    readArchive('bz2', $source),
+                    $sourceOpened);
         case 'tar':
             require_once "File/Archive/Reader/Tar.php";
             return new File_Archive_Reader_Tar($source, $sourceOpened);
+
         case 'gz':
         case 'gzip':
             require_once "File/Archive/Reader/Gzip.php";
             return new File_Archive_Reader_Gzip($source, $sourceOpened);
+
         case 'zip':
             require_once "File/Archive/Reader/Zip.php";
             return new File_Archive_Reader_Zip($source, $sourceOpened);
+
         case 'bz2':
         case 'bzip2':
             require_once "File/Archive/Reader/Bzip2.php";
             return new File_Archive_Reader_Bzip2($source, $sourceOpened);
+
         default:
             return false;
         }

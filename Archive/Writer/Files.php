@@ -129,7 +129,7 @@ class File_Archive_Writer_Files extends File_Archive_Writer
                 return $error;
             }
         }
-        $this->handle = fopen($filename, "w");
+        $this->handle = @fopen($filename, "w");
         if (!is_resource($this->handle)) {
             return PEAR::raiseError("Unable to write to file $filename");
         }

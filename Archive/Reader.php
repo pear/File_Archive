@@ -43,7 +43,7 @@ class File_Archive_Reader
     /**
      * Move to the next file in the reader
      *
-     * @return bool true iif no more files are available
+     * @return bool false iif no more files are available
      */
     function next()
     {

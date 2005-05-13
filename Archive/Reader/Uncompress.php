@@ -107,10 +107,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         // Check the extension of the file (maybe we need to uncompress it?)
         $filename  = $this->source->getFilename();
 
-        $shortcuts = array("tgz"   , "tbz"    );
-        $reals     = array("tar.gz", "tar.bz2");
-
-        $extensions = explode('.', str_replace($shortcuts, $reals, strtolower($filename)));
+        $extensions = explode('.', strtolower($filename));
 
         $reader =& $this->source;
         $nbUncompressions = 0;
