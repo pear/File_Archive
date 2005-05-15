@@ -287,8 +287,10 @@ class Test extends PHPUnit_TestCase
     }
     function testDirectories()
     {
-        $source = File_Archive::read('../Archive');
-        $source->extract(File_Archive::toArchive('up.tbz', File_Archive::toFiles()));
+        File_Archive::extract(
+            File_Archive::read('../Archive'),
+            File_Archive::toArchive('up.tbz', File_Archive::toFiles())
+        );
 
         $source = File_Archive::read('up.tbz/');
         $appendedData = File_Archive::read('test.php');

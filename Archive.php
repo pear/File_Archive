@@ -159,6 +159,10 @@ class File_Archive
     function readSource(&$source, $URL, $symbolic = null,
                   $uncompression = 0, $directoryDepth = -1)
     {
+        if(PEAR::isError($source)) {
+            return $source;
+        }
+
         require_once "File/Archive/Reader/Uncompress.php";
         require_once "File/Archive/Reader/ChangeName.php";
 
@@ -382,13 +386,13 @@ class File_Archive
     {
         switch($extension) {
         case 'tgz':
-            return readArchive('tar',
-                    readArchive('gz', $source),
-                    $sourceOpened);
+            return File_Archive::readArchive('tar',
+                    File_Archive::readArchive('gz', $source, $sourceOpened)
+                    );
         case 'tbz':
-            return readArchive('tar',
-                    readArchive('bz2', $source),
-                    $sourceOpened);
+            return File_Archive::readArchive('tar',
+                    File_Archive::readArchive('bz2', $source, $sourceOpened)
+                    );
         case 'tar':
             require_once "File/Archive/Reader/Tar.php";
             return new File_Archive_Reader_Tar($source, $sourceOpened);
@@ -762,6 +766,9 @@ class File_Archive
     function toArchive($filename, &$innerWriter, $type = null,
                        $stat = array(), $autoClose = true)
     {
+        if (PEAR::isError($innerWriter)) {
+            return $innerWriter;
+        }
         $shortcuts = array("tgz"   , "tbz"    );
         $reals     = array("tar.gz", "tar.bz2");
 
@@ -822,6 +829,25 @@ class File_Archive
             $currentFilename = implode(".", $extensions);
         }
         return $writer;
+    }
+
+
+    /**
+     * File_Archive::extract($source, $dest) is equivalent to $source->extract($dest)
+     * If $source is a PEAR error, the error will be returned
+     * It is thus easier to use this function than $source->extract, since it reduces the number of
+     * error checking and doesn't force you to define a variable $source
+     *
+     * @param File_Archive_Reader $source The source that will be read
+     * @param File_Archive_Writer $dest Where to copy $source files
+     * @return null or a PEAR error if an error occured
+     */
+    function extract(&$source, &$dest)
+    {
+        if (PEAR::isError($source)) {
+            return $source;
+        }
+        return $source->extract($dest);
     }
 }
 

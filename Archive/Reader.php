@@ -191,6 +191,10 @@ class File_Archive_Reader
      */
     function sendData(&$writer, $bufferSize = 102400)
     {
+        if (PEAR::isError($writer)) {
+            return $writer;
+        }
+
         $filename = $this->getDataFilename();
         if ($filename !== NULL) {
             $error = $writer->writeFile($filename);
@@ -221,6 +225,10 @@ class File_Archive_Reader
      */
     function extract(&$writer, $autoClose = true, $bufferSize = 102400)
     {
+        if (PEAR::isError($writer)) {
+            return $writer;
+        }
+
         while (($error = $this->next()) === true) {
             $error = $writer->newFile(
                 $this->getFilename(),
@@ -257,6 +265,10 @@ class File_Archive_Reader
     function extractFile($filename, &$writer,
                          $autoClose = true, $bufferSize = 102400)
     {
+        if (PEAR::isError($writer)) {
+            return $writer;
+        }
+
         if (($error = $this->select($filename)) === true) {
             $result = $this->sendData($writer, $bufferSize);
             if (!PEAR::isError($result)) {
