@@ -15,6 +15,7 @@ class Test extends PHPUnit_TestCase
     {
         $reader = File_Archive::readMemory("ABCDEFGH", "Memory");
 
+        $this->assertFalse(PEAR::isError($reader));
         $this->assertTrue($reader->next());
         $this->assertEquals("Memory", $reader->getFilename());
         $this->assertEquals("A", $reader->getData(1));
@@ -27,6 +28,7 @@ class Test extends PHPUnit_TestCase
     {
         $reader = File_Archive::read("test.php", "test.php");
 
+        $this->assertFalse(PEAR::isError($reader));
         $this->assertTrue($reader->next());
         $this->assertEquals(file_get_contents("test.php"), $reader->getData());
         $this->assertFalse($reader->next());
@@ -36,28 +38,11 @@ class Test extends PHPUnit_TestCase
     {
         $reader = File_Archive::read("http://www.google.com", "google.html");
 
+        $this->assertFalse(PEAR::isError($reader));
         $this->assertTrue($reader->next());
 
         $data = $reader->getData();
         $this->assertFalse(empty($data));
-        $reader->close();
-    }
-    function _testAdvancedURLReader()
-    {
-        $reader = File_Archive::read("http://poocl.la-grotte.org/downloads/PEAR2/poocl.tar/");
-        $nbFiles = '';
-        while ($reader->next())
-        {
-            $nbFiles++;
-        }
-        $this->assertEquals(39, $nbFiles);
-        $reader->close();
-    }
-    function _testDownloadAdvancedURL()
-    {
-        $reader = File_Archive::read("http://poocl.la-grotte.org/downloads/PEAR2/poocl.tar/File/Archive.php");
-        $this->assertTrue($reader->next());
-        $data = $reader->getData();
         $reader->close();
     }
     function testMultiReader()
@@ -287,10 +272,14 @@ class Test extends PHPUnit_TestCase
     }
     function testDirectories()
     {
-        File_Archive::extract(
-            File_Archive::read('../Archive'),
+        $error = File_Archive::extract(
+            File_Archive::read('../Archve'),
             File_Archive::toArchive('up.tbz', File_Archive::toFiles())
         );
+        if (PEAR::isError($error)) {
+            var_dump($error);
+        }
+        $this->assertFalse(PEAR::isError($error));
 
         $source = File_Archive::read('up.tbz/');
         $appendedData = File_Archive::read('test.php');

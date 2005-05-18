@@ -448,7 +448,9 @@ class File_Archive
         require_once "File/Archive/Reader/Multi.php";
         $result = new File_Archive_Reader_Multi();
         foreach ($sources as $index => $foo) {
-            if (is_string($sources[$index])) {
+            if (PEAR::isError($sources[$index])) {
+                return $sources[$index];
+            } else if (is_string($sources[$index])) {
                 unset($URLreader);
                 $URLreader = File_Archive::read($sources[$index]);
                 if (PEAR::isError($URLreader)) {
