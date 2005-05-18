@@ -212,35 +212,40 @@ class Test extends PHPUnit_TestCase
     //TODO: test the toMail
     function testToMemory()
     {
-        $source = File_Archive::read('test.php');
-        $dest = File_Archive::toMemory();
-
-        $source->extract($dest);
-        $this->assertEquals(file_get_contents('test.php'), $dest->getData());
+        $this->assertTrue(
+            !PEAR::isError(
+                File_Archive::extract(
+                    File_Archive::read('test.php'),
+                    $dest = File_Archive::toMemory()
+                )
+            ) &&
+            file_get_contents('test.php') == $dest->getData()
+        );
     }
     function _testArchive($extension)
     {
         $filename = "test.$extension";
 
-        $source = File_Archive::readMulti(array('test.php', '../Archive'));
-        $generated = $extension=='gz' || $extension=='bz2' ? 'test' : 'test.php';
-
-        $source->extract(
-            File_Archive::toArchive(
-                $filename,
-                $compressed = File_Archive::toMemory()
-            )
+        $this->assertTrue(
+            !PEAR::isError(
+                File_Archive::extract(
+                    File_Archive::read('test.php'),
+                    File_Archive::toArchive(
+                        $filename,
+                        $compressed = File_Archive::toMemory()
+                    )
+                )
+            ) &&
+            !PEAR::isError(
+                File_Archive::extract(
+                    File_Archive::readSource(
+                        $compressed->makeReader(), "$filename/test.php")
+                    ),
+                    File_Archive::toVariable($uncompressed)
+                )
+            ) &&
+            $uncompressed == file_get_contents('test.php')
         );
-
-        require_once "File/Archive/Reader/Uncompress.php";
-
-        $compressedReader = $compressed->makeReader();
-        $source = File_Archive::readSource($compressedReader, "$filename/$generated");
-
-        if(PEAR::isError($source))
-            echo ($extension);
-        $source->extract(File_Archive::toVariable($uncompressed));
-        $this->assertEquals(file_get_contents('test.php'), $uncompressed);
     }
     function testTar() { $this->_testArchive('tar'); }
     function testZip() { $this->_testArchive('zip'); }
@@ -248,7 +253,7 @@ class Test extends PHPUnit_TestCase
     function testTgz() { $this->_testArchive('tgz'); }
     function testTbz() { $this->_testArchive('tbz'); }
     function _testBZ2() { $this->_testArchive('bz2'); }
-    function testWriteGZip2()
+    function _testWriteGZip2()
     {
         //Build the writer
         $writer = File_Archive::toArchive('example1.tgz', File_Archive::toFiles());
@@ -272,32 +277,40 @@ class Test extends PHPUnit_TestCase
     }
     function testDirectories()
     {
-        $error = File_Archive::extract(
-            File_Archive::read('../Archve'),
-            File_Archive::toArchive('up.tbz', File_Archive::toFiles())
+        $this->assertTrue(
+            !PEAR::isError(
+                File_Archive::extract(
+                        File_Archive::read('../Archve'),
+                        File_Archive::toArchive('up.tbz', File_Archive::toFiles())
+                )
+            ) &&
+            !PEAR::isError(
+                $source = File_Archive::read('up.tbz/')
+            ) &&
+            !PEAR::isError(
+                $appendedData = File_Archive::read('test.php')
+            ) &&
+            !PEAR::isError(
+                $appendedData->extract($source->makeAppendWriter())
+            )
         );
-        if (PEAR::isError($error)) {
-            var_dump($error);
-        }
-        $this->assertFalse(PEAR::isError($error));
-
-        $source = File_Archive::read('up.tbz/');
-        $appendedData = File_Archive::read('test.php');
-
-        $appendedData->extract($source->makeAppendWriter());
     }
 
     function testMultiWriter()
     {
-        $source = File_Archive::readMemory("ABCDEF", "A.txt");
-        $source->extract(
-            File_Archive::toMulti(
-                $a = File_Archive::toMemory(),
-                $b = File_Archive::toMemory()
-            )
+        $this->assertTrue(
+            !PEAR::isError(
+                File_Archive::extract(
+                    File_Archive::readMemory("ABCDEF", "A.txt"),
+                    File_Archive::toMulti(
+                        File_Archive::toVariable($a),
+                        File_Archive::toVariable($b)
+                    )
+                )
+            ) &&
+            $a == 'ABCDEF' &&
+            $b == 'ABCDEF'
         );
-        $this->assertEquals($a->getData(), "ABCDEF");
-        $this->assertEquals($b->getData(), "ABCDEF");
     }
     function _testReadArchive()
     {

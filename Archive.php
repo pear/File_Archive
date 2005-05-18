@@ -735,6 +735,13 @@ class File_Archive
      */
     function toMulti(&$a, &$b)
     {
+        if (PEAR::isError($a)) {
+            return $a;
+        }
+        if (PEAR::isError($b)) {
+            return $b;
+        }
+
         require_once "File/Archive/Writer/Multi.php";
         return new File_Archive_Writer_Multi($a, $b);
     }
