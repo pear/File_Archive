@@ -55,7 +55,15 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
         $this->stat[7] = 0;
         while (($error = $source->next()) === true) {
             $sourceStat = $source->getStat();
-            $this->stat[7] += $sourceStat[7];
+            if (isset($sourceStat[7])) {
+                $this->stat[7] += $sourceStat[7];
+            } else {
+                unset($this->stat[7]);
+                break;
+            }
+        }
+        if (isset($this->stat[7])) {
+            $this->stat['size'] = $this->stat[7];
         }
         if (PEAR::isError($error) || PEAR::isError($source->close())) {
             die("Error in File_Archive_Reader_Concat constructor ".

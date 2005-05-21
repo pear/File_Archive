@@ -82,7 +82,7 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
         $this->memory = &$memory;
         $this->filename = $this->getStandardURL($filename);
         $this->stat = $stat;
-        $this->stat[7] = strlen($this->memory);
+        $this->stat[7] = $this->stat['size'] = strlen($this->memory);
         $this->mime = $mime;
     }
 

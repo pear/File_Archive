@@ -40,13 +40,13 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
      * @var String Name of the file being read
      * @access private
      */
-    var $currentFilename = NULL;
+    var $currentFilename = null;
     /**
      * @var Array Stats of the file being read
      *            In TAR reader, indexes 2, 4, 5, 7, 9 are set
      * @access private
      */
-    var $currentStat = NULL;
+    var $currentStat = null;
     /**
      * @var int Number of bytes that still have to be read before the end of
      *          file
@@ -138,6 +138,12 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
                 7 => octdec($header['size']),
                 9 => octdec($header['mtime'])
                 );
+            $this->currentStat['mode']  = $this->currentStat[2];
+            $this->currentStat['uid']   = $this->currentStat[4];
+            $this->currentStat['gid']   = $this->currentStat[5];
+            $this->currentStat['size']  = $this->currentStat[7];
+            $this->currentStat['mtime'] = $this->currentStat[9];
+
             if ($header['magic'] == 'ustar') {
                 $this->currentFilename = $this->getStandardURL(
                                 $header['prefix'] . $header['filename']

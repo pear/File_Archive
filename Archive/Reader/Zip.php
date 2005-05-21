@@ -143,6 +143,8 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
                    (($this->header['Date'] & 0xFE00) >> 9) + 1980   //year
                 )
             );
+            $this->currentStat['size']  = $this->currentStat[7];
+            $this->currentStat['mtime'] = $this->currentStat[9];
 
             $this->currentFilename = $this->source->getData($this->header['File']);
 

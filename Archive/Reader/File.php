@@ -58,13 +58,6 @@ class File_Archive_Reader_File extends File_Archive_Reader
      * @access private
      */
     var $stat = null;
-    /**
-     * @var File_Archive_Reader_Memory If we can't use stat on the URL, we need
-     *      to read the whole file to compute its length. In this case $memory
-     *      won't be null, and store the content of the file
-     * @access private
-     */
-    var $memory = null;
 
     /**
      * $filename is the physical file to read
@@ -108,7 +101,6 @@ class File_Archive_Reader_File extends File_Archive_Reader
         if (!is_resource($this->handle)) {
             return PEAR::raiseError("Can't open {$this->filename} for reading");
         }
-        $this->memory = null;
         if ($this->handle === false) {
             return PEAR::raiseError("File {$this->filename} not found");
         } else {
@@ -135,16 +127,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
 
             //If we can't use the stat function
             if ($this->stat === false) {
-                $alreadyRead = ftell($this->handle);
-
-                //Put the whole file content in memory
-                require_once "Memory.php";
-                $this->memory = new File_Archive_Reader_Memory(
-                                        $this->getData(),
-                                        $this->symbolic);
-
-                $this->stat = $this->memory->getStat();
-                $this->stat = array(7 => $this->stat[7] + $alreadyRead);
+                $this->stat = array();
             }
         }
         return $this->stat;
@@ -168,10 +151,6 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function getData($length = -1)
     {
-        if ($this->memory != null) {
-            return $this->memory->getData($length);
-        }
-
         if (feof($this->handle)) {
             return null;
         }
@@ -194,10 +173,6 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function skip($length)
     {
-        if ($this->memory != null) {
-            return $this->memory->skip($length);
-        }
-
         $before = ftell($this->handle);
         if (@fseek($this->handle, $length, SEEK_CUR) === -1) {
             return parent::skip($length);
