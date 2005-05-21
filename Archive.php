@@ -358,13 +358,15 @@ class File_Archive
      */
     function isKnownExtension($extension)
     {
-        return $extension == 'tar' ||
-               $extension == 'zip' ||
-               $extension == 'gz'  ||
-               $extension == 'tgz' ||
-               $extension == 'tbz' ||
-               $extension == 'bz2' ||
-               $extension == 'bzip2';
+        return $extension == 'tar'   ||
+               $extension == 'zip'   ||
+               $extension == 'gz'    ||
+               $extension == 'tgz'   ||
+               $extension == 'tbz'   ||
+               $extension == 'bz2'   ||
+               $extension == 'bzip2' || 
+               $extension == 'ar'    ||
+               $extension == 'deb';
     }
 
     /**
@@ -411,6 +413,10 @@ class File_Archive
             require_once "File/Archive/Reader/Bzip2.php";
             return new File_Archive_Reader_Bzip2($source, $sourceOpened);
 
+        case 'deb':
+        case 'ar':
+            require_once "File/Archive/Reader/Ar.php";
+            return new File_Archive_Reader_Ar($source, $sourceOpened);
         default:
             return false;
         }
@@ -823,6 +829,14 @@ class File_Archive
             case "bzip2":
                 require_once "File/Archive/Writer/Bzip2.php";
                 $next = new File_Archive_Writer_Bzip2(
+                    $currentFilename, $writer, $stat, $autoClose
+                );
+                unset($writer); $writer =& $next;
+                break;
+            case "deb":
+            case "ar":
+                require_once "File/Archive/Writer/Ar.php";
+                $next = new File_Archive_Writer_Ar(
                     $currentFilename, $writer, $stat, $autoClose
                 );
                 unset($writer); $writer =& $next;
