@@ -13,25 +13,30 @@ class Test extends PHPUnit_TestCase
 {
     function testMemoryReader()
     {
-        $reader = File_Archive::readMemory("ABCDEFGH", "Memory");
-
-        $this->assertFalse(PEAR::isError($reader));
-        $this->assertTrue($reader->next());
-        $this->assertEquals("Memory", $reader->getFilename());
-        $this->assertEquals("A", $reader->getData(1));
-        $this->assertEquals("BC", $reader->getData(2));
-        $this->assertEquals("DEFGH", $reader->getData());
-        $this->assertFalse($reader->next());
+        $this->assertTrue(
+            !PEAR::isError(
+                $reader = File_Archive::readMemory('ABCDEFGH', 'Memory')
+            ) &&
+            $reader->next() &&
+            $reader->getFilename() == 'Memory' &&
+            $reader->getData(1) == 'A' &&
+            $reader->getData(2) == 'BC' &&
+            $reader->getData() == 'DEFGH' &&
+            $reader->next() == false
+        );
         $reader->close();
     }
     function testFileReader()
     {
-        $reader = File_Archive::read("test.php", "test.php");
+        $this->assertTrue(
+            !PEAR::isError(
+                $reader = File_Archive::read('test.php', 'test.php')
+            ) &&
+            $reader->next() &&
+            $reader->getData() == file_get_contents('test.php') &&
+            $reader->next() == false
+        );
 
-        $this->assertFalse(PEAR::isError($reader));
-        $this->assertTrue($reader->next());
-        $this->assertEquals(file_get_contents("test.php"), $reader->getData());
-        $this->assertFalse($reader->next());
         $reader->close();
     }
     function _testURLReader()
@@ -239,7 +244,7 @@ class Test extends PHPUnit_TestCase
             !PEAR::isError(
                 File_Archive::extract(
                     File_Archive::readSource(
-                        $compressed->makeReader(), "$filename/test.php")
+                        $compressed->makeReader(), "$filename/test.php"
                     ),
                     File_Archive::toVariable($uncompressed)
                 )
@@ -280,7 +285,7 @@ class Test extends PHPUnit_TestCase
         $this->assertTrue(
             !PEAR::isError(
                 File_Archive::extract(
-                        File_Archive::read('../Archve'),
+                        File_Archive::read('../Archive'),
                         File_Archive::toArchive('up.tbz', File_Archive::toFiles())
                 )
             ) &&
