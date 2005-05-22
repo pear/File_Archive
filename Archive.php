@@ -364,7 +364,7 @@ class File_Archive
                $extension == 'tgz'   ||
                $extension == 'tbz'   ||
                $extension == 'bz2'   ||
-               $extension == 'bzip2' || 
+               $extension == 'bzip2' ||
                $extension == 'ar'    ||
                $extension == 'deb';
     }
