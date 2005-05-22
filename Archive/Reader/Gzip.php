@@ -102,12 +102,16 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
     function getFilename()
     {
         $name = $this->source->getFilename();
-        $pos = strrpos($name, ".");
-        if ($pos === false || $pos === 0) {
-            return $name;
-        } else {
-            return substr($name, 0, $pos);
+        $slashPos = strrpos($name, '/');
+        if ($slashPos !== false) {
+            $name = substr($name, $slashPos+1);
         }
+        $dotPos = strrpos($name, '.');
+        if ($dotPos !== false && $dotPos > 0) {
+            $name = substr($name, 0, $dotPos);
+        }
+
+        return $name;
     }
     /**
      * @see File_Archive_Reader::getData()
