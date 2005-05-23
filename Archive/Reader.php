@@ -196,7 +196,7 @@ class File_Archive_Reader
         }
 
         $filename = $this->getDataFilename();
-        if ($filename !== NULL) {
+        if ($filename !== null) {
             $error = $writer->writeFile($filename);
             if (PEAR::isError($error)) {
                 return $error;
@@ -215,7 +215,7 @@ class File_Archive_Reader
     }
 
     /**
-     * Sends the whole reader to $writer
+     * Sends the whole reader to $writer and close the reader
      *
      * @param File_Archive_Writer $writer Where to write the files of the reader
      * @param bool $autoClose If true, close $writer at the end of the function.
@@ -226,6 +226,7 @@ class File_Archive_Reader
     function extract(&$writer, $autoClose = true, $bufferSize = 102400)
     {
         if (PEAR::isError($writer)) {
+            $this->close();
             return $writer;
         }
 
@@ -236,11 +237,11 @@ class File_Archive_Reader
                 $this->getMime()
             );
             if (PEAR::isError($error)) {
-                return $error;
+                break;
             }
             $error = $this->sendData($writer, $bufferSize);
             if (PEAR::isError($error)) {
-                return $error;
+                break;
             }
         }
         $this->close();
