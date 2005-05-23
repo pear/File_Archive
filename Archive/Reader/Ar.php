@@ -145,7 +145,6 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
 
         // if the filename starts with a length, then just read the bytes of it
         if (preg_match("/\#1\/(\d+)/", $name, $matches)) {
-            echo "matches    : {$matches[1]}\n";
             $name = $this->source->getData($matches[1]);
             $size -= $matches[1];
         } else {
@@ -155,17 +154,23 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
 
         $this->_nbBytesLeft = $size;
         if (empty($name) || empty($mtime) || empty($uid) ||
-            empty($gid)  || empty($mode) || empty($size)) {
+            empty($gid)  || empty($mode)  || empty($size)) {
             return PEAR::raiseError("An ar field is empty");
         }
 
         $this->_currentFilename = $this->getStandardURL($name);
-        $this->_currentStat = array('name'  => $name,
-                                    'mtime' => $mtime,
-                                    'uid'   => $uid,
-                                    'gid'   => $gid,
+        $this->_currentStat = array(
+                                    2       => $mode,
                                     'mode'  => $mode,
-                                    'size'  => $size);
+                                    4       => $uid,
+                                    'uid'   => $uid,
+                                    5       => $gid,
+                                    'gid'   => $gid,
+                                    7       => $size,
+                                    'size'  => $size,
+                                    9       => $mtime,
+                                    'mtime' => $mtime
+                                    );        
 
         return true;
     }
