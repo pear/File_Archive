@@ -44,13 +44,6 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     var $readers = array();
 
     /**
-     * @var array of readers to close when closing this
-     *      This is filled by setBaseDir, with the readers that are needed to
-     *      reach the specified dir, but must not be stacked
-     */
-    var $toClose = array();
-
-    /**
      * @var File_Archive_Reader Reader from which all started (usefull to be
      *      able to close)
      * @access private
@@ -66,24 +59,23 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     var $uncompressionLevel;
 
     /**
-     * @var Int Depth of uncompression of the basicDir
-     * @access private
-     */
-    var $baseDirCompressionLevel = null;
-
-    /**
      * @var String Only files starting with $baseDir will be reported
      * @access private
      */
     var $baseDir = "";
 
     /**
-     * @var Bool True if the current file has not been reported
-     *           (used in setBaseDir to report an error if no file has been
-     *           found)
+     * @var int Compression level required to go to reach the baseDir
+     *          or null if it is currently being computed
      * @access private
      */
-    var $currentFileDisplayed = true;
+    var $baseDirCompressionLevel = null;
+
+    /**
+     * @var boolean Flag set to indicate that the current file has not been
+     *              displayed
+     */
+    var $currentFileNotDisplayed = false;
 
     function File_Archive_Reader_Uncompress(
                         &$innerReader, $uncompressionLevel = -1)
@@ -106,7 +98,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     {
         if ($this->uncompressionLevel >= 0 &&
             $this->baseDirCompressionLevel !== null &&
-            $this->uncompressionLevel >= count($this->readers)
+            count($this->readers) >= $this->uncompressionLevel + $this->baseDirCompressionLevel
            ) {
            return false;
         }
@@ -146,8 +138,8 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
      */
     function next()
     {
-        if (!$this->currentFileDisplayed) {
-            $this->currentFileDisplayed = true;
+        if ($this->currentFileNotDisplayed) {
+            $this->currentFileNotDisplayed = false;
             return true;
         }
         do {
@@ -206,10 +198,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         } else if (PEAR::isError($error)) {
             return $error;
         }
-        $this->toClose = $this->readers;
         $this->readers = array();
 
-        $this->currentFileDisplayed = false;
+        $this->currentFileNotDisplayed = true;
         return strlen($this->getFilename())>strlen($baseDir);
     }
     /**
@@ -251,18 +242,13 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         for($i=0; $i<count($this->readers); ++$i) {
             $this->readers[$i]->close();
         }
-        for($i=0; $i<count($this->toClose); ++$i) {
-            $this->toClose[$i]->close();
-        }
-
 
         $this->readers = array();
         $error = parent::close();
 
         $this->source =& $this->startReader;
         $this->source->close();
-        $this->currentFileDisplayed = true;
-        $this->setBaseDir($this->baseDir);
+        $this->currentFileNotDisplayed = false;
 
         return $error;
     }
