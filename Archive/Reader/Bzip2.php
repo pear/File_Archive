@@ -168,6 +168,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
 
             //Create the writer
             $innerWriter = $this->source->makeWriter();
+            $this->source = null;
             $writer = new File_Archive_Writer_Bzip2(null, $innerWriter);
 
             //And compress data from the temporary file
@@ -178,7 +179,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
             fclose($tmp);
 
             //Do not close inner writer since makeWriter was called
-            $this->close(false);
+            $this->close();
 
             return $writer;
         }

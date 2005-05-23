@@ -86,6 +86,9 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
     {
         $this->_currentFilename = null;
         $this->_currentStat = null;
+        $this->_nbBytesLeft = 0;
+        $this->_footer = false;
+        $this->_alreadyRead = false;
         return parent::close();
     }
 
@@ -116,7 +119,7 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
         if (!$this->_alreadyRead) {
             $header = $this->source->getData(8);
             if ($header != "!<arch>\n") {
-                return PEAR::raiseError("File {$filename} is not a valid Ar file format");
+                return PEAR::raiseError("File {$filename} is not a valid Ar file format (starts with $header)");
             }
             $this->_alreadyRead = true;
         }

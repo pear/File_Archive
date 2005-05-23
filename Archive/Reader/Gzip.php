@@ -174,6 +174,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
 
             //Create the writer
             $innerWriter = $this->source->makeWriter();
+            $this->source = null;
             $writer = new File_Archive_Writer_Gzip(null, $innerWriter);
 
             //And compress data from the temporary file
@@ -184,7 +185,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
             fclose($tmp);
 
             //Do not close inner writer since makeWriter was called
-            $this->close(false);
+            $this->close();
 
             return $writer;
         }

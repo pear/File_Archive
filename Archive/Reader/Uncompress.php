@@ -44,6 +44,13 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     var $readers = array();
 
     /**
+     * @var array of readers to close when closing this
+     *      This is filled by setBaseDir, with the readers that are needed to
+     *      reach the specified dir, but must not be stacked
+     */
+    var $toClose = array();
+
+    /**
      * @var File_Archive_Reader Reader from which all started (usefull to be
      *      able to close)
      * @access private
@@ -199,7 +206,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         } else if (PEAR::isError($error)) {
             return $error;
         }
-        $this->startReader = $this->source;
+        $this->toClose = $this->readers;
         $this->readers = array();
 
         $this->currentFileDisplayed = false;
@@ -244,11 +251,19 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         for($i=0; $i<count($this->readers); ++$i) {
             $this->readers[$i]->close();
         }
+        for($i=0; $i<count($this->toClose); ++$i) {
+            $this->toClose[$i]->close();
+        }
 
 
         $this->readers = array();
         $error = parent::close();
+
         $this->source =& $this->startReader;
+        $this->source->close();
+        $this->currentFileDisplayed = true;
+        $this->setBaseDir($this->baseDir);
+
         return $error;
     }
 }

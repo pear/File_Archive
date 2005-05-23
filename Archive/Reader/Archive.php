@@ -83,12 +83,13 @@ class File_Archive_Reader_Archive extends File_Archive_Reader
      * Close the source if it was given closed in the constructor
      *
      * @see File_Archive_Reader::close()
-     * @param bool $innerClose if false, the inner source won't be closed
      */
-    function close($innerClose = true)
+    function close()
     {
-        if (!$this->sourceInitiallyOpened && $this->sourceOpened && $innerClose) {
-            $error = $this->source->close();
+        if (!$this->sourceInitiallyOpened && $this->sourceOpened) {
+            if ($this->source !== null) {
+                $error = $this->source->close();
+            }
             $this->sourceOpened = false;
             if (PEAR::isError($error)) {
                 return $error;

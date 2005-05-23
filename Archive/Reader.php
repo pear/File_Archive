@@ -121,6 +121,28 @@ class File_Archive_Reader
     }
 
     /**
+     * Returns the list of filenames from the current pos to the end of the source
+     * The source will be closed after having called this function
+     * This function goes through the whole archive (which may be slow).
+     * If you intend to work on the reader, doing it in one pass would be faster
+     *
+     * @return array filenames from the current pos to the end of the source
+     */
+    function getFileList()
+    {
+        $result = array();
+        while ( ($error = $this->next()) === true) {
+            $result[] = $this->getFilename();
+        }
+        $this->close();
+        if (PEAR::isError($error)) {
+            return $error;
+        } else {
+            return $result;
+        }
+    }
+
+    /**
      * Returns an array of statistics about the file
      * (see the PHP stat function for more information)
      *
@@ -179,8 +201,11 @@ class File_Archive_Reader
     /**
      * Put back the reader in the state it was before the first call
      * to next()
+     *
+     * @param $recursive If true, close eventual inner writer even if
+     *                   it was given opened?
      */
-    function close()
+    function close($recursive = false)
     {
         return PEAR::raiseError("Reader abstract function call (close)");
     }
@@ -326,8 +351,13 @@ class File_Archive_Reader
      */
     function makeAppendWriter()
     {
-        while ($this->next()) { }
-        return $this->makeWriter();
+        while ( ($error = $this->next()) === true ) { }
+        if (PEAR::isError($error)) {
+            $this->close();
+            return $error;
+        } else {
+            return $this->makeWriter();
+        }
     }
 }
 

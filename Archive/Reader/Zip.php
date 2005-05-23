@@ -48,7 +48,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::close()
      */
-    function close($innerClose = true)
+    function close()
     {
         $this->currentFilename = null;
         $this->currentStat = null;
@@ -57,7 +57,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         $this->seekToEnd = 0;
         $this->files = array();
 
-        return parent::close($innerClose);
+        return parent::close();
     }
 
     /**
@@ -271,7 +271,8 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             }
         }
 
-        $this->close(false);
+        $this->source = null;
+        $this->close();
         return $writer;
     }
 }
