@@ -39,13 +39,13 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @var    string   Current data of the file. 
      * @access private
      */
-    var $_buffer;
+    var $_buffer = "";
 
     /**
      * @var    string   Filename of the current filename
      * @access private
      */
-    var $_currentFilename;
+    var $_currentFilename = null;
 
     /**
      * @var    boolean  Flag: use buffer or not.
@@ -57,8 +57,8 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @var    array    Stats of the current filename
      * @access private 
      */
-    var $_currentStat;
-    
+    var $_currentStat = array ();
+
     /**
      * Flush the memory we have in the ar. 
      *
@@ -96,7 +96,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
                 $this->innerWriter->writeData($this->_buffer);
                 
                 if ($currentSize % 2 == 1) {
-                    $this->innerWriter->writeData($this->_buffer);
+                    $this->innerWriter->writeData("\n");
                 }
             }            
          }
@@ -111,6 +111,11 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
                      $mime = "application/octet-stream") 
     {
         $this->flush();
+
+        //Are we at the beginning of the archive?
+        if (is_null($this->_currentFilename)) {
+            $this->innerWriter->writeData("!<arch>\n");
+        }
         /**
          * If the file is empty, there's no reason to have a buffer
          * or use memory 
@@ -125,8 +130,6 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      */
     function close()
     {
-        //Ok, lets add the <arch> stuff
-        $this->innerWriter->writeData("!<arch>\n");
         $this->flush();
         parent::close();
     }
