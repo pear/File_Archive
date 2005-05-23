@@ -60,6 +60,12 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     var $_currentStat = array ();
 
     /**
+     * @var    boolean  Flag: beginning of the archive or not
+     * @access private
+     */
+    var $_atStart = true;
+    
+    /**
      * Flush the memory we have in the ar. 
      *
      * Build the buffer if its called at the end or initialize
@@ -141,9 +147,9 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
         if ($this->_useBuffer) {
             $this->_buffer .= $data;
         } else {
-            if ($this->_currentStat[7] == 0 || 
-                strlen($this->_buffer) == 0) {
+            if ($this->_atStart) {
                 $this->innerWriter->writeData("!<arch>\n");
+                $this->_atStart = false;
             }
             $this->innerWriter->writeData($data);
         }
