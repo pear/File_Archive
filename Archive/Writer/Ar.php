@@ -34,9 +34,9 @@ require_once "Archive.php";
  */
 class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
 {
-    
+
     /**
-     * @var    string   Current data of the file. 
+     * @var    string   Current data of the file.
      * @access private
      */
     var $_buffer = "";
@@ -52,10 +52,10 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @access private
      */
     var $_useBuffer;
-    
+
     /**
      * @var    array    Stats of the current filename
-     * @access private 
+     * @access private
      */
     var $_currentStat = array ();
 
@@ -64,7 +64,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @access private
      */
     var $_atStart = true;
-    
+
     /**
      * Returns the appropriate struct of the current file.
      *
@@ -99,16 +99,16 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
                                    $this->_currentStat[7]);
             }
             $struct .= $this->_buffer;
-            
+
             if ($currentSize % 2 == 1) {
                 $struct .= "\n";
             }
         }
-        return $struct;                        
+        return $struct;
     }
 
     /**
-     * Flush the memory we have in the ar. 
+     * Flush the memory we have in the ar.
      *
      * Build the buffer if its called at the end or initialize
      * it if we are just creating it from the start.
@@ -128,7 +128,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
                 if ($this->_currentStat['size'] % 2 == 1) {
                     $this->innerWriter->writeData("\n");
                 }
-            }     
+            }
         }
         $this->_buffer = "";
     }
@@ -137,22 +137,22 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @see File_Archive_Writer::newFile()
      *
      */
-    function newFile($filename, $stat = array (), 
-                     $mime = "application/octet-stream") 
+    function newFile($filename, $stat = array (),
+                     $mime = "application/octet-stream")
     {
-        $this->flush();      
+        $this->flush();
         /**
          * If the file is empty, there's no reason to have a buffer
-         * or use memory 
+         * or use memory
          */
-        $this->_useBuffer = !isset($stats[7]); 
+        $this->_useBuffer = !isset($stats[7]);
         $this->_currentFilename = $filename;
-        $this->_currentStat = $stat;       
+        $this->_currentStat = $stat;
 
-        if(!$this->useBuffer) {
+        if (!$this->_useBuffer) {
             return $this->innerWriter->writeData(
-                                                 $this->tarHeader($filename, $stats)
-                                                 );
+                            $this->buildFileStruct()
+                            );
         }
     }
 
@@ -172,7 +172,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     {
         if ($this->_useBuffer) {
             $this->_buffer .= $data;
-        } else {            
+        } else {
             $this->innerWriter->writeData($data);
         }
 
@@ -184,7 +184,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     {
         if ($this->_useBuffer) {
             $this->_buffer .= file_get_contents($filename);
-        } else {            
+        } else {
             $this->innerWriter->writeFile($filename);
         }
     }
