@@ -68,37 +68,40 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     function flush()
     {
          if ($this->_currentFilename != null) {
-            if ($this->_useBuffer) {
-                $this->_currentStat[7] = strlen($this->_buffer);
-                $this->_currentStat['size'] = $this->_currentStat[7];
-                $currentSize = $this->_currentStat[7];
-                
-                //if file length is > than 16..
-                if (strlen($this->_currentFilename) > 16) {
-                    $currentSize += strlen($this->_currentFilename);
-                    $this->innerWriter->writeData(sprintf("#1/%-13d", strlen($this->_currentFilename)));
-                    $this->innerWriter->writeData(sprintf("%-12d%-6d%-6d%-8s%-10d",
-                                                          $this->_currentStat[9],
-                                                          $this->_currentStat[4],
-                                                          $this->_currentStat[5],
-                                                          $this->_currentStat[2],
-                                                          $currentSize));
-                    $this->innerWriter->writeData("`\n".$this->_currentFilename);
-                } else {
-                    $this->innerWriter->writeData(sprintf("%-16s", $this->_currentFilename));
-                    $this->innerWriter->writeData(sprintf("%-12d%-6d%-6d%-8s%-10d`\n",
-                                                          $this->_currentStat[9],
-                                                          $this->_currentStat[4],
-                                                          $this->_currentStat[5],
-                                                          $this->_currentStat[2],
-                                                          $this->_currentStat[7])); 
-                }
-                $this->innerWriter->writeData($this->_buffer);
-                
-                if ($currentSize % 2 == 1) {
-                    $this->innerWriter->writeData("\n");
-                }
-            }            
+             $this->_currentStat[7] = strlen($this->_buffer);
+             $this->_currentStat['size'] = $this->_currentStat[7];
+             $currentSize = $this->_currentStat[7];
+             if ($this->_useBuffer) {
+                 //if file length is > than 16..
+                 if (strlen($this->_currentFilename) > 16) {
+                     $currentSize += strlen($this->_currentFilename);
+                     $this->innerWriter->writeData(sprintf("#1/%-13d", strlen($this->_currentFilename)));
+                     $this->innerWriter->writeData(sprintf("%-12d%-6d%-6d%-8s%-10d",
+                                                           $this->_currentStat[9],
+                                                           $this->_currentStat[4],
+                                                           $this->_currentStat[5],
+                                                           $this->_currentStat[2],
+                                                           $currentSize));
+                     $this->innerWriter->writeData("`\n".$this->_currentFilename);
+                 } else {
+                     $this->innerWriter->writeData(sprintf("%-16s", $this->_currentFilename));
+                     $this->innerWriter->writeData(sprintf("%-12d%-6d%-6d%-8s%-10d`\n",
+                                                           $this->_currentStat[9],
+                                                           $this->_currentStat[4],
+                                                           $this->_currentStat[5],
+                                                           $this->_currentStat[2],
+                                                           $this->_currentStat[7])); 
+                 }
+                 $this->innerWriter->writeData($this->_buffer);
+                 
+                 if ($currentSize % 2 == 1) {
+                     $this->innerWriter->writeData("\n");
+                 }
+             } else {
+                 if ($currentSize % 2 == 1) {
+                     $this->innerWriter->writeData("\n");
+                 }
+             }            
          }
          $this->_buffer = "";
     }
@@ -111,11 +114,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
                      $mime = "application/octet-stream") 
     {
         $this->flush();
-
-        //Are we at the beginning of the archive?
-        if (is_null($this->_currentFilename)) {
-            $this->innerWriter->writeData("!<arch>\n");
-        }
+        
         /**
          * If the file is empty, there's no reason to have a buffer
          * or use memory 
@@ -130,6 +129,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      */
     function close()
     {
+        $this->innerWriter->writeData("!<arch>\n");
         $this->flush();
         parent::close();
     }
