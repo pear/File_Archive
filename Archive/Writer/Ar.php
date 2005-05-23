@@ -66,6 +66,48 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     var $_atStart = true;
     
     /**
+     * Returns the appropriate struct of the current file.
+     *
+     * More Info:
+     *  http://publibn.boulder.ibm.com/doc_link/en_US/a_doc_lib/files/aixfiles/ar_IA64.htm
+     *
+     * @return  string  The built struct
+     */
+    function buildFileStruct ()
+    {
+        $struct = "";
+        $currentSize = (isset($this->_currentStat[7])) ? $this->_currentStat[7] : 0;
+        if ($this->_useBuffer) {
+            //if file length is > than 16..
+            if (strlen($this->_currentFilename) > 16) {
+                $currentSize += strlen($this->_currentFilename);
+                $struct .= sprintf("#1/%-13d", strlen($this->_currentFilename));
+                $struct .= sprintf("%-12d%-6d%-6d%-8s%-10d",
+                                   $this->_currentStat[9],
+                                   $this->_currentStat[4],
+                                   $this->_currentStat[5],
+                                   $this->_currentStat[2],
+                                   $currentSize);
+                $struct .=  "`\n".$this->_currentFilename;
+            } else {
+                $struct .= sprintf("%-16s", $this->_currentFilename);
+                $struct .= sprintf("%-12d%-6d%-6d%-8s%-10d`\n",
+                                   $this->_currentStat[9],
+                                   $this->_currentStat[4],
+                                   $this->_currentStat[5],
+                                   $this->_currentStat[2],
+                                   $this->_currentStat[7]);
+            }
+            $struct .= $this->_buffer;
+            
+            if ($currentSize % 2 == 1) {
+                $struct .= "\n";
+            }
+        }
+        return $struct;                        
+    }
+
+    /**
      * Flush the memory we have in the ar. 
      *
      * Build the buffer if its called at the end or initialize
@@ -73,44 +115,22 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      */
     function flush()
     {
-         if ($this->_currentFilename != null) {
-             $this->_currentStat[7] = strlen($this->_buffer);
-             $this->_currentStat['size'] = $this->_currentStat[7];
-             $currentSize = $this->_currentStat[7];             
-             if ($this->_useBuffer) {
-                 //if file length is > than 16..
-                 if (strlen($this->_currentFilename) > 16) {
-                     $currentSize += strlen($this->_currentFilename);
-                     $this->innerWriter->writeData(sprintf("#1/%-13d", strlen($this->_currentFilename)));
-                     $this->innerWriter->writeData(sprintf("%-12d%-6d%-6d%-8s%-10d",
-                                                           $this->_currentStat[9],
-                                                           $this->_currentStat[4],
-                                                           $this->_currentStat[5],
-                                                           $this->_currentStat[2],
-                                                           $currentSize));
-                     $this->innerWriter->writeData("`\n".$this->_currentFilename);
-                 } else {
-                     $this->innerWriter->writeData(sprintf("%-16s", $this->_currentFilename));
-                     $this->innerWriter->writeData(sprintf("%-12d%-6d%-6d%-8s%-10d`\n",
-                                                           $this->_currentStat[9],
-                                                           $this->_currentStat[4],
-                                                           $this->_currentStat[5],
-                                                           $this->_currentStat[2],
-                                                           $this->_currentStat[7])); 
-                 }
-                 $this->innerWriter->writeData($this->_buffer);
-                 
-                 if ($currentSize % 2 == 1) {
-                     $this->innerWriter->writeData("\n");
-                 }
-             } else {
-                 if ($currentSize % 2 == 1) {
-                     $this->innerWriter->writeData("\n");
-                 }
-             }     
-       
-         }
-         $this->_buffer = "";
+        if ($this->_atStart) {
+            $this->innerWriter->writeData("!<arch>\n");
+            $this->_atStart = false;
+        }
+        if ($this->_currentFilename != null) {
+            $this->_currentStat[7] = strlen($this->_buffer);
+            $this->_currentStat['size'] = $this->_currentStat[7];
+            if ($this->_useBuffer) {
+                $this->innerWriter->writeData($this->buildFileStruct());
+            } else {
+                if ($this->_currentStat['size'] % 2 == 1) {
+                    $this->innerWriter->writeData("\n");
+                }
+            }     
+        }
+        $this->_buffer = "";
     }
 
     /**
@@ -128,6 +148,12 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
         $this->_useBuffer = !isset($stats[7]); 
         $this->_currentFilename = $filename;
         $this->_currentStat = $stat;       
+
+        if(!$this->useBuffer) {
+            return $this->innerWriter->writeData(
+                                                 $this->tarHeader($filename, $stats)
+                                                 );
+        }
     }
 
     /**
@@ -146,11 +172,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     {
         if ($this->_useBuffer) {
             $this->_buffer .= $data;
-        } else {
-            if ($this->_atStart) {
-                $this->innerWriter->writeData("!<arch>\n");
-                $this->_atStart = false;
-            }
+        } else {            
             $this->innerWriter->writeData($data);
         }
 
