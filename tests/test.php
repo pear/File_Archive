@@ -254,6 +254,7 @@ class Test extends PHPUnit_TestCase
     }
     function testTar() { $this->_testArchive('tar'); }
     function testZip() { $this->_testArchive('zip'); }
+    function testAr()  { $this->_testArchive('ar');  }
     function _testGzip() { $this->_testArchive('gz'); }
     function testTgz() { $this->_testArchive('tgz'); }
     function testTbz() { $this->_testArchive('tbz'); }
