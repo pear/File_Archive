@@ -70,7 +70,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
          if ($this->_currentFilename != null) {
              $this->_currentStat[7] = strlen($this->_buffer);
              $this->_currentStat['size'] = $this->_currentStat[7];
-             $currentSize = $this->_currentStat[7];
+             $currentSize = $this->_currentStat[7];             
              if ($this->_useBuffer) {
                  //if file length is > than 16..
                  if (strlen($this->_currentFilename) > 16) {
@@ -101,7 +101,8 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
                  if ($currentSize % 2 == 1) {
                      $this->innerWriter->writeData("\n");
                  }
-             }            
+             }     
+       
          }
          $this->_buffer = "";
     }
@@ -113,8 +114,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     function newFile($filename, $stat = array (), 
                      $mime = "application/octet-stream") 
     {
-        $this->flush();
-        
+        $this->flush();      
         /**
          * If the file is empty, there's no reason to have a buffer
          * or use memory 
@@ -129,7 +129,6 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      */
     function close()
     {
-        $this->innerWriter->writeData("!<arch>\n");
         $this->flush();
         parent::close();
     }
@@ -142,6 +141,10 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
         if ($this->_useBuffer) {
             $this->_buffer .= $data;
         } else {
+            if ($this->_currentStat[7] == 0 || 
+                strlen($this->_buffer) == 0) {
+                $this->innerWriter->writeData("!<arch>\n");
+            }
             $this->innerWriter->writeData($data);
         }
 
@@ -153,7 +156,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     {
         if ($this->_useBuffer) {
             $this->_buffer .= file_get_contents($filename);
-        } else {
+        } else {            
             $this->innerWriter->writeFile($filename);
         }
     }
