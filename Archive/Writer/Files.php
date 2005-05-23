@@ -45,13 +45,14 @@ class File_Archive_Writer_Files extends File_Archive_Writer
 
     function File_Archive_Writer_Files($base = '')
     {
-        if($base == null || $base == '')
+        if ($base == null || $base == '') {
             $this->basePath = '';
-        else {
-            if(substr($base, -1) == '/')
+        } else {
+            if (substr($base, -1) == '/') {
                 $this->basePath = $base;
-            else
+            } else {
                 $this->basePath = $base.'/';
+            }
         }
     }
 

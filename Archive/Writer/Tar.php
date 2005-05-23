@@ -160,7 +160,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_Archive
         $this->filename = $filename;
         $this->stats = $stats;
 
-        if(!$this->useBuffer) {
+        if (!$this->useBuffer) {
             return $this->innerWriter->writeData(
                 $this->tarHeader($filename, $stats)
             );

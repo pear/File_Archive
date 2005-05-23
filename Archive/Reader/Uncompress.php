@@ -239,7 +239,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
      */
     function close()
     {
-        for($i=0; $i<count($this->readers); ++$i) {
+        for ($i=0; $i<count($this->readers); ++$i) {
             $this->readers[$i]->close();
         }
 

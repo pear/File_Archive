@@ -47,9 +47,9 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
      */
     function close($innerClose = true)
     {
-        if($this->bzfile != null)
+        if ($this->bzfile != null)
             bzclose($this->bzfile);
-        if($this->tmpName != null)
+        if ($this->tmpName != null)
             unlink($this->tmpName);
 
         $this->nbRead = 0;
@@ -116,7 +116,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
             do {
                 $newData = bzread($this->bzfile);
                 $data .= $newData;
-            } while($newData != '');
+            } while ($newData != '');
             $this->pos += strlen($data);
         } else if ($length == 0) {
             return '';

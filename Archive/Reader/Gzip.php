@@ -124,7 +124,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
             {
                 $newData = gzread($this->gzfile, 8196);
                 $data .= $newData;
-            } while($newData != '');
+            } while ($newData != '');
         } else if ($length == 0) {
             return '';
         } else {

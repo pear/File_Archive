@@ -88,7 +88,7 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer
     function newFile($filename, $stat = array(),
                      $mime = "application/octet-stream")
     {
-        if($this->nbFiles > 1) {
+        if ($this->nbFiles > 1) {
             return PEAR::raiseError("A Gz archive can only contain one single file.".
                                     "Use Tgz archive to be able to write several files");
         }

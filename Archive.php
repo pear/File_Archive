@@ -159,7 +159,7 @@ class File_Archive
     function readSource(&$source, $URL, $symbolic = null,
                   $uncompression = 0, $directoryDepth = -1)
     {
-        if(PEAR::isError($source)) {
+        if (PEAR::isError($source)) {
             return $source;
         }
 

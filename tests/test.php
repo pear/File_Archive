@@ -320,7 +320,7 @@ class Test extends PHPUnit_TestCase
     function _testReadArchive()
     {
         $source = File_Archive::readArchive('tar', File_Archive::read('up.tar'));
-        while($source->next())
+        while ($source->next())
             echo $source->getFilename()."\n";
     }
 }
