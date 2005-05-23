@@ -34,9 +34,9 @@ require_once "Archive.php";
  */
 class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
 {
-
+    
     /**
-     * @var    string   Current data of the file.
+     * @var    string   Current data of the file. 
      * @access private
      */
     var $_buffer = "";
@@ -52,10 +52,10 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @access private
      */
     var $_useBuffer;
-
+    
     /**
      * @var    array    Stats of the current filename
-     * @access private
+     * @access private 
      */
     var $_currentStat = array ();
 
@@ -64,51 +64,62 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @access private
      */
     var $_atStart = true;
-
+    
     /**
-     * Returns the appropriate struct of the current file.
+     * Returns the header of the current file.
      *
      * More Info:
      *  http://publibn.boulder.ibm.com/doc_link/en_US/a_doc_lib/files/aixfiles/ar_IA64.htm
      *
-     * @return  string  The built struct
+     * @access  private
+     * @param   string  $filename  Name of the current file
+     * @param   array   $stat      Stat array of the current file
+     * @return  string  The built header struct
      */
-    function buildFileStruct ()
-    {
-        $struct = "";
-        $currentSize = (isset($this->_currentStat[7])) ? $this->_currentStat[7] : 0;
-        if ($this->_useBuffer) {
-            //if file length is > than 16..
-            if (strlen($this->_currentFilename) > 16) {
-                $currentSize += strlen($this->_currentFilename);
-                $struct .= sprintf("#1/%-13d", strlen($this->_currentFilename));
-                $struct .= sprintf("%-12d%-6d%-6d%-8s%-10d",
-                                   $this->_currentStat[9],
-                                   $this->_currentStat[4],
-                                   $this->_currentStat[5],
-                                   $this->_currentStat[2],
-                                   $currentSize);
-                $struct .=  "`\n".$this->_currentFilename;
-            } else {
-                $struct .= sprintf("%-16s", $this->_currentFilename);
-                $struct .= sprintf("%-12d%-6d%-6d%-8s%-10d`\n",
-                                   $this->_currentStat[9],
-                                   $this->_currentStat[4],
-                                   $this->_currentStat[5],
-                                   $this->_currentStat[2],
-                                   $this->_currentStat[7]);
-            }
-            $struct .= $this->_buffer;
+    function arHeader ($filename, $stat)
+    {        
+        $mode = isset($stat[2]) ? $stat[2] : 0x8000;
+        $uid  = isset($stat[4]) ? $stat[4] : 0;
+        $gid  = isset($stat[5]) ? $stat[5] : 0;
+        $size = $stat[7];
+        $time = isset($stat[9]) ? $stat[9] : time();
 
-            if ($currentSize % 2 == 1) {
-                $struct .= "\n";
-            }
-        }
-        return $struct;
+        $struct = "";
+        $currentSize = $size;
+        //if file length is > than 16..
+        if (strlen($filename) > 16) {
+            $currentSize += strlen($filename);
+            $struct .= sprintf("#1/%-13d", strlen($filename));
+            $struct .= sprintf("%-12d%-6d%-6d%-8s%-10d",
+                               $time, $uid, $gid, $mode, $currentSize);
+            $struct .=  "`\n".$filename;
+        } else {
+            $struct .= sprintf("%-16s", $filename);
+            $struct .= sprintf("%-12d%-6d%-6d%-8s%-10d`\n",
+                               $time, $uid, $gid, $mode, $size);
+        }           
+        return $struct;                        
     }
 
     /**
-     * Flush the memory we have in the ar.
+     * Returns the footer of the current file, the footer depends
+     * of the size of the file
+     *
+     * @access  private
+     * @param   string   $filename Name of the file, the footer depends on its length
+     * @param   int      $size     Size of the current file, here the size does matters!
+     * @return  string   The footer struct
+     */
+    function arFooter($filename, $size)
+    {
+        $size = (strlen ($filename) > 16) ? $size + strlen($filename) : $size;
+
+        return ($size % 2 == 1) ? "\n" : "";
+    }
+
+
+    /**
+     * Flush the memory we have in the ar. 
      *
      * Build the buffer if its called at the end or initialize
      * it if we are just creating it from the start.
@@ -121,14 +132,13 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
         }
         if ($this->_currentFilename != null) {
             $this->_currentStat[7] = strlen($this->_buffer);
-            $this->_currentStat['size'] = $this->_currentStat[7];
             if ($this->_useBuffer) {
-                $this->innerWriter->writeData($this->buildFileStruct());
-            } else {
-                if ($this->_currentStat['size'] % 2 == 1) {
-                    $this->innerWriter->writeData("\n");
-                }
-            }
+                $this->innerWriter->writeData(
+                                              $this->arHeader($this->_currentFilename, $this->_currentStat)
+                                              );
+                $this->innerWriter->writeData($this->_buffer);
+            } 
+            $this->innerWriter->writeData($this->arFooter($this->_currentFilename, $this->_currentStat[7]));
         }
         $this->_buffer = "";
     }
@@ -137,22 +147,21 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @see File_Archive_Writer::newFile()
      *
      */
-    function newFile($filename, $stat = array (),
-                     $mime = "application/octet-stream")
+    function newFile($filename, $stat = array (), 
+                     $mime = "application/octet-stream") 
     {
-        $this->flush();
+        $this->flush();      
+        echo $filename."<br />";
         /**
          * If the file is empty, there's no reason to have a buffer
-         * or use memory
+         * or use memory 
          */
-        $this->_useBuffer = !isset($stats[7]);
+        $this->_useBuffer = !isset($stats[7]); 
         $this->_currentFilename = $filename;
-        $this->_currentStat = $stat;
+        $this->_currentStat = $stat;       
 
-        if (!$this->_useBuffer) {
-            return $this->innerWriter->writeData(
-                            $this->buildFileStruct()
-                            );
+        if(!$this->_useBuffer) {
+            return $this->innerWriter->writeData($this->arHeader($filename, $stat));
         }
     }
 
@@ -172,7 +181,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     {
         if ($this->_useBuffer) {
             $this->_buffer .= $data;
-        } else {
+        } else {            
             $this->innerWriter->writeData($data);
         }
 
@@ -184,7 +193,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     {
         if ($this->_useBuffer) {
             $this->_buffer .= file_get_contents($filename);
-        } else {
+        } else {            
             $this->innerWriter->writeFile($filename);
         }
     }
