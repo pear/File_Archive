@@ -239,8 +239,9 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0)
+    function makeWriter($seek = 0, $fileModif = true)
     {
+    //TODO: case when fileModif is true (size of the file changes)
         require_once "File/Archive/Writer/Zip.php";
 
         if ($this->currentFilename == null) {

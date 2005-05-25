@@ -90,7 +90,10 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0) { return $this->source->makeWriter($seek); }
+    function makeWriter($seek = 0, $fileModif = true)
+    {
+        return $this->source->makeWriter($seek, $fileModif);
+    }
 }
 
 ?>

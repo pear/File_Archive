@@ -517,7 +517,7 @@ class File_Archive
         if (PEAR::isError($source)) {
             return $source;
         }
-        return $source->makeAppendWriter();
+        return $source->makeAppendWriter(false);
     }
 
     /**

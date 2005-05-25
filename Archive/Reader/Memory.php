@@ -154,8 +154,15 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0)
+    function makeWriter($seek = 0, $fileModif = true)
     {
+        if ($fileModif == false) {
+            return PEAR::raiseError(
+                'A Memory reader contains one single file. '
+                'makeWriter must be called with $fileModif set to true'
+            );
+        }
+
         require_once "File/Archive/Writer/Memory.php";
         $writer = new File_Archive_Writer_Memory($this->memory, $this->offset);
         $this->close();

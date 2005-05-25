@@ -336,12 +336,19 @@ class File_Archive_Reader
      *  $file->extract($source->makeAppendWriter());
      * </sample>
      *
-     * @param int seek The new writer will be opened seek bytes after the current position
+     * @param int $seek The new writer will be opened seek bytes after the current position
      *        Seek can be positive or negative
      *        If current file pos + seek < 0 or current file pos + seek > current file size,
      *        we have an undefined behaviour
+     * @param bool $fileModif Set to false only if you will call newFile or close first on the
+     *        returned writer (and thus will not modify the current file of the reader)
+     *        Setting this parameter to false can speed up a lot the process
+     *        If $fileModif is false, $seek will not be taken into account (since the writer will
+     *        not write in the current file)
+     * @return File_Archive_Writer Writer that appends data to the ressource of this reader,
+     *        starting at the current location
      */
-    function makeWriter($seek = 0)
+    function makeWriter($seek = 0, $fileModif = true)
     {
         return PEAR::raiseError("Reader abstract function call (makeWriter)");
     }
@@ -349,14 +356,14 @@ class File_Archive_Reader
     /**
      * @return a writer that will allow to append files to an existing archive
      */
-    function makeAppendWriter()
+    function makeAppendWriter($fileModif = true)
     {
         while ( ($error = $this->next()) === true ) { }
         if (PEAR::isError($error)) {
             $this->close();
             return $error;
         } else {
-            return $this->makeWriter();
+            return $this->makeWriter($fileModif);
         }
     }
 }

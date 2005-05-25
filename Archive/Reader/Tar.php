@@ -200,8 +200,9 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0)
+    function makeWriter($seek = 0, $fileModif = true)
     {
+    //TODO: case when $fileModif is true
         require_once "File/Archive/Writer/Tar.php";
 
         if ($this->seekToEnd != null) {

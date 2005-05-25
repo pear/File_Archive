@@ -184,11 +184,17 @@ class File_Archive_Reader_File extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0)
+    function makeWriter($seek = 0, $fileModif = true)
     {
         require_once "File/Archive/Writer/Files.php";
 
         $writer = new File_Archive_Writer_Files();
+
+        if ($fileModif == false) {
+            return PEAR::raiseError(
+                'To append data to a file, you must set $fileModif to true'
+            );
+        }
 
         if ($this->handle != null) {
             $file = $this->getDataFilename();

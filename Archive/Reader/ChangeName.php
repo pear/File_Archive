@@ -65,10 +65,10 @@ class File_Archive_Reader_AddBaseName extends File_Archive_Reader_Relay
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0)
+    function makeWriter($seek = 0, $fileModif = true)
     {
         //TODO: makeWriter
-        return parent::makeWriter($seek);
+        return parent::makeWriter($seek, $fileModif);
     }
 }
 
@@ -127,10 +127,10 @@ class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0)
+    function makeWriter($seek = 0, $fileModif = true)
     {
         //TODO: makeWriter
-        return parent::makeWriter($seek);
+        return parent::makeWriter($seek, $fileModif);
     }
 }
 
