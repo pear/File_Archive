@@ -895,14 +895,17 @@ class File_Archive
      *
      * @param File_Archive_Reader $source The source that will be read
      * @param File_Archive_Writer $dest Where to copy $source files
+     * @param bool $autoClose if true (default), $dest will be closed after the extraction
+     * @param int $bufferSize Size of the buffer to use to move data from the reader to the buffer
+     *        You shouldn't need to change that
      * @return null or a PEAR error if an error occured
      */
-    function extract(&$source, &$dest)
+    function extract(&$source, &$dest, $autoClose = true, $bufferSize = 8192)
     {
         if (PEAR::isError($source)) {
             return $source;
         }
-        return $source->extract($dest);
+        return $source->extract($dest, $autoClose, $bufferSize);
     }
 }
 

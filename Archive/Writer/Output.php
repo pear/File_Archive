@@ -61,9 +61,16 @@ class File_Archive_Writer_Output extends File_Archive_Writer
     function newFile($filename, $stat = array(), $mime = "application/octet-stream")
     {
         if ($this->sendHeaders) {
+            if(headers_sent()) {
+                return PEAR::raiseError(
+                    'The headers have already been sent. '.
+                    'Use File_Archive::toOutput(false) to write '.
+                    'to output without sending headers');
+            }
+
             header("Content-type: $mime");
             header("Content-disposition: attachment; filename=$filename");
-            $this->sendHeaders = FALSE;
+            $this->sendHeaders = false;
         }
     }
     /**

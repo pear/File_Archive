@@ -289,7 +289,7 @@ class File_Archive_Reader
      *        Default value is 100kB
      */
     function extractFile($filename, &$writer,
-                         $autoClose = true, $bufferSize = 102400)
+                         $autoClose = true, $bufferSize = 8192)
     {
         if (PEAR::isError($writer)) {
             return $writer;
