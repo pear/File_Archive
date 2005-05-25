@@ -146,7 +146,8 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
             //Remove the readers we have completly read from the stack
             do {
                 while (($error = $this->source->next()) === false) {
-                    if (empty($this->readers)) {
+                    if (empty($this->readers) ||
+                        count($this->readers)+1 == $this->baseDirCompressionLevel) {
                         return false;
                     }
                     $this->source->close();

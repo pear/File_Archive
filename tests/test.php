@@ -302,6 +302,7 @@ class Test extends PHPUnit_TestCase
         );
     }
 
+
     function testMultiWriter()
     {
         $this->assertTrue(

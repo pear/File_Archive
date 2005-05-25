@@ -384,8 +384,12 @@ class File_Archive
      *         $source interpreting it as a $extension archive
      *         If $extension is not handled return false
      */
-    function readArchive($extension, $source, $sourceOpened = false)
+    function readArchive($extension, &$source, $sourceOpened = false)
     {
+        if (PEAR::isError($source)) {
+            return $source;
+        }
+
         switch($extension) {
         case 'tgz':
             return File_Archive::readArchive('tar',
@@ -486,6 +490,34 @@ class File_Archive
     {
         require_once "File/Archive/Reader/Concat.php";
         return new File_Archive_Reader_Concat($source, $filename, $stat, $mime);
+    }
+
+    /**
+     * Generate a writer to append data to the specified source
+     * The source will be closed and should no longer be used
+     *
+     * To add foo.bar to the existing archive.tar archive, do the following:
+     * <sample>
+     *  //Append data to a tar archive
+     *  //Do not forget the trailing / (which is here to ask to considere
+     *  //archive.tar as an archive rather than a file)
+     *  File_Archive::extract(
+     *   File_Archive::read('foo.bar'),
+     *   File_Archive::append(File_Archive::read('archive.tar/')),
+     *  );
+     * </sample>
+     *
+     * Files cannot be appended to nested archives
+     *
+     * @param File_Archive_Reader the source where files will be appended
+     * @return File_Archive_Writer a writer that writes at the end of the source
+     */
+    function append(&$source)
+    {
+        if (PEAR::isError($source)) {
+            return $source;
+        }
+        return $source->makeAppendWriter();
     }
 
     /**
