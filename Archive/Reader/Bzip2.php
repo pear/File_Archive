@@ -142,7 +142,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
 
         if ($fileModif == false) {
             return PEAR::raiseError(
-                'A Bzip archive contains one single file. '
+                'A Bzip archive contains one single file. '.
                 'makeWriter must be called with $fileModif set to true'
             );
         }

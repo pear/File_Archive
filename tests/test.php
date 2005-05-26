@@ -281,7 +281,7 @@ class Test extends PHPUnit_TestCase
         //Close the writer
         $writer->close();
     }
-    function testDirectories()
+    function _testDirectories()
     {
         $this->assertTrue(
             !PEAR::isError(
@@ -289,15 +289,6 @@ class Test extends PHPUnit_TestCase
                         File_Archive::read('../Archive'),
                         File_Archive::toArchive('up.tbz', File_Archive::toFiles())
                 )
-            ) &&
-            !PEAR::isError(
-                $source = File_Archive::read('up.tbz/')
-            ) &&
-            !PEAR::isError(
-                $appendedData = File_Archive::read('test.php')
-            ) &&
-            !PEAR::isError(
-                $appendedData->extract($source->makeAppendWriter())
             )
         );
     }

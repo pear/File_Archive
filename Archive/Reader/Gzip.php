@@ -143,7 +143,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
 
         if ($fileModif == false) {
             return PEAR::raiseError(
-                'A GZip archive contains one single file. '
+                'A GZip archive contains one single file. '.
                 'makeWriter must be called with $fileModif set to true'
             );
         }

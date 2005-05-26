@@ -158,7 +158,7 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     {
         if ($fileModif == false) {
             return PEAR::raiseError(
-                'A Memory reader contains one single file. '
+                'A Memory reader contains one single file. '.
                 'makeWriter must be called with $fileModif set to true'
             );
         }
