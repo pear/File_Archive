@@ -82,13 +82,13 @@ class File_Archive_Writer_Files extends File_Archive_Writer
         // Crawl up the directory tree
         $next_pathname = substr(
                     $pathname,
-                    0, strrpos($pathname, DIRECTORY_SEPARATOR));
-        if (($error = $this->mkdirr($next_pathname)) === true) {
-            if (!mkdir($pathname)) {
-                return PEAR::raiseError("Unable to create directory $pathname");
-            }
-        } else {
+                    0, strrpos($pathname, "/"));
+        $error = $this->mkdirr($next_pathname);
+        if (PEAR::isError($error)) {
             return $error;
+        }
+        if (!@mkdir($pathname)) {
+            return PEAR::raiseError("Unable to create directory $pathname");
         }
     }
 
