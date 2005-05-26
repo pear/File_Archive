@@ -151,13 +151,17 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
                      $mime = "application/octet-stream") 
     {
         $this->flush();      
-        echo $filename."<br />";
         /**
          * If the file is empty, there's no reason to have a buffer
          * or use memory 
          */
         $this->_useBuffer = !isset($stats[7]); 
-        $this->_currentFilename = $filename;
+        /**
+         * Becaue ar fileformats doesn't support files in directories,
+         * then we need to just save with the filename an ommit the 
+         * directory
+         */
+        $this->_currentFilename = basename($filename);
         $this->_currentStat = $stat;       
 
         if(!$this->_useBuffer) {

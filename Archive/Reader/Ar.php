@@ -192,5 +192,18 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
             return $this->source->getData($length);
         }
     }
+
+    /**
+     * @see File_Archive_Reader::makeWriter
+     */
+    function makeWriter($seek = 0, $fileModif = true)
+    {
+        require_once "File/Archive/Writer/Ar.php";
+        
+        $writer = $this->source->makeWriter();
+        $this->source = null;
+        $this->close();
+        return new File_Archive_Writer_Ar(null, $writer);
+    }
 }
 ?>
