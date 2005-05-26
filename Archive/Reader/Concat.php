@@ -157,9 +157,9 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0, $fileModif = true)
+    function makeWriter($fileModif = true, $seek = 0)
     {
-        return $this->source->makeWriter($seek, $fileModif);
+        return $this->source->makeWriter($fileModif, $seek);
     }
 }
 

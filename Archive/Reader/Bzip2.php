@@ -136,7 +136,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0, $fileModif = true)
+    function makeWriter($fileModif = true, $seek = 0)
     {
         require_once "File/Archive/Writer/Bzip2.php";
 

@@ -239,9 +239,13 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0, $fileModif = true)
+    function makeWriter($fileModif = true, $seek = 0)
     {
-    //TODO: case when fileModif is true (size of the file changes)
+        if ($fileModif) {
+            //TODO: inner modification of archives
+            return PEAR::raiseError('Modification of nested archives not available');
+        }
+
         require_once "File/Archive/Writer/Zip.php";
 
         if ($this->currentFilename == null) {
@@ -254,7 +258,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
                 $seekToEnd = $this->seekToEnd;
             }
 
-            $writer = new File_Archive_Writer_Zip(null, $this->source->makeWriter(- $seekToEnd));
+            $writer = new File_Archive_Writer_Zip(null, $this->source->makeWriter(true, - $seekToEnd));
 
             if (!empty($this->files) && $this->seekToEnd == 0) {
                 //Last file will be rewritten

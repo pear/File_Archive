@@ -317,10 +317,25 @@ class File_Archive_Reader
     /**
      * Returns a writer that will start writing at the current pos in the source
      * Any data (from current file or any other file) located after current pos
-     * will be erased. No file will be erased though (so for file and directory
-     * readers, the file and directory will not be deleted)
-     * $this->close will be called. $this should not be used until the returned writer
-     * has been closed
+     * will be erased.
+     * For security reasons, calling makeWriter on a directory reader will not erase any file
+     * though.
+     * $this->close will be called and after this function the reader is invalid (and
+     * should no longer be used).
+     *
+     * If $fileModif is true, the writer will allow editing the current file (or the
+     * last file if the end of the archive has been reached)
+     * Thus it is an error to call makeWriter with fileModif to true if the reader
+     * has not been opened (no call to next() have been done, or first call to next
+     * returned false).
+     * In this case, $seek allows to change the position from where the file must be
+     * edited
+     *
+     * If $fileModif is false, the writer will not allow to edit the current file, and
+     * the first function call should be new file. The current file will be left unchanged
+     * If the first function call is writeData, the behaviour is undefined (it
+     * will generally result in invalid archives).
+     * In this case, $seek is not used
      *
      * Here is how to append a single file to an existing zip archive
      * <sample>
@@ -348,13 +363,16 @@ class File_Archive_Reader
      * @return File_Archive_Writer Writer that appends data to the ressource of this reader,
      *        starting at the current location
      */
-    function makeWriter($seek = 0, $fileModif = true)
+    function makeWriter($fileModif = true, $seek = 0)
     {
         return PEAR::raiseError("Reader abstract function call (makeWriter)");
     }
 
     /**
+     * This is equivalent to move to the end of the archive and calling makeWriter
+     *
      * @return a writer that will allow to append files to an existing archive
+     * @see makeWriter
      */
     function makeAppendWriter($fileModif = true)
     {

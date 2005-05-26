@@ -154,7 +154,7 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0, $fileModif = true)
+    function makeWriter($fileModif = true, $seek = 0)
     {
         if ($fileModif == false) {
             return PEAR::raiseError(
@@ -164,7 +164,7 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
         }
 
         require_once "File/Archive/Writer/Memory.php";
-        $writer = new File_Archive_Writer_Memory($this->memory, $this->offset);
+        $writer = new File_Archive_Writer_Memory($this->memory, $this->offset + $seek);
         $this->close();
         return $writer;
     }

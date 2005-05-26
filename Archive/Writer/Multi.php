@@ -34,7 +34,6 @@ require_once "File/Archive/Writer.php";
 /**
  * Write to several writers
  */
-//TODO: check that it's working with PHP4 (worried about the references)
 class File_Archive_Writer_Multi extends File_Archive_Writer
 {
     /**

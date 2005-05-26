@@ -135,14 +135,16 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
     /**
      * @see File_Archive_Reader::makeWriter
      */
-    function makeWriter($seek = 0, $fileModif = true)
+    function makeWriter($fileModif = true, $seek = 0)
     {
         require_once "File/Archive/Writer/Files.php";
 
-        if ($this->source == null) {
+        if ($this->source == null ||
+            (!$fileModif && is_a($source, 'File_Archive_Reader_File'))
+           ) {
             $writer = new File_Archive_Writer_Files($directory);
         } else {
-            $writer = $this->source->makeWriter($seek, $fileModif);
+            $writer = $this->source->makeWriter($fileModif, $seek);
         }
 
         $toUnlink = array();

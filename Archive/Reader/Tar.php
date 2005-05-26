@@ -73,7 +73,7 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     {
         $actualLength = min($this->leftLength, $length);
         $error = $this->source->skip($actualLength);
-        $length -= $actualLength;
+        $this->leftLength -= $actualLength;
         return $error;
     }
 
@@ -202,17 +202,45 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
      */
     function makeWriter($seek = 0, $fileModif = true)
     {
-    //TODO: case when $fileModif is true
         require_once "File/Archive/Writer/Tar.php";
 
-        if ($this->seekToEnd != null) {
-            $writer = $this->source->makeWriter(- $this->seekToEnd);
+        if ($fileModif) {
+            if ($this->seekToEnd != null) {
+                //Seek before the stat of the last file
+                $innerSeek = -$this->seekToEnd - $this->currentStat[7] - 512;
+                if ($this->currentStat[7] % 512 != 0) {
+                    $innerSeek += 512 - $this->currentStat[7] % 512;
+                }
+            } else {
+                //Seek before the stat of the current file
+                $innerSeek = -$this->currentStat[7] + $this->leftLength - 512;
+            }
         } else {
-            $writer = $this->source->makeWriter();
+            if ($this->seekToEnd != null) {
+                //Seek before the empty header
+                $innerSeek = -$this->seekToEnd;
+            } else {
+                //Seek to the end of the current file
+                $innerSeek = $this->leftLength;
+            }
         }
+
+        $innerWriter = $this->source->makeWriter($innerSeek);
+        if (PEAR::isError($innerWriter)) {
+            return $innerWriter;
+        }
+
         $this->source = null;
         $this->close();
-        return new File_Archive_Writer_Tar(null, $writer);
+        $writer = new File_Archive_Writer_Tar(null, $writer);
+
+        if ($fileModif) {
+            //Rewrite the file
+
+            //TODO: inner modification of archives
+            return PEAR::raiseError("Modification of nested archives not available");
+        }
+        return $writer;
     }
 }
 
