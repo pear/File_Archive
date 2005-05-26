@@ -30,7 +30,7 @@
  */
 
 require_once "File/Archive/Reader.php";
-require_once "ChangeName.php";
+require_once "File/Archive/Reader/ChangeName.php";
 
 /**
  * Recursively uncompress every file it finds

@@ -32,7 +32,7 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "Reader.php";
+require_once "File/Archive/Reader.php";
 
 /**
  * A predicate is an object that can evaluate to true or false depending on the

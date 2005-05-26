@@ -157,7 +157,7 @@ class File_Archive_Reader
      */
     function getMime()
     {
-        require_once "Reader/MimeList.php";
+        require_once "File/Archive/Reader/MimeList.php";
         return File_Archive_Reader_GetMime($this->getFilename());
     }
 

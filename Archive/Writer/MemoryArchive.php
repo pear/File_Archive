@@ -30,8 +30,8 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "Archive.php";
-require_once "Memory.php";
+require_once "File/Archive/Writer/Archive.php";
+require_once "File/Archive/Writer/Memory.php";
 
 /**
  * Base class for all the archiveWriters that can only work on complete files

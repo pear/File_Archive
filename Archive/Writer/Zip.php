@@ -29,7 +29,7 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "MemoryArchive.php";
+require_once "File/Archive/Writer/MemoryArchive.php";
 
 /**
  * ZIP archive writer

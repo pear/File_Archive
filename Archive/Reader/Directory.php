@@ -29,8 +29,8 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "Relay.php";
-require_once "File.php";
+require_once "File/Archive/Reader/Relay.php";
+require_once "File/Archive/Reader/File.php";
 
 /**
  * Recursively reads a directory

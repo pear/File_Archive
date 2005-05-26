@@ -27,16 +27,16 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "Archive.php";
+require_once "File/Archive/Writer/Archive.php";
 
 /**
  * Write the files as an AR archive
  */
 class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
 {
-    
+
     /**
-     * @var    string   Current data of the file. 
+     * @var    string   Current data of the file.
      * @access private
      */
     var $_buffer = "";
@@ -52,10 +52,10 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @access private
      */
     var $_useBuffer;
-    
+
     /**
      * @var    array    Stats of the current filename
-     * @access private 
+     * @access private
      */
     var $_currentStat = array ();
 
@@ -64,7 +64,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @access private
      */
     var $_atStart = true;
-    
+
     /**
      * Returns the header of the current file.
      *
@@ -77,7 +77,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @return  string  The built header struct
      */
     function arHeader ($filename, $stat)
-    {        
+    {
         $mode = isset($stat[2]) ? $stat[2] : 0x8000;
         $uid  = isset($stat[4]) ? $stat[4] : 0;
         $gid  = isset($stat[5]) ? $stat[5] : 0;
@@ -97,8 +97,8 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
             $struct .= sprintf("%-16s", $filename);
             $struct .= sprintf("%-12d%-6d%-6d%-8s%-10d`\n",
                                $time, $uid, $gid, $mode, $size);
-        }           
-        return $struct;                        
+        }
+        return $struct;
     }
 
     /**
@@ -119,7 +119,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
 
 
     /**
-     * Flush the memory we have in the ar. 
+     * Flush the memory we have in the ar.
      *
      * Build the buffer if its called at the end or initialize
      * it if we are just creating it from the start.
@@ -137,7 +137,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
                                               $this->arHeader($this->_currentFilename, $this->_currentStat)
                                               );
                 $this->innerWriter->writeData($this->_buffer);
-            } 
+            }
             $this->innerWriter->writeData($this->arFooter($this->_currentFilename, $this->_currentStat[7]));
         }
         $this->_buffer = "";
@@ -147,22 +147,22 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
      * @see File_Archive_Writer::newFile()
      *
      */
-    function newFile($filename, $stat = array (), 
-                     $mime = "application/octet-stream") 
+    function newFile($filename, $stat = array (),
+                     $mime = "application/octet-stream")
     {
-        $this->flush();      
+        $this->flush();
         /**
          * If the file is empty, there's no reason to have a buffer
-         * or use memory 
+         * or use memory
          */
-        $this->_useBuffer = !isset($stats[7]); 
+        $this->_useBuffer = !isset($stats[7]);
         /**
          * Becaue ar fileformats doesn't support files in directories,
-         * then we need to just save with the filename an ommit the 
+         * then we need to just save with the filename an ommit the
          * directory
          */
         $this->_currentFilename = basename($filename);
-        $this->_currentStat = $stat;       
+        $this->_currentStat = $stat;
 
         if(!$this->_useBuffer) {
             return $this->innerWriter->writeData($this->arHeader($filename, $stat));
@@ -185,7 +185,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     {
         if ($this->_useBuffer) {
             $this->_buffer .= $data;
-        } else {            
+        } else {
             $this->innerWriter->writeData($data);
         }
 
@@ -197,7 +197,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
     {
         if ($this->_useBuffer) {
             $this->_buffer .= file_get_contents($filename);
-        } else {            
+        } else {
             $this->innerWriter->writeFile($filename);
         }
     }

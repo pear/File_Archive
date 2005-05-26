@@ -2,12 +2,12 @@
 <package version="1.0">
  <name>File_Archive</name>
  <summary>
-  File_Archive will let you manipulate easily the tar, gz, bz2 and zip files
+  File_Archive will let you manipulate easily the tar, gz, tgz, bz2, tbz, zip, ar (or deb) files
  </summary>
  <description>
   This library is strongly object oriented. It makes it very easy to use, writing simple code, yet the library is very powerfull.
-  File_Archive is made of two objects : readers and writers. Are currently implemented readers from file, directory, tar, gz, zip and bzip2 archives.
-  You can write to file(s), send mails with files attached, or create tar, gz, zip, bzip2 archives.
+  It lets you easily read or generate tar, gz, tgz, bz2, tbz, zip, ar (or deb) archives to files, memory, mail or standard output.
+  See poocl.la-grotte.org for a tutorial
  </description>
  <license>LGPL</license>
  <maintainers>
@@ -25,11 +25,15 @@
   </maintainer>
  </maintainers>
  <release>
-  <version>1.1.0</version>
-  <date>2005-05-08</date>
+  <version>1.2.0</version>
+  <date>2005-05-26</date>
   <state>stable</state>
   <notes>
-    + Add the makeAppendWriter function on readers to allow to append data to an existing archive
+   + Add an ar (or deb) reader / writer
+   + Add a getFileList() on any reader to quickly retrieve file list
+   + File_Archive::readArchive properly handles tgz and tbz extensions
+   + Better error handling
+   + Various bug fixes
   </notes>
   <filelist>
    <dir name="File" role="php">
@@ -54,6 +58,7 @@
       <file>True.php</file>
      </dir>
      <dir name="Reader" role="php">
+      <file>Ar.php</file>
       <file>Archive.php</file>
       <file>Bzip2.php</file>
       <file>ChangeName.php</file>
@@ -72,6 +77,7 @@
       <file>Zip.php</file>
      </dir>
      <dir name="Writer" role="php">
+      <file>Ar.php</file>
       <file>Archive.php</file>
       <file>Bzip2.php</file>
       <file>Files.php</file>

@@ -29,7 +29,7 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "Relay.php";
+require_once "File/Archive/Reader/Relay.php";
 
 /**
  * Add a directory to the public name of all the files of a reader

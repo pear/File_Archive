@@ -27,7 +27,7 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "Archive.php";
+require_once "File/Archive/Reader/Archive.php";
 
 /**
  * Read an Ar archive
@@ -170,7 +170,7 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
                                     'size'  => $size,
                                     9       => $mtime,
                                     'mtime' => $mtime
-                                    );        
+                                    );
 
         return true;
     }
@@ -199,7 +199,7 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
     function makeWriter($seek = 0, $fileModif = true)
     {
         require_once "File/Archive/Writer/Ar.php";
-        
+
         $writer = $this->source->makeWriter();
         $this->source = null;
         $this->close();
