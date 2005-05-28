@@ -126,6 +126,9 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
             //The loop is here to correct what appears to be a bzread bug
             while (strlen($data) < $length) {
                 $newData = bzread($this->bzfile, $length - strlen($data));
+                if ($newData == '') {
+                    break;
+                }
                 $data .= $newData;
             }
             $this->filePos += strlen($data);
@@ -164,9 +167,9 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
     }
 
     /**
-     * @see File_Archive_Reader::makeWriterRemove()
+     * @see File_Archive_Reader::makeWriterRemoveFiles()
      */
-    function makeWriterRemove()
+    function makeWriterRemoveFiles($pred)
     {
         return PEAR::raiseError('Unable to remove files from a bzip2 archive');
     }
@@ -183,7 +186,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
         }
 
         //Uncompress data to a temporary file
-        $tmp = fopen('debug', 'w+');//tmpfile();
+        $tmp = tmpfile();
         $expectedPos = $this->filePos + $seek;
 
         $this->rewind();

@@ -258,31 +258,57 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     }
 
     /**
-     * @see File_Archive_Reader::makeWriterRemove()
+     * @see File_Archive_Reader::makeWriterRemoveFiles()
      */
-    function makeWriterRemove()
+    function makeWriterRemoveFiles($pred)
     {
         require_once "File/Archive/Writer/Zip.php";
 
-        if ($this->currentFilename === null) {
-            return PEAR::raiseError('No file selected');
+        $blocks = array();
+        $seek = null;
+        $gap = 0;
+        if ($this->currentFilename !== null && $pred->isTrue($this)) {
+            $seek = 30 + $this->header['File'] + $this->header['Extra'] + $this->header['CLen'];
+            $blocks[] = $seek; //Remove this file
+            array_pop($this->files);
         }
 
-        $seek = $size = 30 + $this->header['File'] + $this->header['Extra'] + $this->header['CLen'];
-        array_pop($this->files);
         while ($this->next()) {
-            $seek += 30 + $this->header['File'] + $this->header['Extra'] + $this->header['CLen'];
+            $size = 30 + $this->header['File'] + $this->header['Extra'] + $this->header['CLen'];
+            if ($pred->isTrue($this)) {
+                array_pop($this->files);
+                if ($seek === null) {
+                    $seek = $size;
+                    $blocks[] = $size;
+                } else if ($gap > 0) {
+                    $blocks[] = $gap; //Don't remove the files between the gap
+                    $blocks[] = $size;
+                    $seek += $size;
+                } else {
+                    $blocks[count($blocks)-1] += $size;   //Also remove this file
+                    $seek += $size;
+                }
+                $gap = 0;
+            } else {
+                if ($seek !== null) {
+                    $seek += $size;
+                    $gap += $size;
+                }
+            }
         }
-        $seek += 4;
+        if ($seek === null) {
+            $seek = 4;
+        } else {
+            $seek += 4;
+            if ($gap == 0) {
+                array_pop($blocks);
+            } else {
+                $blocks[] = $gap;
+            }
+        }
 
         $writer = new File_Archive_Writer_Zip(null,
-            $this->source->makeWriterRemoveBlocks(
-                array(
-                    $size,              //Remove the current file
-                    $seek - $size - 4,  //Keep the other files
-                                        //Remove the end (central dir...)
-                ), -$seek
-            )
+            $this->source->makeWriterRemoveBlocks($blocks, -$seek)
         );
         if (PEAR::isError($writer)) {
             return $writer;

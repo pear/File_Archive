@@ -331,29 +331,45 @@ class File_Archive_Reader
 
     /**
      * Return a writer that allows appending files to the archive
-     * After having called makeAppendWriter, $this is closed and should not be used until the returned
-     * writer is closed.
+     * After having called makeAppendWriter, $this is closed and should not be
+     * used until the returned writer is closed.
      *
      * @return a writer that will allow to append files to an existing archive
      * @see makeWriter
      */
     function makeAppendWriter()
     {
-        return PEAR::raiseError("Reader abstract function call (makeAppendWriter)");
+        require_once "File/Archive/Predicate/False.php";
+        return $this->makeWriterRemoveFiles(new File_Archive_Predicate_False());
     }
 
     /**
-     * Return a writer that has the same properties as the one returned by makeAppendWriter, but after
-     * having removed the current file
+     * Return a writer that has the same properties as the one returned by
+     * makeAppendWriter, but after having removed all the files that follow a
+     * given predicate.
+     * After a call to makeWriterRemoveFiles, $this is closed and should not
+     * be used until the returned writer is closed
+     *
+     * @param File_Archive_Predicate $pred the predicate verified by removed files
+     * @return File_Archive_Writer that allows to append files to the archive
+     */
+    function makeWriterRemoveFiles($pred)
+    {
+        return PEAR::raiseError("Reader abstract function call (makeWriterRemoveFiles)");
+    }
+
+    /**
+     * Returns a writer that removes the current file
+     * This is a syntaxic sugar for makeWriterRemoveFiles(new File_Archive_Predicate_Current());
      */
     function makeWriterRemove()
     {
-        return PEAR::raiseError("Reader abstract function call (makeWriterRemove)");
+        require_once "File/Archive/Predicate/Current.php";
+        return $this->makeWriterRemoveFiles(new File_Archive_Predicate_Current());
     }
 
     /**
-     * Removes the current file from the archive
-     * After a call to remove, $this is closed
+     * Removes the current file from the reader
      */
     function remove()
     {

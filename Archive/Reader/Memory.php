@@ -182,9 +182,9 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     }
 
     /**
-     * @see File_Archive_Reader::makeWriterRemove()
+     * @see File_Archive_Reader::makeWriterRemoveFiles()
      */
-    function makeWriterRemove()
+    function makeWriterRemoveFiles($pred)
     {
         return PEAR::raiseError('Unable to remove files from a memory archive');
     }

@@ -146,6 +146,7 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
             }
             if (strlen($rawHeader)<512 || $rawHeader == pack("a512", "")) {
                 $this->seekToEnd = strlen($rawHeader);
+                $this->currentFilename = null;
                 return false;
             }
 
@@ -221,28 +222,55 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     }
 
     /**
-     * @see File_Archive_Reader::makeWriterRemove()
+     * @see File_Archive_Reader::makeWriterRemoveFiles()
      */
-    function makeWriterRemove()
+    function makeWriterRemoveFiles($pred)
     {
         require_once "File/Archive/Writer/Tar.php";
 
-        if ($this->seekToEnd !== null || $this->currentFilename === null) {
-            return PEAR::raiseError('No file selected');
+        $blocks = array();
+        $seek = null;
+        $gap = 0;
+        if ($this->currentFilename !== null && $pred->isTrue($this)) {
+            $seek = 512 + $this->currentStat[7] + $this->footerLength;
+            $blocks[] = $seek; //Remove this file
         }
 
-        $size = $seek = 512 + $this->currentStat[7] + $this->footerLength;
-        while ($this->next()) {
-            $seek += 512 + $this->currentStat[7] + $this->footerLength;
+        while (($error = $this->next()) === true) {
+            $size = 512 + $this->currentStat[7] + $this->footerLength;
+            if ($pred->isTrue($this)) {
+                if ($seek === null) {
+                    $seek = $size;
+                    $blocks[] = $size;
+                } else if ($gap > 0) {
+                    $blocks[] = $gap; //Don't remove the files between the gap
+                    $blocks[] = $size;
+                    $seek += $size;
+                } else {
+                    $blocks[count($blocks)-1] += $size;   //Also remove this file
+                    $seek += $size;
+                }
+                $gap = 0;
+            } else {
+                if ($seek !== null) {
+                    $seek += $size;
+                    $gap += $size;
+                }
+            }
         }
-        $seek += $this->seekToEnd;
+        if ($seek === null) {
+            $seek = $this->seekToEnd;
+        } else {
+            $seek += $this->seekToEnd;
+            if ($gap == 0) {
+                array_pop($blocks);
+            } else {
+                $blocks[] = $gap;
+            }
+        }
 
-        return new File_Archive_Writer_Tar(null, $this->source->makeWriterRemoveBlocks(
-            array(
-                $size,                           //Remove the file
-                $seek - $size - $this->seekToEnd,//Keep other files
-                                                 //Remove end empty file
-            ), -$seek)
+        return new File_Archive_Writer_Tar(null,
+            $this->source->makeWriterRemoveBlocks($blocks, -$seek)
         );
     }
 

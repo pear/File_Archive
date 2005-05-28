@@ -135,11 +135,12 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
     function getFilename() { return $this->symbolic . parent::getFilename(); }
 
     /**
-     * @see File_Archive_Reader::makeWriterRemove()
+     * @see File_Archive_Reader::makeWriterRemoveFiles()
      */
-    function makeWriterRemove()
+    function makeWriterRemoveFiles($pred)
     {
-        $lastSource = &$this->getLastSource();
+        //TODO: implementation
+/*        $lastSource = &$this->getLastSource();
         if ($lastSource === null) {
             return PEAR::raiseError('No file selected');
         }
@@ -152,7 +153,7 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
             $this->close();
         }
 
-        return $writer;
+        return $writer;*/
     }
 
     function getLastSource()

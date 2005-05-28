@@ -194,9 +194,9 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
     }
 
     /**
-     * @see File_Archive_Reader::makeWriterRemove()
+     * @see File_Archive_Reader::makeWriterRemoveFiles()
      */
-    function makeWriterRemove()
+    function makeWriterRemoveFiles($pred)
     {
         return PEAR::raiseError('Unable to remove files from a gzip archive');
     }

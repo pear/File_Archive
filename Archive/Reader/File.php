@@ -198,9 +198,9 @@ class File_Archive_Reader_File extends File_Archive_Reader
     }
 
     /**
-     * @see File_Archive_Reader::makeWriterRemove()
+     * @see File_Archive_Reader::makeWriterRemoveFiles()
      */
-    function makeWriterRemove()
+    function makeWriterRemoveFiles($pred)
     {
         return PEAR::raiseError(
             'File_Archive_Reader_File represents a single file, you cant remove it');

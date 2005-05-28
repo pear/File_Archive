@@ -96,13 +96,12 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
      */
     function makeAppendWriter() { return $this->source->makeAppendWriter(); }
     /**
-     * @see File_Archive_Reader::makeWriterRemove()
+     * @see File_Archive_Reader::makeWriterRemoveFiles()
      */
-    function makeWriterRemove() { return $this->source->makeWriterRemove(); }
-    /**
-     * @see File_Archive_Reader::remove()
-     */
-    function remove() { return $this->source->remove(); }
+    function makeWriterRemoveFiles($pred)
+    {
+        return $this->source->makeWriterRemoveFiles($pred);
+    }
     /**
      * @see File_Archive_Reader::makeWriterRemoveBlocks()
      */
