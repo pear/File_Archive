@@ -69,7 +69,7 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::skip()
      */
-    function skip($length)
+    function skip($length = -1)
     {
         if ($length == -1) {
             $length = $this->leftLength;
@@ -86,7 +86,7 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::rewind()
      */
-    function rewind($length)
+    function rewind($length = -1)
     {
         if ($length == -1) {
             $length = $this->currentStat[7] - $this->leftLength;
@@ -221,48 +221,95 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     }
 
     /**
-     * @see File_Archive_Reader::makeWriter
+     * @see File_Archive_Reader::makeWriterRemove()
      */
-    function makeWriter($seek = 0, $fileModif = true)
+    function makeWriterRemove()
     {
         require_once "File/Archive/Writer/Tar.php";
 
-        if ($fileModif) {
-            if ($this->seekToEnd != null) {
-                //Seek before the stat of the last file
-                $innerSeek = -$this->seekToEnd - $this->currentStat[7] - 512;
-                if ($this->currentStat[7] % 512 != 0) {
-                    $innerSeek += 512 - $this->currentStat[7] % 512;
-                }
-            } else {
-                //Seek before the stat of the current file
-                $innerSeek = -$this->currentStat[7] + $this->leftLength - 512;
-            }
-        } else {
-            if ($this->seekToEnd != null) {
-                //Seek before the empty header
-                $innerSeek = -$this->seekToEnd;
-            } else {
-                //Seek to the end of the current file
-                $innerSeek = $this->leftLength;
-            }
+        if ($this->seekToEnd !== null || $this->currentFilename === null) {
+            return PEAR::raiseError('No file selected');
         }
 
-        $innerWriter = $this->source->makeWriter($innerSeek);
+        $size = $seek = 512 + $this->currentStat[7] + $this->footerLength;
+        while ($this->next()) {
+            $seek += 512 + $this->currentStat[7] + $this->footerLength;
+        }
+        $seek += $this->seekToEnd;
+
+        return new File_Archive_Writer_Tar(null, $this->source->makeWriterRemoveBlocks(
+            array(
+                $size,                           //Remove the file
+                $seek - $size - $this->seekToEnd,//Keep other files
+                                                 //Remove end empty file
+            ), -$seek)
+        );
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriterRemoveBlocks()
+     */
+    function makeWriterRemoveBlocks($blocks, $seek = 0)
+    {
+        if ($this->seekToEnd !== null || $this->currentStat === null) {
+            return PEAR::raiseError('No file selected');
+        }
+
+        $blockPos = $this->currentStat[7] - $this->leftLength + $seek;
+
+        $this->rewind();
+        $keep = false;
+
+        //TODO: write this data to a temp file?
+        $data = $this->getData($blockPos);
+        foreach ($blocks as $length) {
+            if ($keep) {
+                $data .= $this->getData($length);
+            } else {
+                $this->skip($length);
+            }
+            $keep = !$keep;
+        }
+        if ($keep) {
+            $data .= $this->getData();
+        }
+
+        $filename = $this->currentFilename;
+        $stat = $this->currentStat;
+
+        $writer = $this->makeWriterRemove();
+        if (PEAR::isError($writer)) {
+            return $writer;
+        }
+
+        unset($stat[7]);
+        $writer->newFile($filename, $stat);
+        $writer->writeData($data);
+        return $writer;
+    }
+
+    /**
+     * @see File_Archive_Reader::makeAppendWriter
+     */
+    function makeAppendWriter()
+    {
+        require_once "File/Archive/Writer/Tar.php";
+
+        while (($error = $this->next()) === true) { }
+        if (PEAR::isError($error)) {
+            $this->close();
+            return $error;
+        }
+
+        $innerWriter = $this->source->makeWriterRemoveBlocks(array(), -$this->seekToEnd);
         if (PEAR::isError($innerWriter)) {
             return $innerWriter;
         }
 
         $this->source = null;
         $this->close();
-        $writer = new File_Archive_Writer_Tar(null, $writer);
+        $writer = new File_Archive_Writer_Tar(null, $innerWriter);
 
-        if ($fileModif) {
-            //Rewrite the file
-
-            //TODO: inner modification of archives
-            return PEAR::raiseError("Modification of nested archives not available");
-        }
         return $writer;
     }
 }

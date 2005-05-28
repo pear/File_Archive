@@ -137,7 +137,7 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::skip()
      */
-    function skip($length)
+    function skip($length = -1)
     {
         if ($length == -1) {
             $length = strlen($this->memory) - $this->offset;
@@ -151,7 +151,7 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::rewind()
      */
-    function rewind($length)
+    function rewind($length = -1)
     {
         if ($length == -1) {
             $tmp = $this->offset;
@@ -174,21 +174,44 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     }
 
     /**
-     * @see File_Archive_Reader::makeWriter
+     * @see File_Archive_Reader::makeAppendWriter()
      */
-    function makeWriter($fileModif = true, $seek = 0)
+    function makeAppendWriter()
     {
-        if ($fileModif == false) {
-            return PEAR::raiseError(
-                'A Memory reader contains one single file. '.
-                'makeWriter must be called with $fileModif set to true'
-            );
-        }
+        return PEAR::raiseError('Unable to append files to a memory archive');
+    }
 
+    /**
+     * @see File_Archive_Reader::makeWriterRemove()
+     */
+    function makeWriterRemove()
+    {
+        return PEAR::raiseError('Unable to remove files from a memory archive');
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriterRemoveBlocks()
+     */
+    function makeWriterRemoveBlocks($blocks, $seek = 0)
+    {
         require_once "File/Archive/Writer/Memory.php";
-        $writer = new File_Archive_Writer_Memory($this->memory, $this->offset + $seek);
-        $this->close();
-        return $writer;
+        $data = substr($this->memory, 0, $this->offset + $seek);
+        $this->memory = substr($this->memory, $this->offset + $seek);
+
+        $keep = false;
+        foreach ($blocks as $length) {
+            if ($keep) {
+                $data .= substr($this->memory, 0, $length);
+            }
+            $this->memory = substr($this->memory, $length);
+            $keep = !$keep;
+        }
+        if ($keep) {
+            $this->memory = data . $this->memory;
+        } else {
+            $this->memory = data;
+        }
+        return new File_Archive_Writer_Memory($this->memory, strlen($this->memory));
     }
 }
 

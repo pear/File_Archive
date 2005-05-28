@@ -196,7 +196,7 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::skip
      */
-    function skip($length)
+    function skip($length = -1)
     {
         if ($length == -1) {
             $length = $this->_nbBytesLeft;
@@ -214,7 +214,7 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::rewind
      */
-    function rewind($length)
+    function rewind($length = -1)
     {
         if ($length == -1) {
             $length = $this->_currentStat[7] - $this->_nbBytesLeft;
@@ -232,17 +232,5 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
         }
     }
 
-    /**
-     * @see File_Archive_Reader::makeWriter
-     */
-    function makeWriter($seek = 0, $fileModif = true)
-    {
-        require_once "File/Archive/Writer/Ar.php";
-
-        $writer = $this->source->makeWriter();
-        $this->source = null;
-        $this->close();
-        return new File_Archive_Writer_Ar(null, $writer);
-    }
 }
 ?>

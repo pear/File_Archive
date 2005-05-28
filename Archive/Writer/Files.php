@@ -107,10 +107,43 @@ class File_Archive_Writer_Files extends File_Archive_Writer
             return PEAR::raiseError("Unable to open file $filename");
         }
 
-        if (fseek($this->handle, $pos) == -1) {
-            fread($this->handle, $pos);
+        if ($pos > 0) {
+            if (fseek($this->handle, $pos) == -1) {
+                fread($this->handle, $pos);
+            }
         }
     }
+
+    /**
+     * Open a file for appending after having removed a block of data from it
+     * See File_Archive_Reader::makeWriterRemoveBlocks
+     */
+    function openFileRemoveBlock($filename, $pos, $blocks, $stat = array(), $mime = "application/octet-stream")
+    {
+        $this->openFile($filename, $pos, $stat, $mime);
+
+        //TODO: Might be a lot in memory...
+        $keep = false;
+        $data = '';
+        foreach ($blocks as $length) {
+            if ($keep && $length > 0) {
+                $data .= fread($this->handle, $length);
+            } else {
+                fseek($this->handle, $length, SEEK_CUR);
+            }
+            $keep = !$keep;
+        }
+        if ($keep) {
+            while(!feof($this->handle)) {
+                $data .= fread($this->handle, 8196);
+            }
+        }
+
+        fseek($this->handle, $pos);
+        fwrite($this->handle, $data);
+        ftruncate($this->handle, ftell($this->handle));
+    }
+
 
     /**
      * @see File_Archive_Writer::newFile()

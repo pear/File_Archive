@@ -133,7 +133,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::skip()
      */
-    function skip($length)
+    function skip($length = -1)
     {
         $skipped = 0;
         while ($skipped < $length) {
@@ -148,7 +148,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::rewind()
      */
-    function rewind($length)
+    function rewind($length = -1)
     {
         //TODO: implement rewind
         return parent::rewind($length);

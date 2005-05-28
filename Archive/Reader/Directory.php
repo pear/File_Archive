@@ -69,6 +69,7 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
         $this->symbolic = $this->getStandardURL($symbolic);
         $this->maxRecurs = $maxRecurs;
     }
+
     /**
      * @see File_Archive_Reader::close()
      */
@@ -76,11 +77,12 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
     {
         $error = parent::close();
 
+        closedir($this->directoryHandle);
         $this->directoryHandle = null;
-        $this->source = null;
 
         return $error;
     }
+
     /**
      * @see File_Archive_Reader::next()
      *
@@ -133,27 +135,69 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
     function getFilename() { return $this->symbolic . parent::getFilename(); }
 
     /**
-     * @see File_Archive_Reader::makeWriter
+     * @see File_Archive_Reader::makeWriterRemove()
      */
-    function makeWriter($fileModif = true, $seek = 0)
+    function makeWriterRemove()
+    {
+        $lastSource = &$this->getLastSource();
+        if ($lastSource === null) {
+            return PEAR::raiseError('No file selected');
+        }
+
+        require_once "File/Archive/Writer/Files.php";
+
+        $writer = $lastSource->makeWriterRemove();
+        if (!PEAR::isError($writer)) {
+            $writer->basePath = $this->directory;
+            $this->close();
+        }
+
+        return $writer;
+    }
+
+    function getLastSource()
+    {
+        if ($this->source === null ||
+            is_a($this->source, 'File_Archive_Reader_File')) {
+            return &$this->source;
+        } else {
+            return &$this->source->getLastSource();
+        }
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriterRemoveBlocks()
+     */
+    function makeWriterRemoveBlocks($blocks, $seek = 0)
+    {
+        $lastSource = &$this->getLastSource();
+        if ($lastSource === null) {
+            return PEAR::raiseError('No file selected');
+        }
+
+        require_once "File/Archive/Writer/Files.php";
+
+        $writer = $lastSource->makeWriterRemoveBlocks($blocks, $seek);
+        if (!PEAR::isError($writer)) {
+            $writer->basePath = $this->directory;
+            $this->close();
+        }
+
+        return $writer;
+    }
+
+    /**
+     * @see File_Archive_Reader::makeAppendWriter
+     */
+    function makeAppendWriter()
     {
         require_once "File/Archive/Writer/Files.php";
 
         if ($this->source == null ||
-            (!$fileModif && is_a($source, 'File_Archive_Reader_File'))
-           ) {
-            $writer = new File_Archive_Writer_Files($directory);
+            is_a($this->source, 'File_Archive_Reader_File') ) {
+            $writer = new File_Archive_Writer_Files($this->directory);
         } else {
-            $writer = $this->source->makeWriter($fileModif, $seek);
-        }
-
-        $toUnlink = array();
-        while ($this->next()) {
-            $toUnlink[] = $this->getDataFilename();
-        }
-
-        foreach ($toUnlink as $filename) {
-            unlink($filename);
+            $writer = $this->source->makeAppendWriter($seek);
         }
 
         $this->close();

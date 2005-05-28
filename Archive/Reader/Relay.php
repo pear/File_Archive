@@ -77,11 +77,11 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::skip()
      */
-    function skip($length) { return $this->source->skip($length); }
+    function skip($length = -1) { return $this->source->skip($length); }
     /**
      * @see File_Archive_Reader::rewind()
      */
-    function rewind($length) { return $this->source->rewind($length); }
+    function rewind($length = -1) { return $this->source->rewind($length); }
     /**
      * @see File_Archive_Reader::close()
      */
@@ -92,12 +92,28 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
         }
     }
     /**
-     * @see File_Archive_Reader::makeWriter
+     * @see File_Archive_Reader::makeAppendWriter()
      */
-    function makeWriter($fileModif = true, $seek = 0)
+    function makeAppendWriter() { return $this->source->makeAppendWriter(); }
+    /**
+     * @see File_Archive_Reader::makeWriterRemove()
+     */
+    function makeWriterRemove() { return $this->source->makeWriterRemove(); }
+    /**
+     * @see File_Archive_Reader::remove()
+     */
+    function remove() { return $this->source->remove(); }
+    /**
+     * @see File_Archive_Reader::makeWriterRemoveBlocks()
+     */
+    function makeWriterRemoveBlocks($blocks, $seek = 0)
     {
-        return $this->source->makeWriter($fileModif, $seek);
+        return $this->source->makeWriterRemoveBlocks($blocks, $seek);
     }
+    /**
+     * @see File_Archive_Reader::makeWriter()
+     */
+    function makeWriter() { return $this->source->makeWriter(); }
 }
 
 ?>

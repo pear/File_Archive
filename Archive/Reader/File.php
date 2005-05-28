@@ -172,7 +172,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::skip()
      */
-    function skip($length)
+    function skip($length = -1)
     {
         $before = ftell($this->handle);
         if (($length == -1 && @fseek($this->handle, 0, SEEK_END) === -1) ||
@@ -186,7 +186,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::rewind
      */
-    function rewind($length)
+    function rewind($length = -1)
     {
         $before = ftell($this->handle);
         if (($length == -1 && @fseek($this->handle, 0, SEEK_SET) === -1) ||
@@ -198,19 +198,22 @@ class File_Archive_Reader_File extends File_Archive_Reader
     }
 
     /**
-     * @see File_Archive_Reader::makeWriter
+     * @see File_Archive_Reader::makeWriterRemove()
      */
-    function makeWriter($fileModif = true, $seek = 0)
+    function makeWriterRemove()
+    {
+        return PEAR::raiseError(
+            'File_Archive_Reader_File represents a single file, you cant remove it');
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriterRemoveBlocks()
+     */
+    function makeWriterRemoveBlocks($blocks, $seek = 0)
     {
         require_once "File/Archive/Writer/Files.php";
 
         $writer = new File_Archive_Writer_Files();
-
-        if ($fileModif == false) {
-            return PEAR::raiseError(
-                'To append data to a file, you must set $fileModif to true'
-            );
-        }
 
         if ($this->handle != null) {
             $file = $this->getDataFilename();
@@ -220,10 +223,21 @@ class File_Archive_Reader_File extends File_Archive_Reader
 
             $this->close();
 
-            $writer->openFile($file, $pos + $seek, $stat, $mime);
+            $writer->openFileRemoveBlock($file, $pos + $seek, $blocks, $stat, $mime);
         }
 
         return $writer;
+    }
+
+    /**
+     * @see File_Archive_Reader::makeAppendWriter
+     */
+    function makeAppendWriter()
+    {
+        return PEAR::raiseError(
+            'File_Archive_Reader_File represents a single file.'.
+            ' makeAppendWriter cant be executed on it'
+        );
     }
 }
 

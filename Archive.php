@@ -879,6 +879,17 @@ class File_Archive
         }
         return $source->extract($dest, $autoClose, $bufferSize);
     }
+
+    /**
+     * Create a writer that allows appending new files to an existing archive
+     */
+    function append(&$source)
+    {
+        if (PEAR::isError($source)) {
+            return $source;
+        }
+        return $source->makeAppendWriter();
+    }
 }
 
 ?>

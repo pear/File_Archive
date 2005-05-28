@@ -143,7 +143,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::skip()
      */
-    function skip($length)
+    function skip($length = -1)
     {
         if($length == -1) {
             do
@@ -164,7 +164,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::rewind()
      */
-    function rewind($length)
+    function rewind($length = -1)
     {
         if ($length == -1) {
             if (@gzseek($this->gzfile, 0) === -1) {
@@ -185,70 +185,84 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         }
     }
 
+    /**
+     * @see File_Archive_Reader::makeAppendWriter()
+     */
+    function makeAppendWriter()
+    {
+        return PEAR::raiseError('Unable to append files to a gzip archive');
+    }
 
     /**
-     * @see File_Archive_Reader::makeWriter
+     * @see File_Archive_Reader::makeWriterRemove()
      */
-    function makeWriter($fileModif = true, $seek = 0)
+    function makeWriterRemove()
+    {
+        return PEAR::raiseError('Unable to remove files from a gzip archive');
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriterRemoveBlocks()
+     */
+    function makeWriterRemoveBlocks($blocks, $seek = 0)
     {
         require_once "File/Archive/Writer/Gzip.php";
 
-        if ($fileModif == false) {
-            return PEAR::raiseError(
-                'A GZip archive contains one single file. '.
-                'makeWriter must be called with $fileModif set to true'
-            );
+        if ($this->nbRead == 0) {
+            return PEAR::raiseError('No file selected');
         }
 
-        if ($this->nbRead == 0) {
-            return new File_Archive_Writer_Gzip(
-                null, $this->source->makeWriter()
-            );
-        } else {
-            //Uncompress data to a temporary file
-            $tmp = tmpfile();
+        //Uncompress data to a temporary file
+        $tmp = tmpfile();
+        $expectedPos = $this->filePos + $seek;
+        $this->rewind();
 
-            if ($this->nbRead == 1) {
-                $toRead = gztell($this->gzfile) + $seek;
+        //Read the begining of the file
+        while ($this->filePos < $expectedPos &&
+               ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) != null) {
+            fwrite($tmp, $data);
+        }
 
-                gzseek($this->gzfile, 0);
-
-                while ($toRead > 0 &&
-                       ($data = gzread($this->gzfile, min($toRead, 8192))) != '') {
-                    $toRead -= strlen($data);
+        $keep = false;
+        foreach ($blocks as $length) {
+            if ($keep) {
+                $expectedPos = $this->filePos + $length;
+                while ($this->filePos < $expectedPos &&
+                       ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) != null) {
                     fwrite($tmp, $data);
                 }
             } else {
-                gzseek($this->gzfile, 0);
-                while (($data = $this->getData(8192)) !== null) {
-                    fwrite($tmp, $data);
-                }
-                if ($seek < 0) {
-                    echo "removing $seek from file\n";
-                    ftruncate($tmp, ftell($tmp) + $seek);
-                }
+                $this->skip($length);
             }
-
-            fseek($tmp, 0);
-
-            //Create the writer
-            $innerWriter = $this->source->makeWriter();
-            $this->source = null;
-            $writer = new File_Archive_Writer_Gzip(null, $innerWriter);
-
-            //And compress data from the temporary file
-            while (!feof($tmp)) {
-                $data = fread($tmp, 8192);
-                $writer->writeData($data);
-            }
-            fclose($tmp);
-
-            //Do not close inner writer since makeWriter was called
-            $this->close();
-
-            return $writer;
+            $keep = !$keep;
         }
+        if ($keep) {
+            //Read the end of the file
+            while(($data = $this->getData(8192)) != null) {
+                fwrite($tmp, $data);
+            }
+        }
+        fseek($tmp, 0);
+
+        //Create the writer
+        $this->source->rewind();
+        $innerWriter = $this->source->makeWriterRemoveBlocks(array()); //Truncate the source
+        $this->source = null;
+        $writer = new File_Archive_Writer_Gzip(null, $innerWriter);
+
+        //And compress data from the temporary file
+        while (!feof($tmp)) {
+            $data = fread($tmp, 8192);
+            $writer->writeData($data);
+        }
+        fclose($tmp);
+
+        //Do not close inner writer since makeWriter was called
+        $this->close();
+
+        return $writer;
     }
+
 }
 
 ?>

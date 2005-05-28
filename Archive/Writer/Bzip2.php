@@ -100,7 +100,6 @@ class File_Archive_Writer_Bzip2 extends File_Archive_Writer
         return true;
     }
 
-
     /**
      * Actually write the tmp file to the inner writer
      * Close and delete temporary file

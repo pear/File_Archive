@@ -188,7 +188,7 @@ class File_Archive_Reader
      *  return strlen(getData($length))
      * But could be far more efficient
      */
-    function skip($length)
+    function skip($length = -1)
     {
         $data = $this->getData($length);
         if (PEAR::isError($data)) {
@@ -208,7 +208,7 @@ class File_Archive_Reader
      * @return the number of bytes really rewinded (which may be less than
      *        $length if the current pos is less than $length
      */
-    function rewind($length)
+    function rewind($length = -1)
     {
         return PEAR::raiseError('Rewind function is not implemented on this reader');
     }
@@ -330,125 +330,64 @@ class File_Archive_Reader
     }
 
     /**
-     * Remove the current file from the archive
-     * After having removed a file from an archive, the current position in the
-     * archive is set to the next file in the archive
-     */
-    function remove()
-    {
-    }
-
-    /**
-     * Remove some data from the current file in the archive
-     * After having removed a block of data, the current position in the archive
-     * is will be after the removed block of data, in the current file that may have
-     * been moved
-     *
-     * @param int $seek Relative position of the begining of the block that must
-     *        be removed, from the current pos
-     * @param int $size Size of the block (in bytes) to remove, or -1 to remove to
-     *        the end of the file
-     */
-    function removeBlock($seek = 0, $size = -1)
-    {
-    }
-
-    /**
-     * Create a writer to append files to the archive
-     * After having called this function, $this will be closed and should no longer be used
-     *
-     * @return File_Archive_Writer writer on which you can call newFile to append new files
-     *         in the archive
-     */
-    function makeAppendWriter()
-    {
-        $this->skip(-1);
-        return $this->makeDataWriter();
-    }
-
-    /**
-     * Create a writer to append data to the current file, erasing it from current pos
-     * After having called this function, $this will be closed and should no longer be used
-     * The order of the files in the archive may not be preserved
-     *
-     * Note: if you won't modify the data of the file, use makeAppendWriter which is way faster
-     *
-     * @return File_Archive_Writer writer on which you can call writeData to append data to the
-     *         current file in the archive, or newFile to append files
-     */
-    function makeDataWriter($seek = 0)
-    {
-    }
-
-    /**
-     * Returns a writer that will start writing at the current pos in the source
-     * Any data (from current file or any other file) located after current pos
-     * will be erased.
-     * For security reasons, calling makeWriter on a directory reader will not erase any file
-     * though.
-     * $this->close will be called and after this function the reader is invalid (and
-     * should no longer be used).
-     *
-     * If $fileModif is true, the writer will allow editing the current file (or the
-     * last file if the end of the archive has been reached)
-     * Thus it is an error to call makeWriter with fileModif to true if the reader
-     * has not been opened (no call to next() have been done, or first call to next
-     * returned false).
-     * In this case, $seek allows to change the position from where the file must be
-     * edited
-     *
-     * If $fileModif is false, the writer will not allow to edit the current file, and
-     * the first function call should be new file. The current file will be left unchanged
-     * If the first function call is writeData, the behaviour is undefined (it
-     * will generally result in invalid archives).
-     * In this case, $seek is not used
-     *
-     * Here is how to append a single file to an existing zip archive
-     * <sample>
-     *  $archive = File_Archive::read('archive.zip/');
-     *  $file = File_Archive::read('foo.txt');
-     *  $file->extract($source->makeAppendWriter());
-     * </sample>
-     *
-     * Append the content of a tgz archive to an existing zip archive
-     * <sample>
-     *  $archive = File_Archive::read('archive.zip/');
-     *  $file = File_Archive::read('archive.tgz/');
-     *  $file->extract($source->makeAppendWriter());
-     * </sample>
-     *
-     * @param int $seek The new writer will be opened seek bytes after the current position
-     *        Seek can be positive or negative
-     *        If current file pos + seek < 0 or current file pos + seek > current file size,
-     *        we have an undefined behaviour
-     * @param bool $fileModif Set to false only if you will call newFile or close first on the
-     *        returned writer (and thus will not modify the current file of the reader)
-     *        Setting this parameter to false can speed up a lot the process
-     *        If $fileModif is false, $seek will not be taken into account (since the writer will
-     *        not write in the current file)
-     * @return File_Archive_Writer Writer that appends data to the ressource of this reader,
-     *        starting at the current location
-     */
-    function makeWriter($fileModif = true, $seek = 0)
-    {
-        return PEAR::raiseError("Reader abstract function call (makeWriter)");
-    }
-
-    /**
-     * This is equivalent to move to the end of the archive and calling makeWriter
+     * Return a writer that allows appending files to the archive
+     * After having called makeAppendWriter, $this is closed and should not be used until the returned
+     * writer is closed.
      *
      * @return a writer that will allow to append files to an existing archive
      * @see makeWriter
      */
-    function makeAppendWriter($fileModif = true)
+    function makeAppendWriter()
     {
-        while ( ($error = $this->next()) === true ) { }
-        if (PEAR::isError($error)) {
-            $this->close();
-            return $error;
-        } else {
-            return $this->makeWriter($fileModif);
+        return PEAR::raiseError("Reader abstract function call (makeAppendWriter)");
+    }
+
+    /**
+     * Return a writer that has the same properties as the one returned by makeAppendWriter, but after
+     * having removed the current file
+     */
+    function makeWriterRemove()
+    {
+        return PEAR::raiseError("Reader abstract function call (makeWriterRemove)");
+    }
+
+    /**
+     * Removes the current file from the archive
+     * After a call to remove, $this is closed
+     */
+    function remove()
+    {
+        $writer = $this->makeWriterRemove();
+        if (PEAR::isError($writer)) {
+            return $writer;
         }
+        $writer->close();
+    }
+
+    /**
+     * Return a writer that has the same properties as the one returned by makeWriter, but after
+     * having removed a block of data from the current file. The writer will append data to the current file
+     * no data (other than the block) will be removed
+     *
+     * @param array Lengths of the blocks. The first one will be discarded, the second one kept, the third
+     *        one discarded... If the sum of the blocks is less than the size of the file, the comportment is the
+     *        same as if a last block was set in the array to reach the size of the file
+     *        if $length is -1, the file is truncated from the specified pos
+     *        It is possible to specify blocks of size 0
+     * @param int $seek relative pos of the block
+     */
+    function makeWriterRemoveBlocks($blocks, $seek = 0)
+    {
+        return PEAR::raiseError("Reader abstract function call (makeWriterRemoveBlocks)");
+    }
+
+    /**
+     * Equivalent to makeWriterRemoveBlocks(array(0)), but may be more efficient
+     * It creates a writer to append data to a file
+     */
+    function makeWriter()
+    {
+        return $this->makeWriterRemoveBlocks(array(0));
     }
 }
 

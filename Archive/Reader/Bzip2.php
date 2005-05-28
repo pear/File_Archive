@@ -29,7 +29,7 @@
  * @link       http://pear.php.net/package/File_Archive
  */
 
-require_once "File/Archive/Writer/Archive.php";
+require_once "File/Archive/Reader/Archive.php";
 require_once "File/Archive/Writer/Files.php";
 
 /**
@@ -40,7 +40,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
     var $nbRead = 0;
     var $bzfile = null;
     var $tmpName = null;
-    var $pos = 0;
+    var $filePos = 0;
 
     /**
      * @see File_Archive_Reader::close()
@@ -53,7 +53,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
             unlink($this->tmpName);
 
         $this->nbRead = 0;
-        $this->pos = 0;
+        $this->filePos = 0;
         return parent::close($innerClose);
     }
 
@@ -117,7 +117,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
                 $newData = bzread($this->bzfile);
                 $data .= $newData;
             } while ($newData != '');
-            $this->pos += strlen($data);
+            $this->filePos += strlen($data);
         } else if ($length == 0) {
             return '';
         } else {
@@ -125,9 +125,10 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
 
             //The loop is here to correct what appears to be a bzread bug
             while (strlen($data) < $length) {
-                $data .= bzread($this->bzfile, $length - strlen($data));
+                $newData = bzread($this->bzfile, $length - strlen($data));
+                $data .= $newData;
             }
-            $this->pos += strlen($data);
+            $this->filePos += strlen($data);
         }
 
         return $data == '' ? null : $data;
@@ -136,71 +137,102 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::rewind
      */
-    function rewind($length)
+    function rewind($length = -1)
     {
-        //TODO: implement rewind
-        return parent::rewind($length);
+        $before = $this->filePos;
+
+        bzclose($this->bzfile);
+        if ($this->tmpName == null) {
+            $this->bzfile = bzopen($this->source->getDataFilename(), 'r');
+        } else {
+            $this->bzfile = bzopen($this->tmpName, 'r');
+        }
+        $this->filePos = 0;
+
+        if ($length != -1) {
+            $this->skip($before - $length);
+        }
+        return $before - $this->filePos;
     }
 
     /**
-     * @see File_Archive_Reader::makeWriter
+     * @see File_Archive_Reader::makeAppendWriter()
      */
-    function makeWriter($fileModif = true, $seek = 0)
+    function makeAppendWriter()
+    {
+        return PEAR::raiseError('Unable to append files to a bzip2 archive');
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriterRemove()
+     */
+    function makeWriterRemove()
+    {
+        return PEAR::raiseError('Unable to remove files from a bzip2 archive');
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriterRemoveBlocks()
+     */
+    function makeWriterRemoveBlocks($blocks, $seek = 0)
     {
         require_once "File/Archive/Writer/Bzip2.php";
 
-        if ($fileModif == false) {
-            return PEAR::raiseError(
-                'A Bzip archive contains one single file. '.
-                'makeWriter must be called with $fileModif set to true'
-            );
+        if ($this->nbRead == 0) {
+            return PEAR::raiseError('No file selected');
         }
 
-        if ($this->nbRead == 0) {
-            return new File_Archive_Writer_Bzip2(
-                null, $this->source->makeWriter()
-            );
-        } else {
-            //Uncompress data to a temporary file
-            $tmp = tmpfile();
+        //Uncompress data to a temporary file
+        $tmp = fopen('debug', 'w+');//tmpfile();
+        $expectedPos = $this->filePos + $seek;
 
-            $toRead = $this->pos + $seek;
+        $this->rewind();
 
-            //bzseek($this->bzfile, 0);
-            bzclose($this->bzfile);
-            if ($this->tmpName == null) {
-                $this->bzfile = bzopen($this->source->getDataFilename(), 'r');
+        //Read the begining of the file
+        while ($this->filePos < $expectedPos &&
+               ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) != null) {
+            fwrite($tmp, $data);
+        }
+
+        $keep = false;
+        foreach ($blocks as $length) {
+            if ($keep) {
+                $expectedPos = $this->filePos + $length;
+                while ($this->filePos < $expectedPos &&
+                       ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) != null) {
+                    fwrite($tmp, $data);
+                }
             } else {
-                $this->bzfile = bzopen($this->tmpName, 'r');
+                $this->skip($length);
             }
-
-
-            while ($toRead > 0 &&
-                   ($data = bzread($this->bzfile, min($toRead, 8192))) != '') {
-                $toRead -= strlen($data);
+            $keep = !$keep;
+        }
+        if ($keep) {
+            //Read the end of the file
+            while(($data = $this->getData(8192)) != null) {
                 fwrite($tmp, $data);
             }
-            fseek($tmp, 0);
-
-            //Create the writer
-            $innerWriter = $this->source->makeWriter();
-            $this->source = null;
-            $writer = new File_Archive_Writer_Bzip2(null, $innerWriter);
-
-            //And compress data from the temporary file
-            while (!feof($tmp)) {
-                $data = fread($tmp, 8192);
-                $writer->writeData($data);
-            }
-            fclose($tmp);
-
-            //Do not close inner writer since makeWriter was called
-            $this->close();
-
-            return $writer;
         }
-    }
+        fseek($tmp, 0);
 
+        //Create the writer
+        $this->source->rewind();
+        $innerWriter = $this->source->makeWriterRemoveBlocks(array());   //Truncate the source
+        $this->source = null;
+        $writer = new File_Archive_Writer_Bzip2(null, $innerWriter);
+
+        //And compress data from the temporary file
+        while (!feof($tmp)) {
+            $data = fread($tmp, 8192);
+            $writer->writeData($data);
+        }
+        fclose($tmp);
+
+        //Do not close inner writer since makeWriter was called
+        $this->close();
+
+        return $writer;
+    }
 }
 
 ?>

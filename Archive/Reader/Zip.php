@@ -163,6 +163,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         } else {
             //Begining of central area
             $this->seekToEnd = 4;
+            $this->currentFilename = null;
             return false;
         }
     }
@@ -213,7 +214,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::skip()
      */
-    function skip($length)
+    function skip($length = -1)
     {
         $before = $this->offset;
         if ($length == -1) {
@@ -226,7 +227,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::rewind()
      */
-    function rewind($length)
+    function rewind($length = -1)
     {
         $before = $this->offset;
         if ($length == -1) {
@@ -234,7 +235,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         } else {
             $this->offset = min(0, $this->offset - $length);
         }
-        return before - $this->offset;
+        return $before - $this->offset;
     }
 
     function uncompressData()
@@ -257,43 +258,103 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     }
 
     /**
-     * @see File_Archive_Reader::makeWriter
+     * @see File_Archive_Reader::makeWriterRemove()
      */
-    function makeWriter($fileModif = true, $seek = 0)
+    function makeWriterRemove()
     {
-        if ($fileModif) {
-            //TODO: inner modification of archives
-            return PEAR::raiseError('Modification of nested archives not available');
-        }
-
         require_once "File/Archive/Writer/Zip.php";
 
-        if ($this->currentFilename == null) {
-            //The zip file was not even opened
-            $writer = new File_Archive_Writer_Zip(null, $this->source->makeWriter());
-        } else {
-            if ($this->seekToEnd == 0) {
-                $seekToEnd = 26 + $this->header['File'] + $this->header['Extra'] + ($this->data == null ? 0 : $this->header['CRC']);
-            } else {
-                $seekToEnd = $this->seekToEnd;
-            }
+        if ($this->currentFilename === null) {
+            return PEAR::raiseError('No file selected');
+        }
 
-            $writer = new File_Archive_Writer_Zip(null, $this->source->makeWriter(true, - $seekToEnd));
+        $seek = $size = 30 + $this->header['File'] + $this->header['Extra'] + $this->header['CLen'];
+        array_pop($this->files);
+        while ($this->next()) {
+            $seek += 30 + $this->header['File'] + $this->header['Extra'] + $this->header['CLen'];
+        }
+        $seek += 4;
 
-            if (!empty($this->files) && $this->seekToEnd == 0) {
-                //Last file will be rewritten
-                array_pop($this->files);
-            }
-            foreach ($this->files as $file) {
-                $writer->alreadyWrittenFile($file['name'], $file['stat'], $file['CRC'], $file['CLen']);
-            }
+        $writer = new File_Archive_Writer_Zip(null,
+            $this->source->makeWriterRemoveBlocks(
+                array(
+                    $size,              //Remove the current file
+                    $seek - $size - 4,  //Keep the other files
+                                        //Remove the end (central dir...)
+                ), -$seek
+            )
+        );
+        if (PEAR::isError($writer)) {
+            return $writer;
+        }
 
-            if ($this->seekToEnd == 0) {
-                $writer->newFile($this->getFilename(),
-                                 $this->getStat(),
-                                 $this->getMime());
-                $writer->writeData($this->data == null ? '' : substr($this->data, 0, $this->offset + $seek));
+        foreach ($this->files as $file) {
+            $writer->alreadyWrittenFile($file['name'], $file['stat'], $file['CRC'], $file['CLen']);
+        }
+
+        $this->source = null;
+        $this->close();
+        return $writer;
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriterRemoveBlocks()
+     */
+    function makeWriterRemoveBlocks($blocks, $seek = 0)
+    {
+        if ($this->currentFilename === null) {
+            return PEAR::raiseError('No file selected');
+        }
+
+        $keep = false;
+
+        $this->uncompressData();
+        $newData = substr($this->data, 0, $this->offset + $seek);
+        $this->data = substr($this->data, $this->offset + $seek);
+        foreach ($blocks as $length) {
+            if ($keep) {
+                $newData .= substr($this->data, 0, $length);
             }
+            $this->data = substr($this->data, $length);
+            $keep = !$keep;
+        }
+        if ($keep) {
+            $newData .= $this->data;
+        }
+
+        $filename = $this->currentFilename;
+        $stat = $this->currentStat;
+
+        $writer = $this->makeWriterRemove();
+        if (PEAR::isError($writer)) {
+            return $writer;
+        }
+
+        unset($stat[7]);
+        $writer->newFile($filename, $stat);
+        $writer->writeData($newData);
+        return $writer;
+    }
+
+    /**
+     * @see File_Archive_Reader::makeAppendWriter
+     */
+    function makeAppendWriter()
+    {
+        require_once "File/Archive/Writer/Zip.php";
+
+        while (($error = $this->next()) === true) { }
+        if (PEAR::isError($error)) {
+            $this->close();
+            return $error;
+        }
+
+        $writer = new File_Archive_Writer_Zip(null,
+            $this->source->makeWriterRemoveBlocks(array(), -4)
+        );
+
+        foreach ($this->files as $file) {
+            $writer->alreadyWrittenFile($file['name'], $file['stat'], $file['CRC'], $file['CLen']);
         }
 
         $this->source = null;
