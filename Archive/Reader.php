@@ -199,6 +199,21 @@ class File_Archive_Reader
     }
 
     /**
+     * Move the current position back of a given amount of bytes.
+     * Not all readers may implement this function (a PEAR error will
+     * be returned if the reader can't rewind)
+     *
+     * @param int $length number of bytes to seek before the current pos
+     *        or -1 to move back to the begining of the current file
+     * @return the number of bytes really rewinded (which may be less than
+     *        $length if the current pos is less than $length
+     */
+    function rewind($length)
+    {
+        return PEAR::raiseError('Rewind function is not implemented on this reader');
+    }
+
+    /**
      * Put back the reader in the state it was before the first call
      * to next()
      *
@@ -312,6 +327,57 @@ class File_Archive_Reader
             }
         }
         return $result;
+    }
+
+    /**
+     * Remove the current file from the archive
+     * After having removed a file from an archive, the current position in the
+     * archive is set to the next file in the archive
+     */
+    function remove()
+    {
+    }
+
+    /**
+     * Remove some data from the current file in the archive
+     * After having removed a block of data, the current position in the archive
+     * is will be after the removed block of data, in the current file that may have
+     * been moved
+     *
+     * @param int $seek Relative position of the begining of the block that must
+     *        be removed, from the current pos
+     * @param int $size Size of the block (in bytes) to remove, or -1 to remove to
+     *        the end of the file
+     */
+    function removeBlock($seek = 0, $size = -1)
+    {
+    }
+
+    /**
+     * Create a writer to append files to the archive
+     * After having called this function, $this will be closed and should no longer be used
+     *
+     * @return File_Archive_Writer writer on which you can call newFile to append new files
+     *         in the archive
+     */
+    function makeAppendWriter()
+    {
+        $this->skip(-1);
+        return $this->makeDataWriter();
+    }
+
+    /**
+     * Create a writer to append data to the current file, erasing it from current pos
+     * After having called this function, $this will be closed and should no longer be used
+     * The order of the files in the archive may not be preserved
+     *
+     * Note: if you won't modify the data of the file, use makeAppendWriter which is way faster
+     *
+     * @return File_Archive_Writer writer on which you can call writeData to append data to the
+     *         current file in the archive, or newFile to append files
+     */
+    function makeDataWriter($seek = 0)
+    {
     }
 
     /**

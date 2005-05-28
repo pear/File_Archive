@@ -134,6 +134,15 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
     }
 
     /**
+     * @see File_Archive_Reader::rewind
+     */
+    function rewind($length)
+    {
+        //TODO: implement rewind
+        return parent::rewind($length);
+    }
+
+    /**
      * @see File_Archive_Reader::makeWriter
      */
     function makeWriter($fileModif = true, $seek = 0)

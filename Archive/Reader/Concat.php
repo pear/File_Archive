@@ -146,6 +146,14 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
         return $skipped;
     }
     /**
+     * @see File_Archive_Reader::rewind()
+     */
+    function rewind($length)
+    {
+        //TODO: implement rewind
+        return parent::rewind($length);
+    }
+    /**
      * @see File_Archive_Reader::close()
      */
     function close()

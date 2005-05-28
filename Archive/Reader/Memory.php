@@ -133,15 +133,37 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
         $this->offset += $actualLength;
         return $result;
     }
+
     /**
      * @see File_Archive_Reader::skip()
      */
     function skip($length)
     {
-        $actualLength = min($length, strlen($this->memory) - $this->offset);
-        $this->offset += $actualLength;
-        return $actualLength;
+        if ($length == -1) {
+            $length = strlen($this->memory) - $this->offset;
+        } else {
+            $length = min($length, strlen($this->memory) - $this->offset);
+        }
+        $this->offset += $length;
+        return $length;
     }
+
+    /**
+     * @see File_Archive_Reader::rewind()
+     */
+    function rewind($length)
+    {
+        if ($length == -1) {
+            $tmp = $this->offset;
+            $this->offset = 0;
+            return $tmp;
+        } else {
+            $length = min($length, $this->offset);
+            $this->offset -= $length;
+            return $length;
+        }
+    }
+
     /**
      * @see File_Archive_Reader::close()
      */

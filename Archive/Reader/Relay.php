@@ -79,6 +79,10 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
      */
     function skip($length) { return $this->source->skip($length); }
     /**
+     * @see File_Archive_Reader::rewind()
+     */
+    function rewind($length) { return $this->source->rewind($length); }
+    /**
      * @see File_Archive_Reader::close()
      */
     function close()

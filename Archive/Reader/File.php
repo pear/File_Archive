@@ -168,16 +168,32 @@ class File_Archive_Reader_File extends File_Archive_Reader
             }
         }
     }
+
     /**
-     * @see File_Archive_Reader::Skip()
+     * @see File_Archive_Reader::skip()
      */
     function skip($length)
     {
         $before = ftell($this->handle);
-        if (@fseek($this->handle, $length, SEEK_CUR) === -1) {
+        if (($length == -1 && @fseek($this->handle, 0, SEEK_END) === -1) ||
+            ($length >= 0  && @fseek($this->handle, $length, SEEK_CUR) === -1)) {
             return parent::skip($length);
         } else {
             return ftell($this->handle) - $before;
+        }
+    }
+
+    /**
+     * @see File_Archive_Reader::rewind
+     */
+    function rewind($length)
+    {
+        $before = ftell($this->handle);
+        if (($length == -1 && @fseek($this->handle, 0, SEEK_SET) === -1) ||
+            ($length >= 0  && @fseek($this->handle, -$length, SEEK_CUR) === -1)) {
+            return parent::rewind($length);
+        } else {
+            return $before - ftell($this->handle);
         }
     }
 

@@ -71,10 +71,33 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
      */
     function skip($length)
     {
-        $actualLength = min($this->leftLength, $length);
-        $error = $this->source->skip($actualLength);
-        $this->leftLength -= $actualLength;
-        return $error;
+        if ($length == -1) {
+            $length = $this->leftLength;
+        } else {
+            $length = min($this->leftLength, $length);
+        }
+        $skipped = $this->source->skip($length);
+        if (!PEAR::isError($skipped)) {
+            $this->leftLength -= $skipped;
+        }
+        return $skipped;
+    }
+
+    /**
+     * @see File_Archive_Reader::rewind()
+     */
+    function rewind($length)
+    {
+        if ($length == -1) {
+            $length = $this->currentStat[7] - $this->leftLength;
+        } else {
+            $length = min($length, $this->currentStat[7] - $this->leftLength);
+        }
+        $rewinded = $this->source->rewind($length);
+        if (!PEAR::isError($rewinded)) {
+            $this->leftLength += $rewinded;
+        }
+        return $rewinded;
     }
 
     /**

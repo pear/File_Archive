@@ -194,6 +194,45 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
     }
 
     /**
+     * @see File_Archive_Reader::skip
+     */
+    function skip($length)
+    {
+        if ($length == -1) {
+            $length = $this->_nbBytesLeft;
+        } else {
+            $length = min($length, $this->_nbBytesLeft);
+        }
+        if ($length == 0) {
+            return 0;
+        } else {
+            $this->_nbBytesLeft -= $length;
+            return $this->source->skip($length);
+        }
+    }
+
+    /**
+     * @see File_Archive_Reader::rewind
+     */
+    function rewind($length)
+    {
+        if ($length == -1) {
+            $length = $this->_currentStat[7] - $this->_nbBytesLeft;
+        } else {
+            $length = min($length, $this->_currentStat[7] - $this->_nbBytesLeft);
+        }
+        if ($length == 0) {
+            return 0;
+        } else {
+            $rewinded = $this->source->rewind($length);
+            if (!PEAR::isError($rewinded)) {
+                $this->_nbBytesLeft += $rewinded;
+            }
+            return $rewinded;
+        }
+    }
+
+    /**
      * @see File_Archive_Reader::makeWriter
      */
     function makeWriter($seek = 0, $fileModif = true)

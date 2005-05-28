@@ -38,6 +38,7 @@ require_once "File/Archive/Writer/Files.php";
 class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
 {
     var $nbRead = 0;
+    var $filePos = 0;
     var $gzfile = null;
     var $tmpName = null;
 
@@ -54,6 +55,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         }
 
         $this->nbRead = 0;
+        $this->filePos = 0;
         $this->gzfile = null;
         $this->tmpName = null;
 
@@ -70,6 +72,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         }
 
         $this->nbRead++;
+        $this->filePos = 0;
         if ($this->nbRead > 1) {
             return false;
         }
@@ -93,6 +96,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
 
         return true;
     }
+
     /**
      * Return the name of the single file contained in the archive
      * deduced from the name of the archive (the extension is removed)
@@ -113,6 +117,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
 
         return $name;
     }
+
     /**
      * @see File_Archive_Reader::getData()
      */
@@ -122,7 +127,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
             $data = '';
             do
             {
-                $newData = gzread($this->gzfile, 8196);
+                $newData = gzread($this->gzfile, 8192);
                 $data .= $newData;
             } while ($newData != '');
         } else if ($length == 0) {
@@ -131,8 +136,55 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
             $data = gzread($this->gzfile, $length);
         }
 
+        $this->filePos += strlen($data);
         return $data == '' ? null : $data;
     }
+
+    /**
+     * @see File_Archive_Reader::skip()
+     */
+    function skip($length)
+    {
+        if($length == -1) {
+            do
+            {
+                $tmp = gzread($this->gzfile, 8192);
+                $this->filePos += strlen($tmp);
+            } while ($tmp != '');
+        } else {
+            if (@gzseek($this->gzfile, $this->filePos + $length) === -1) {
+                return parent::skip($length);
+            } else {
+                $this->filePos += $length;
+                return $length;
+            }
+        }
+    }
+
+    /**
+     * @see File_Archive_Reader::rewind()
+     */
+    function rewind($length)
+    {
+        if ($length == -1) {
+            if (@gzseek($this->gzfile, 0) === -1) {
+                return parent::rewind($length);
+            } else {
+                $tmp = $this->filePos;
+                $this->filePos = 0;
+                return $tmp;
+            }
+        } else {
+            $length = min($length, $this->filePos);
+            if (@gzseek($this->gzfile, $this->filePos - $length) === -1) {
+                return parent::rewind($length);
+            } else {
+                $this->filePos -= $length;
+                return $length;
+            }
+        }
+    }
+
 
     /**
      * @see File_Archive_Reader::makeWriter

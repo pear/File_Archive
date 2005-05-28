@@ -215,8 +215,28 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
      */
     function skip($length)
     {
-        $this->offset = min($this->offset + $length, $this->currentStat[7]);
+        $before = $this->offset;
+        if ($length == -1) {
+            $this->offset = $this->currentStat[7];
+        } else {
+            $this->offset = min($this->offset + $length, $this->currentStat[7]);
+        }
+        return $this->offset - $before;
     }
+    /**
+     * @see File_Archive_Reader::rewind()
+     */
+    function rewind($length)
+    {
+        $before = $this->offset;
+        if ($length == -1) {
+            $this->offset = 0;
+        } else {
+            $this->offset = min(0, $this->offset - $length);
+        }
+        return before - $this->offset;
+    }
+
     function uncompressData()
     {
         if ($this->data !== null)
