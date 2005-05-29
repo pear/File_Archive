@@ -205,8 +205,11 @@ class File_Archive_Writer_Files extends File_Archive_Writer
             }
         }
 
-        if (!@unlink($complete) ||
+        echo "New from tmp file: $tmpfile => $complete\n";
+
+        if ((file_exists($complete) && !@unlink($complete)) ||
             !@rename($tmpfile, $complete)) {
+            echo "failed to rename\n";
             parent::newFromTempFile($tmpfile, $filename, $stat, $mime);
         }
     }

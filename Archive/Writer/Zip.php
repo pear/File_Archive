@@ -141,7 +141,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
      * @see    File_Archive_Writer_MemoryArchive::appendFileData()
      * @access protected
      */
-    function appendFileData($filename, $stat, $data)
+    function appendFileData($filename, $stat, &$data)
     {
         $filename = preg_replace("/^(\.{1,2}(\/|\\\))+/","",$filename);
 

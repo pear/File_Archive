@@ -44,7 +44,7 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
      *         waiting for the file to be complete
      * @access private
      */
-    var $memoryWriter = null;
+    var $buffer = '';
     /**
      * @var    string Name of the file which data are coming
      * @access private
@@ -72,7 +72,6 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
     function File_Archive_Writer_MemoryArchive
                 ($filename, &$t, $stat = array(), $autoClose = true)
     {
-        $this->memoryWriter = new File_Archive_Writer_Memory($tmp = null);
         parent::File_Archive_Writer_Archive($filename, $t, $stat, $autoClose);
     }
 
@@ -133,7 +132,7 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
             } else {
                 $error = $this->appendFileData($this->currentFilename,
                                  $this->currentStat,
-                                 $this->memoryWriter->getData());
+                                 $this->buffer);
             }
             if (PEAR::isError($error)) {
                 return $error;
@@ -141,22 +140,33 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
 
             $this->currentFilename = null;
             $this->currentDataFile = null;
-            $this->memoryWriter->clear();
+            $this->buffer = '';
         }
     }
     /**
      * @see File_Archive_Writer::writeData()
      */
-    function writeData($data) { return $this->memoryWriter->writeData($data); }
+    function writeData(&$data)
+    {
+        if ($this->currentDataFile !== null) {
+            $this->buffer .= file_get_contents($this->currentDataFile);
+            $this->currentDataFile = null;
+        }
+        $this->buffer .= $data;
+    }
     /**
      * @see File_Archive_Writer::writeFile()
      */
     function writeFile($filename)
     {
-        if ($this->currentDataFile == null && $this->memoryWriter->isEmpty()) {
+        if ($this->currentDataFile == null && empty($this->buffer)) {
             $this->currentDataFile = $filename;
         } else {
-            return $this->memoryWriter->writeFile($filename);
+            if ($this->currentDataFile !== null) {
+                $this->buffer .= file_get_contents($this->currentDataFile);
+                $this->currentDataFile = null;
+            }
+            $this->buffer .= file_get_contents($filename);
         }
     }
 
@@ -168,7 +178,7 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
      *
      * @access protected
      */
-    function appendFileData($filename, $stat, $data) { }
+    function appendFileData($filename, $stat, &$data) { }
 
 //SHOULD REWRITE FUNCTIONS
     /**

@@ -150,12 +150,12 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
         while ($this->next()) {
             if ($toUnlink != null &&
                 !@unlink($toUnlink)) {
-                return PEAR::raiseError($pred);
+                return PEAR::raiseError("Unable to unlink $toUnlink");
             }
             $toUnlink = ($pred->isTrue($this) ? $this->getDataFilename() : null);
         }
         if ($toUnlink != null &&
-            !@unlink($toUnlink)) {
+            !@unlink("Unable to unlink $toUnlink")) {
             return PEAR::raiseError($pred);
         }
 
