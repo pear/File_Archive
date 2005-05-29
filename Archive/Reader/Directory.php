@@ -139,21 +139,29 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
      */
     function makeWriterRemoveFiles($pred)
     {
-        //TODO: implementation
-/*        $lastSource = &$this->getLastSource();
-        if ($lastSource === null) {
-            return PEAR::raiseError('No file selected');
+        if ($source !== null && $pred->isTrue($this)) {
+            $toUnlink = $this->getDataFilename();
+        } else {
+            $toUnlink = null;
+        }
+
+        while ($this->next()) {
+            if ($toUnlink != null &&
+                !@unlink($toUnlink)) {
+                return PEAR::raiseError($pred);
+            }
+            $toUnlink = ($pred->isTrue($this) ? $this->getDataFilename() : null);
+        }
+        if ($toUnlink != null &&
+            !@unlink($toUnlink)) {
+            return PEAR::raiseError($pred);
         }
 
         require_once "File/Archive/Writer/Files.php";
 
-        $writer = $lastSource->makeWriterRemove();
-        if (!PEAR::isError($writer)) {
-            $writer->basePath = $this->directory;
-            $this->close();
-        }
-
-        return $writer;*/
+        $writer = new File_Archive_Writer_Files($this->directory);
+        $this->close();
+        return $writer;
     }
 
     function getLastSource()

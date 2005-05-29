@@ -882,6 +882,9 @@ class File_Archive
 
     /**
      * Create a writer that allows appending new files to an existing archive
+     *
+     * @param File_Archive_Reader $source A reader where some files will be appended
+     * @return File_Archive_Writer a writer that you can use to append files to the reader
      */
     function append(&$source)
     {
@@ -889,6 +892,25 @@ class File_Archive
             return $source;
         }
         return $source->makeAppendWriter();
+    }
+
+    /**
+     * Remove the files that follow a given predicate from the source
+     *
+     * @param File_Archive_Reader $source A reader that contains the files to remove
+     * @param File_Archive_Predicate $pred The files that follow the predicate
+     *        (for which $pred->isTrue($source) is true) will be erased
+     */
+    function remove(&$source, $pred)
+    {
+        if (PEAR::isError($source)) {
+            return $source;
+        }
+        $writer = $source->makeWriterRemoveFiles($pred);
+        if (PEAR::isError($writer)) {
+            return $writer;
+        }
+        $writer->close();
     }
 }
 
