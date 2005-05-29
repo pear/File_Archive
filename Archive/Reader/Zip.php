@@ -318,7 +318,6 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             $writer->alreadyWrittenFile($file['name'], $file['stat'], $file['CRC'], $file['CLen']);
         }
 
-        $this->source = null;
         $this->close();
         return $writer;
     }
@@ -383,7 +382,6 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             $writer->alreadyWrittenFile($file['name'], $file['stat'], $file['CRC'], $file['CLen']);
         }
 
-        $this->source = null;
         $this->close();
         return $writer;
     }

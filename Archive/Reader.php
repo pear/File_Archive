@@ -396,15 +396,6 @@ class File_Archive_Reader
     {
         return PEAR::raiseError("Reader abstract function call (makeWriterRemoveBlocks)");
     }
-
-    /**
-     * Equivalent to makeWriterRemoveBlocks(array(0)), but may be more efficient
-     * It creates a writer to append data to a file
-     */
-    function makeWriter()
-    {
-        return $this->makeWriterRemoveBlocks(array(0));
-    }
 }
 
 ?>

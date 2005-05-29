@@ -144,6 +144,7 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
         if ($delim == null) {
             return false;
         }
+
         // All files inside should have more than 0 bytes of size
         if ($size < 0) {
             return PEAR::raiseError("Files must be at least one byte long");
@@ -253,12 +254,12 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
         $seek = null;
         $gap = 0;
         if ($this->_currentFilename !== null && $pred->isTrue($this)) {
-            $seek = $this->_header + $this->currentStat[7] + ($this->_footer ? 1 : 0);
+            $seek = $this->_header + $this->_currentStat[7] + ($this->_footer ? 1 : 0);
             $blocks[] = $seek; //Remove this file
         }
 
         while (($error = $this->next()) === true) {
-            $size = $this->_header + $this->currentStat[7] + ($this->_footer ? 1 : 0);
+            $size = $this->_header + $this->_currentStat[7] + ($this->_footer ? 1 : 0);
             if ($pred->isTrue($this)) {
                 if ($seek === null) {
                     $seek = $size;
@@ -289,9 +290,11 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
             }
         }
 
-        return new File_Archive_Writer_Tar(null,
+        $writer = new File_Archive_Writer_Ar(null,
             $this->source->makeWriterRemoveBlocks($blocks, -$seek)
         );
+        $this->close();
+        return $writer;
     }
 
     /**
@@ -354,7 +357,7 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
             return $innerWriter;
         }
 
-        $this->source = null;
+        unset($this->source);
         $this->close();
 
         return new File_Archive_Writer_Ar(null, $innerWriter);

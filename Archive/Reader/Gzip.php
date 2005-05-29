@@ -247,7 +247,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         //Create the writer
         $this->source->rewind();
         $innerWriter = $this->source->makeWriterRemoveBlocks(array()); //Truncate the source
-        $this->source = null;
+        unset($this->source);
         $writer = new File_Archive_Writer_Gzip(null, $innerWriter);
 
         //And compress data from the temporary file

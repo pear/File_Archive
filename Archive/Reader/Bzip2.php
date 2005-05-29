@@ -52,6 +52,8 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
         if ($this->tmpName != null)
             unlink($this->tmpName);
 
+        $this->bzfile = null;
+        $this->tmpName = null;
         $this->nbRead = 0;
         $this->filePos = 0;
         return parent::close($innerClose);
@@ -221,7 +223,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
         //Create the writer
         $this->source->rewind();
         $innerWriter = $this->source->makeWriterRemoveBlocks(array());   //Truncate the source
-        $this->source = null;
+        unset($this->source);
         $writer = new File_Archive_Writer_Bzip2(null, $innerWriter);
 
         //And compress data from the temporary file

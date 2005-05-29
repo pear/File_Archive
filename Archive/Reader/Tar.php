@@ -103,13 +103,13 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     /**
      * @see File_Archive_Reader::close()
      */
-    function close($innerClose = true)
+    function close()
     {
         $this->leftLength = 0;
         $this->currentFilename = null;
         $this->currentStat = null;
         $this->seekToEnd = null;
-        return parent::close($innerClose);
+        return parent::close();
     }
 
     /**
@@ -269,9 +269,11 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
             }
         }
 
-        return new File_Archive_Writer_Tar(null,
+        $writer = new File_Archive_Writer_Tar(null,
             $this->source->makeWriterRemoveBlocks($blocks, -$seek)
         );
+        $this->close();
+        return $writer;
     }
 
     /**
@@ -334,7 +336,6 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
             return $innerWriter;
         }
 
-        $this->source = null;
         $this->close();
         return new File_Archive_Writer_Tar(null, $innerWriter);
     }

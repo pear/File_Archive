@@ -207,10 +207,11 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
             $keep = !$keep;
         }
         if ($keep) {
-            $this->memory = data . $this->memory;
+            $this->memory = $data . $this->memory;
         } else {
-            $this->memory = data;
+            $this->memory = $data;
         }
+        $this->close();
         return new File_Archive_Writer_Memory($this->memory, strlen($this->memory));
     }
 }

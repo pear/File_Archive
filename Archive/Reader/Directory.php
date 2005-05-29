@@ -77,8 +77,10 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
     {
         $error = parent::close();
 
-        closedir($this->directoryHandle);
-        $this->directoryHandle = null;
+        if ($this->directoryHandle !== null) {
+            closedir($this->directoryHandle);
+            $this->directoryHandle = null;
+        }
 
         return $error;
     }
@@ -164,13 +166,13 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
         return $writer;
     }
 
-    function getLastSource()
+    function &getLastSource()
     {
         if ($this->source === null ||
             is_a($this->source, 'File_Archive_Reader_File')) {
-            return &$this->source;
+            return $this->source;
         } else {
-            return &$this->source->getLastSource();
+            return $this->source->getLastSource();
         }
     }
 

@@ -94,25 +94,36 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
     /**
      * @see File_Archive_Reader::makeAppendWriter()
      */
-    function makeAppendWriter() { return $this->source->makeAppendWriter(); }
+    function makeAppendWriter()
+    {
+        $writer = $this->source->makeAppendWriter();
+        if (!PEAR::isError($writer)) {
+            $this->close();
+        }
+        return $writer;
+    }
     /**
      * @see File_Archive_Reader::makeWriterRemoveFiles()
      */
     function makeWriterRemoveFiles($pred)
     {
-        return $this->source->makeWriterRemoveFiles($pred);
+        $writer = $this->source->makeWriterRemoveFiles($pred);
+        if (!PEAR::isError($writer)) {
+            $this->close();
+        }
+        return $writer;
     }
     /**
      * @see File_Archive_Reader::makeWriterRemoveBlocks()
      */
     function makeWriterRemoveBlocks($blocks, $seek = 0)
     {
-        return $this->source->makeWriterRemoveBlocks($blocks, $seek);
+        $writer = $this->source->makeWriterRemoveBlocks($blocks, $seek);
+        if (!PEAR::isError($writer)) {
+            $this->close();
+        }
+        return $writer;
     }
-    /**
-     * @see File_Archive_Reader::makeWriter()
-     */
-    function makeWriter() { return $this->source->makeWriter(); }
 }
 
 ?>
