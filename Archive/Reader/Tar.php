@@ -336,9 +336,7 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
 
         $this->source = null;
         $this->close();
-        $writer = new File_Archive_Writer_Tar(null, $innerWriter);
-
-        return $writer;
+        return new File_Archive_Writer_Tar(null, $innerWriter);
     }
 }
 

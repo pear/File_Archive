@@ -34,7 +34,6 @@ require_once "File/Archive/Reader/Archive.php";
  */
 class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
 {
-
     /**
      * @var    int       The number of files to read to reach the end of the
      *                   current ar file
@@ -42,6 +41,14 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
      * @access private
      */
     var $_nbBytesLeft = 0;
+
+    /**
+     * @var    int      The size of the header in number of bytes
+     *                  The header is not always 60 bytes since it sometimes
+     *                  contains a long filename
+     * @access private
+     */
+    var $_header = 0;
 
     /**
      * @var    boolean   Flag set if their is a 1 byte footer after the data
@@ -87,6 +94,7 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
         $this->_currentFilename = null;
         $this->_currentStat = null;
         $this->_nbBytesLeft = 0;
+        $this->_header = 0;
         $this->_footer = false;
         $this->_alreadyRead = false;
         return parent::close();
@@ -145,10 +153,12 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
 
         // if the filename starts with a length, then just read the bytes of it
         if (preg_match("/\#1\/(\d+)/", $name, $matches)) {
+            $this->_header = 60 + $matches[1];
             $name = $this->source->getData($matches[1]);
             $size -= $matches[1];
         } else {
-            // strip trailing spaces in name, so we can distinguish spaces in a filename with padding.
+            // strip trailing spaces in name, so we can distinguish spaces in a filename with padding
+            $this->_header = 60;
             $name = preg_replace ("/\s+$/", "", $name);
         }
 
@@ -232,5 +242,122 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
         }
     }
 
+    /**
+     * @see File_Archive_Reader::makeWriterRemoveFiles()
+     */
+    function makeWriterRemoveFiles($pred)
+    {
+        require_once "File/Archive/Writer/Ar.php";
+
+        $blocks = array();
+        $seek = null;
+        $gap = 0;
+        if ($this->_currentFilename !== null && $pred->isTrue($this)) {
+            $seek = $this->_header + $this->currentStat[7] + ($this->_footer ? 1 : 0);
+            $blocks[] = $seek; //Remove this file
+        }
+
+        while (($error = $this->next()) === true) {
+            $size = $this->_header + $this->currentStat[7] + ($this->_footer ? 1 : 0);
+            if ($pred->isTrue($this)) {
+                if ($seek === null) {
+                    $seek = $size;
+                    $blocks[] = $size;
+                } else if ($gap > 0) {
+                    $blocks[] = $gap; //Don't remove the files between the gap
+                    $blocks[] = $size;
+                    $seek += $size;
+                } else {
+                    $blocks[count($blocks)-1] += $size;   //Also remove this file
+                    $seek += $size;
+                }
+                $gap = 0;
+            } else {
+                if ($seek !== null) {
+                    $seek += $size;
+                    $gap += $size;
+                }
+            }
+        }
+        if ($seek === null) {
+            $seek = 0;
+        } else {
+            if ($gap == 0) {
+                array_pop($blocks);
+            } else {
+                $blocks[] = $gap;
+            }
+        }
+
+        return new File_Archive_Writer_Tar(null,
+            $this->source->makeWriterRemoveBlocks($blocks, -$seek)
+        );
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriterRemoveBlocks()
+     */
+    function makeWriterRemoveBlocks($blocks, $seek = 0)
+    {
+        if ($this->_currentStat === null) {
+            return PEAR::raiseError('No file selected');
+        }
+
+        $blockPos = $this->_currentStat[7] - $this->_nbBytesLeft + $seek;
+
+        $this->rewind();
+        $keep = false;
+
+        //TODO: write this data to a temp file?
+        $data = $this->getData($blockPos);
+        foreach ($blocks as $length) {
+            if ($keep) {
+                $data .= $this->getData($length);
+            } else {
+                $this->skip($length);
+            }
+            $keep = !$keep;
+        }
+        if ($keep) {
+            $data .= $this->getData();
+        }
+
+        $filename = $this->_currentFilename;
+        $stat = $this->_currentStat;
+
+        $writer = $this->makeWriterRemove();
+        if (PEAR::isError($writer)) {
+            return $writer;
+        }
+
+        unset($stat[7]);
+        $writer->newFile($filename, $stat);
+        $writer->writeData($data);
+        return $writer;
+    }
+
+    /**
+     * @see File_Archive_Reader::makeAppendWriter
+     */
+    function makeAppendWriter()
+    {
+        require_once "File/Archive/Writer/Ar.php";
+
+        while (($error = $this->next()) === true) { }
+        if (PEAR::isError($error)) {
+            $this->close();
+            return $error;
+        }
+
+        $innerWriter = $this->source->makeWriterRemoveBlocks(array());
+        if (PEAR::isError($innerWriter)) {
+            return $innerWriter;
+        }
+
+        $this->source = null;
+        $this->close();
+
+        return new File_Archive_Writer_Ar(null, $innerWriter);
+    }
 }
 ?>
