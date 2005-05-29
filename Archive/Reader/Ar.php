@@ -311,7 +311,6 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
         $this->rewind();
         $keep = false;
 
-        //TODO: write this data to a temp file?
         $data = $this->getData($blockPos);
         foreach ($blocks as $length) {
             if ($keep) {

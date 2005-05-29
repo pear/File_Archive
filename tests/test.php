@@ -316,6 +316,37 @@ class Test extends PHPUnit_TestCase
         while ($source->next())
             echo $source->getFilename()."\n";
     }
+
+    function _testRemove($extension)
+    {
+        $writer = File_Archive::toArchive(
+                    "test.$extension",
+                     File_Archive::toVariable($x)
+               );
+        $writer->newFile('foo.txt');
+        $writer->writeData('ABCDEF');
+        $writer->newFile('bla_to_remove.txt');
+        $writer->writeData('GHIJKL');
+        $writer->newFile('bar.txt');
+        $writer->writeData('MNOP');
+        $writer->close();
+
+        File_Archive::remove(
+            $source = File_Archive::readSource(
+                File_Archive::readMemory($x, "test.$extension"),
+                "test.$extension/"),
+            File_Archive::predEreg('_to_remove')
+        );
+        $this->assertEquals(
+            "foo.txt\nbar.txt",
+            implode("\n", $source->getFileList())
+        );
+    }
+    function testRemoveTar() { return $this->_testRemove('tar'); }
+    function testRemoveTgz() { return $this->_testRemove('tbz'); }
+    function testRemoveTbz() { return $this->_testRemove('tgz'); }
+    function testRemoveAr() { return $this->_testRemove('ar'); }
+    function testRemoveZip() { return $this->_testRemove('zip'); }
 }
 
 $test = new PHPUnit_TestSuite("Test");

@@ -94,6 +94,11 @@ class File_Archive_Writer_Files extends File_Archive_Writer
 
     /**
      * Open a file for writing from a given position
+     *
+     * @param string $filename The name of the file to open
+     * @param int $pos the initial position in the file
+     * @param $stat the stats of the file
+     * @param $mime the mime type of the file
      */
     function openFile($filename, $pos = 0, $stat = array(), $mime = "application/octet-stream")
     {
@@ -120,27 +125,41 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      */
     function openFileRemoveBlock($filename, $pos, $blocks, $stat = array(), $mime = "application/octet-stream")
     {
-        $this->openFile($filename, $pos, $stat, $mime);
+        $error = $this->openFile($filename, $pos, $stat, $mime);
+        if (PEAR::isError($error)) {
+            return $error;
+        }
 
-        //TODO: Might be a lot in memory...
+        //This will be used to read the initial file
+        //The data, with the unusefull block removed will be written to $this->handle
+        $read = fopen($filename, 'r');
+        if ($pos > 0) {
+            if (fseek($this->handle, $pos) == -1) {
+                fread($this->handle, $pos);
+            }
+        }
+
         $keep = false;
         $data = '';
         foreach ($blocks as $length) {
-            if ($keep && $length > 0) {
-                $data .= fread($this->handle, $length);
+            if ($keep) {
+                while ($length > 0 &&
+                       ($data = fread($read, min($length, 8192))) != '') {
+                    $length -= strlen($data);
+                    fwrite($this->handle, $data);
+                }
             } else {
-                fseek($this->handle, $length, SEEK_CUR);
+                fseek($read, $length, SEEK_CUR);
             }
             $keep = !$keep;
         }
         if ($keep) {
             while(!feof($this->handle)) {
-                $data .= fread($this->handle, 8196);
+                fwrite($this->handle, fread($read, 8196));
             }
         }
 
-        fseek($this->handle, $pos);
-        fwrite($this->handle, $data);
+        fclose($read);
         ftruncate($this->handle, ftell($this->handle));
     }
 

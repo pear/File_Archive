@@ -901,7 +901,7 @@ class File_Archive
      * @param File_Archive_Predicate $pred The files that follow the predicate
      *        (for which $pred->isTrue($source) is true) will be erased
      */
-    function remove(&$source, $pred)
+    function remove($pred, &$source)
     {
         if (PEAR::isError($source)) {
             return $source;
