@@ -25,15 +25,12 @@
   </maintainer>
  </maintainers>
  <release>
-  <version>1.2.0</version>
-  <date>2005-05-26</date>
+  <version></version>
+  <date></date>
   <state>stable</state>
   <notes>
-   + Add an ar (or deb) reader / writer
-   + Add a getFileList() on any reader to quickly retrieve file list
-   + File_Archive::readArchive properly handles tgz and tbz extensions
-   + Better error handling
-   + Various bug fixes
+   + Add File_Archive::append and File_Archive::remove to add or remove files from
+     an archive, or even a nested archive
   </notes>
   <filelist>
    <dir name="File" role="php">
@@ -44,6 +41,7 @@
      <file>Writer.php</file>
      <dir name="Predicate" role="php">
       <file>And.php</file>
+      <file>Current.php</file>
       <file>Custom.php</file>
       <file>Ereg.php</file>
       <file>Eregi.php</file>
@@ -110,6 +108,18 @@
  </release>
  
  <changelog>
+  <release>
+   <version>1.2.0</version>
+   <date>2005-05-26</date>
+   <state>stable</state>
+   <notes>
+    + Add an ar (or deb) reader / writer
+    + Add a getFileList() on any reader to quickly retrieve file list
+    + File_Archive::readArchive properly handles tgz and tbz extensions
+    + Better error handling
+    + Various bug fixes
+   </notes>
+  </release>
   <release>
    <version>1.0.1</version>
    <date>2005-04-21</date>
