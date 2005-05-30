@@ -162,6 +162,13 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
         $this->currentFilename = $filename;
         $this->currentMime = $mime;
     }
+    /**
+     * @see File_Archive_Writer::newFileNeedsMIME()
+     */
+    function newFileNeedsMIME()
+    {
+        return true;
+    }
 
     /**
      * @see File_Archive_Writer::close()

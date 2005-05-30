@@ -984,13 +984,6 @@ class File_Archive
      */
     function removeFromSource(&$pred, &$source, $URL = null)
     {
-        echo "pred\n";
-        var_dump($pred);
-        echo "source\n";
-        var_dump($source);
-        echo "URL\n";
-        var_dump($URL);
-
         if (PEAR::isError($source)) {
             return $source;
         }

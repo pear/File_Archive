@@ -63,6 +63,14 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
             return $errorB;
         }
     }
+    /**
+     * @see File_Archive_Writer::newFileNeedsMIME()
+     */
+    function newFileNeedsMIME()
+    {
+        return $this->a->newFileNeedsMIME() ||
+               $this->b->newFileNeedsMIME();
+    }
 
     /**
      * @see File_Archive_Writer::writeData()

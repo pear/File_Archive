@@ -70,6 +70,15 @@ class File_Archive_Writer
     }
 
     /**
+     * Returns whether the writer newFile function needs the $mime parameter
+     * Default is false
+     */
+    function newFileNeedsMIME()
+    {
+        return false;
+    }
+
+    /**
      * Append the specified data to the writer
      *
      * @param String $data the data to append to the writer

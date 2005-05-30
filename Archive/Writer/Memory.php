@@ -76,6 +76,13 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
         $this->stat = $stat;
         $this->mime = $mime;
     }
+    /**
+     * @see File_Archive_Writer::newFileNeedsMIME
+     */
+    function newFileNeedsMIME()
+    {
+        return true;
+    }
 
     /**
      * Retrieve the concatenated data

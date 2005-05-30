@@ -271,10 +271,15 @@ class File_Archive_Reader
         }
 
         while (($error = $this->next()) === true) {
+            if ($writer->newFileNeedsMIME()) {
+                $mime = $this->getMime();
+            } else {
+                $mime = null;
+            }
             $error = $writer->newFile(
                 $this->getFilename(),
                 $this->getStat(),
-                $this->getMime()
+                $mime
             );
             if (PEAR::isError($error)) {
                 break;

@@ -74,6 +74,13 @@ class File_Archive_Writer_Output extends File_Archive_Writer
         }
     }
     /**
+     * @see File_Archive_Writer::newFileNeedsMIME
+     */
+    function newFileNeedsMIME()
+    {
+        return $this->sendHeaders;
+    }
+    /**
      * @see File_Archive_Writer::writeData()
      */
     function writeData($data) { echo $data; }
