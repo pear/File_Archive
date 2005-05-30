@@ -895,20 +895,6 @@ class File_Archive
     }
 
     /**
-     * Create a writer that allows appending new files to an existing archive
-     * This function actes as appendToSource with source being the system files
-     * $URL can't be null here
-     *
-     * @param File_Archive_Reader $source A reader where some files will be appended
-     * @return File_Archive_Writer a writer that you can use to append files to the reader
-     */
-    function append($URL, $type = null, $stat = array())
-    {
-        $source = null;
-        return File_Archive::appendToSource($source, $URL, $type, $stat);
-    }
-
-    /**
      * Create a writer that can be used to append files to an archive inside a source
      * If the archive can't be found in the source, it will be created
      * If source is set to null, File_Archive::toFiles will be assumed
@@ -935,13 +921,21 @@ class File_Archive
      */
     function appendToSource(&$source, $URL = null, $type = null, $stat = array())
     {
-        if ($type === null) {
-            $result = File_Archive::_readSource($source, $URL.'/', $reachable, $baseDir);
+        if (PEAR::isError($source)) {
+            return $source;
+        }
+
+        if ($URL === null) {
+            $result =& $source;
         } else {
-            $result = File_Archive::readArchive(
-                        $type,
-                        File_Archive::_readSource($source, $URL, $reachable, $baseDir)
-                      );
+            if ($type === null) {
+                $result = File_Archive::_readSource($source, $URL.'/', $reachable, $baseDir);
+            } else {
+                $result = File_Archive::readArchive(
+                            $type,
+                            File_Archive::_readSource($source, $URL, $reachable, $baseDir)
+                          );
+            }
         }
         if (!PEAR::isError($result)) {
             return $result->makeAppendWriter();
@@ -959,24 +953,66 @@ class File_Archive
         }
     }
 
+    /**
+     * Create a writer that allows appending new files to an existing archive
+     * This function actes as appendToSource with source being the system files
+     * $URL can't be null here
+     *
+     * @param File_Archive_Reader $source A reader where some files will be appended
+     * @return File_Archive_Writer a writer that you can use to append files to the reader
+     */
+    function append($URL, $type = null, $stat = array())
+    {
+        $source = null;
+        return File_Archive::appendToSource($source, $URL, $type, $stat);
+    }
 
     /**
      * Remove the files that follow a given predicate from the source
+     * If URL is null, the files will be removed from the source directly
+     * Else, URL must link to a source from which the files will be removed
      *
-     * @param File_Archive_Reader $source A reader that contains the files to remove
      * @param File_Archive_Predicate $pred The files that follow the predicate
      *        (for which $pred->isTrue($source) is true) will be erased
+     * @param File_Archive_Reader $source A reader that contains the files to remove
      */
-    function remove(&$pred, &$source)
+    function removeFromSource(&$pred, &$source, $URL = null)
     {
+        echo "pred\n";
+        var_dump($pred);
+        echo "source\n";
+        var_dump($source);
+        echo "URL\n";
+        var_dump($URL);
+
         if (PEAR::isError($source)) {
             return $source;
         }
-        $writer = $source->makeWriterRemoveFiles($pred);
+        if ($URL === null) {
+            $result = &$source;
+        } else {
+            if (substr($URL, -1) !== '/') {
+                $URL .= '/';
+            }
+            $result = File_Archive::readSource($source, $URL);
+        }
+
+        $writer = $result->makeWriterRemoveFiles($pred);
         if (PEAR::isError($writer)) {
             return $writer;
         }
         $writer->close();
+    }
+
+    /**
+     * Remove the files that follow a given predicate from the archive specified
+     * in $URL
+     *
+     * @param $URL URL of the archive where some files must be removed
+     */
+    function remove(&$pred, $URL)
+    {
+        return File_Archive::removeFromSource($pred, null, $URL);
     }
 
     /**
@@ -985,16 +1021,34 @@ class File_Archive
      *
      * @param File_Archive_Reader a reader that may contain duplicates
      */
-    function removeDuplicates(&$source)
+    function removeDuplicatesFromSource(&$source, $URL = null)
     {
         if (PEAR::isError($source)) {
             return $source;
         }
+        if ($URL !== null && substr($URL, -1) != '/') {
+            $URL .= '/';
+        }
+
+        if ($source === null) {
+            $source = File_Archive::read($URL);
+        }
+
         require_once "File/Archive/Predicate/Duplicate.php";
-        return File_Archive::remove(
+        return File_Archive::removeFromSource(
             new File_Archive_Predicate_Duplicate($source),
-            $source
+            $source,
+            null
         );
+    }
+
+    /**
+     * Remove duplicates from the archive specified in the URL
+     */
+    function removeDuplicates($URL)
+    {
+        $source = null;
+        return File_Archive::removeDuplicatesFromSource($source, $URL);
     }
 }
 
