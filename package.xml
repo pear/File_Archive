@@ -25,12 +25,17 @@
   </maintainer>
  </maintainers>
  <release>
-  <version></version>
-  <date></date>
+  <version>1.3.0</version>
+  <date>2005-05-30</date>
   <state>stable</state>
   <notes>
-   + Add File_Archive::append and File_Archive::remove to add or remove files from
-     an archive, or even a nested archive
+   + Add some functions to allow archive modification
+     - File_Archive::appender creates a writer to append files to an existing archive
+     - File_Archive::remove and File_Archive::removeDuplicates removes some files from
+       an existing archive
+     
+     These functions allow to modify archives or even nested archives
+     See http://poocl.la-grotte.org for more detailed examples
   </notes>
   <filelist>
    <dir name="File" role="php">
@@ -43,10 +48,12 @@
       <file>And.php</file>
       <file>Current.php</file>
       <file>Custom.php</file>
+      <file>Duplicate.php</file>
       <file>Ereg.php</file>
       <file>Eregi.php</file>
       <file>Extension.php</file>
       <file>False.php</file>
+      <file>Index.php</file>
       <file>MaxDepth.php</file>
       <file>MIME.php</file>
       <file>MinSize.php</file>
@@ -86,6 +93,7 @@
       <file>Multi.php</file>
       <file>Output.php</file>
       <file>Tar.php</file>
+      <file>UniqueAppender.php</file>
       <file>Zip.php</file>
      </dir>
     </dir>
