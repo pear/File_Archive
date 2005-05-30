@@ -925,6 +925,9 @@ class File_Archive
             return $source;
         }
 
+        //Do not report the fact that the archive does not exist as an error
+        PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
+
         if ($URL === null) {
             $result =& $source;
         } else {
@@ -937,6 +940,9 @@ class File_Archive
                           );
             }
         }
+
+        PEAR::popErrorHandling();
+
         if (!PEAR::isError($result)) {
             return $result->makeAppendWriter();
         }
