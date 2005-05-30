@@ -159,6 +159,18 @@ class File_Archive
     function readSource(&$source, $URL, $symbolic = null,
                   $uncompression = 0, $directoryDepth = -1)
     {
+        return File_Archive::_readSource($source, $URL, $reachable, $baseDir,
+                  $symbolic, $uncompression, $directoryDepth);
+    }
+
+    /**
+     * This function performs exactly as readSource, but with two additional parameters
+     * ($reachable and $baseDir) that will be set so that $reachable."/".$baseDir == $URL
+     * and $reachable can be reached (in case of error)
+     */
+    function _readSource(&$source, $URL, &$reachable, &$baseDir, $symbolic = null,
+                  $uncompression = 0, $directoryDepth = -1)
+    {
         if (PEAR::isError($source)) {
             return $source;
         }
@@ -245,6 +257,7 @@ class File_Archive
                 }
 
                 $file = substr($realPath, 0, $pos);
+                $baseDir = substr($realPath, $pos+1);
                 $dotPos = strrpos($file, '.');
                 $extension = '';
                 if ($dotPos !== false) {
@@ -283,6 +296,7 @@ class File_Archive
             if (isset($parsedURL['fragment'])) {
                 $file .= '#'.$parsedURL['fragment'];
             }
+            $reachable = $file;
 
             //If we are reading from the file system
             if ($source == null) {
@@ -882,17 +896,69 @@ class File_Archive
 
     /**
      * Create a writer that allows appending new files to an existing archive
+     * This function actes as appendToSource with source being the system files
+     * $URL can't be null here
      *
      * @param File_Archive_Reader $source A reader where some files will be appended
      * @return File_Archive_Writer a writer that you can use to append files to the reader
      */
-    function append(&$source)
+    function append($URL, $type = null, $stat = array())
     {
-        if (PEAR::isError($source)) {
-            return $source;
-        }
-        return $source->makeAppendWriter();
+        $source = null;
+        return File_Archive::appendToSource($source, $URL, $type, $stat);
     }
+
+    /**
+     * Create a writer that can be used to append files to an archive inside a source
+     * If the archive can't be found in the source, it will be created
+     * If source is set to null, File_Archive::toFiles will be assumed
+     * If type is set to null, the type of the archive will be determined looking at
+     * the extension in the URL
+     * stat is the array of stat (returned by stat() PHP function of Reader getStat())
+     * to use if the archive must be created
+     *
+     * This function allows to create or append data to nested archives. Only one
+     * archive will be created and if your creation requires creating several nested
+     * archives, a PEAR error will be returned
+     *
+     * After this call, $source will be closed and should not be used until the
+     * returned writer is closed.
+     *
+     * @param File_Archive_Reader $source A reader where some files will be appended
+     * @param string $URL URL to reach the archive in the source.
+     *        if $URL is null, a writer to append files to the $source reader will be returned
+     * @param string $type Extension of the archive (or null to use the one in the URL)
+     * @param array $stat Used only if archive is created, array of stat as returned by PHP stat function
+     *        or Reader getStat function: stats of the archive)
+     *        Time (index 9) will be overwritten to current time
+     * @return File_Archive_Writer a writer that you can use to append files to the reader
+     */
+    function appendToSource(&$source, $URL = null, $type = null, $stat = array())
+    {
+        if ($type === null) {
+            $result = File_Archive::_readSource($source, $URL.'/', $reachable, $baseDir);
+        } else {
+            $result = File_Archive::readArchive(
+                        $type,
+                        File_Archive::_readSource($source, $URL, $reachable, $baseDir)
+                      );
+        }
+        if (!PEAR::isError($result)) {
+            return $result->makeAppendWriter();
+        }
+
+        //The source can't be found and has to be created
+        $stat[9] = $stat['mtime'] = time();
+        if (empty($baseDir)) {
+            return File_Archive::toArchive($reachable, $source, $type);
+        } else {
+            return File_Archive::toArchive(
+                $baseDir,
+                File_Archive::readSource($source, $reachable),
+                $type);
+        }
+    }
+
 
     /**
      * Remove the files that follow a given predicate from the source
@@ -901,7 +967,7 @@ class File_Archive
      * @param File_Archive_Predicate $pred The files that follow the predicate
      *        (for which $pred->isTrue($source) is true) will be erased
      */
-    function remove($pred, &$source)
+    function remove(&$pred, &$source)
     {
         if (PEAR::isError($source)) {
             return $source;
@@ -911,6 +977,24 @@ class File_Archive
             return $writer;
         }
         $writer->close();
+    }
+
+    /**
+     * Remove duplicates from a source, keeping the most recent one (or the one that has highest pos in
+     * the archive if the files have same date or no date specified)
+     *
+     * @param File_Archive_Reader a reader that may contain duplicates
+     */
+    function removeDuplicates(&$source)
+    {
+        if (PEAR::isError($source)) {
+            return $source;
+        }
+        require_once "File/Archive/Predicate/Duplicate.php";
+        return File_Archive::remove(
+            new File_Archive_Predicate_Duplicate($source),
+            $source
+        );
     }
 }
 

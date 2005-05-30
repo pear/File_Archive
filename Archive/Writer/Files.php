@@ -98,9 +98,8 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      * @param string $filename The name of the file to open
      * @param int $pos the initial position in the file
      * @param $stat the stats of the file
-     * @param $mime the mime type of the file
      */
-    function openFile($filename, $pos = 0, $stat = array(), $mime = "application/octet-stream")
+    function openFile($filename, $pos = 0, $stat = array())
     {
         if ($this->handle !== null) {
             fclose($this->handle);
@@ -123,9 +122,9 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      * Open a file for appending after having removed a block of data from it
      * See File_Archive_Reader::makeWriterRemoveBlocks
      */
-    function openFileRemoveBlock($filename, $pos, $blocks, $stat = array(), $mime = "application/octet-stream")
+    function openFileRemoveBlock($filename, $pos, $blocks, $stat = array())
     {
-        $error = $this->openFile($filename, $pos, $stat, $mime);
+        $error = $this->openFile($filename, $pos, $stat);
         if (PEAR::isError($error)) {
             return $error;
         }
@@ -205,11 +204,8 @@ class File_Archive_Writer_Files extends File_Archive_Writer
             }
         }
 
-        echo "New from tmp file: $tmpfile => $complete\n";
-
         if ((file_exists($complete) && !@unlink($complete)) ||
             !@rename($tmpfile, $complete)) {
-            echo "failed to rename\n";
             parent::newFromTempFile($tmpfile, $filename, $stat, $mime);
         }
     }

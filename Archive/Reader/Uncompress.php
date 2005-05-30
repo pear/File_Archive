@@ -269,6 +269,34 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
 
         return $error;
     }
+
+    /**
+     * @see File_Archive_Reader::makeAppendWriter()
+     */
+    function makeAppendWriter()
+    {
+        //The reader needs to be open so that the base dir is found
+        $error = $this->next();
+        if (PEAR::isError($error)) {
+            return $error;
+        }
+
+        return parent::makeAppendWriter();
+    }
+
+    /**
+     * @see File_Archive_Reader::makeWriterRemoveFiles()
+     */
+    function makeWriterRemoveFiles($pred)
+    {
+        //The reader needs to be open so that the base dir is found
+        $error = $this->next();
+        if (PEAR::isError($error)) {
+            return $error;
+        }
+
+        return parent::makeWriterRemoveFiles($pred);
+    }
 }
 
 ?>

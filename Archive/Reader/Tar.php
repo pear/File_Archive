@@ -312,6 +312,7 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
         }
 
         unset($stat[7]);
+        $stat[9] = $stat['mtime'] = time();
         $writer->newFile($filename, $stat);
         $writer->writeData($data);
         return $writer;

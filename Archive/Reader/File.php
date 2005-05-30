@@ -138,6 +138,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function getMime()
     {
+        var_dump(debug_backtrace());
         $result = MIME_Type::autoDetect($this->getDataFilename());
         if (PEAR::isError($result)) {
             return parent::getMime();
@@ -218,12 +219,11 @@ class File_Archive_Reader_File extends File_Archive_Reader
         if ($this->handle != null) {
             $file = $this->getDataFilename();
             $stat = $this->getStat();
-            $mime = $this->getMime();
             $pos = ftell($this->handle);
 
             $this->close();
 
-            $writer->openFileRemoveBlock($file, $pos + $seek, $blocks, $stat, $mime);
+            $writer->openFileRemoveBlock($file, $pos + $seek, $blocks, $stat);
         }
 
         return $writer;

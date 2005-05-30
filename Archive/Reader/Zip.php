@@ -273,7 +273,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             array_pop($this->files);
         }
 
-        while ($this->next()) {
+        while (($error = $this->next()) === true) {
             $size = 30 + $this->header['File'] + $this->header['Extra'] + $this->header['CLen'];
             if ($pred->isTrue($this)) {
                 array_pop($this->files);
@@ -296,6 +296,10 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
                 }
             }
         }
+        if (PEAR::isError($error)) {
+            return $error;
+        }
+
         if ($seek === null) {
             $seek = 4;
         } else {
@@ -356,6 +360,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         }
 
         unset($stat[7]);
+        $stat[9] = $stat['mtime'] = time();
         $writer->newFile($filename, $stat);
         $writer->writeData($newData);
         return $writer;
