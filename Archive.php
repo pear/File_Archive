@@ -912,14 +912,19 @@ class File_Archive
      *
      * @param File_Archive_Reader $source A reader where some files will be appended
      * @param string $URL URL to reach the archive in the source.
-     *        if $URL is null, a writer to append files to the $source reader will be returned
+     *        if $URL is null, a writer to append files to the $source reader will
+     *        be returned
+     * @param bool $unique If true, the duplicate files will be deleted on close
+     *        Default is false (and setting it to true may have some performance
+     *        consequences)
      * @param string $type Extension of the archive (or null to use the one in the URL)
-     * @param array $stat Used only if archive is created, array of stat as returned by PHP stat function
-     *        or Reader getStat function: stats of the archive)
+     * @param array $stat Used only if archive is created, array of stat as returned
+     *        by PHP stat function or Reader getStat function: stats of the archive)
      *        Time (index 9) will be overwritten to current time
      * @return File_Archive_Writer a writer that you can use to append files to the reader
      */
-    function appendToSource(&$source, $URL = null, $type = null, $stat = array())
+    function appenderFromSource(&$source, $URL = null, $unique = false,
+                                 $type = null, $stat = array())
     {
         if (PEAR::isError($source)) {
             return $source;
@@ -944,7 +949,12 @@ class File_Archive
         PEAR::popErrorHandling();
 
         if (!PEAR::isError($result)) {
-            return $result->makeAppendWriter();
+            if ($unique) {
+                require_once "File/Archive/Writer/UniqueAppender.php";
+                return new File_Archive_Writer_UniqueAppender($result);
+            } else {
+                return $result->makeAppendWriter();
+            }
         }
 
         //The source can't be found and has to be created
@@ -967,10 +977,10 @@ class File_Archive
      * @param File_Archive_Reader $source A reader where some files will be appended
      * @return File_Archive_Writer a writer that you can use to append files to the reader
      */
-    function append($URL, $type = null, $stat = array())
+    function appender($URL, $unique = false, $type = null, $stat = array())
     {
         $source = null;
-        return File_Archive::appendToSource($source, $URL, $type, $stat);
+        return File_Archive::appenderFromSource($source, $URL, $unique, $type, $stat);
     }
 
     /**
@@ -1034,8 +1044,10 @@ class File_Archive
         }
 
         require_once "File/Archive/Predicate/Duplicate.php";
+        $pred = new File_Archive_Predicate_Duplicate($source);
+        $source->close();
         return File_Archive::removeFromSource(
-            new File_Archive_Predicate_Duplicate($source),
+            $pred,
             $source,
             null
         );
