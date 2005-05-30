@@ -1021,7 +1021,8 @@ class File_Archive
      */
     function remove(&$pred, $URL)
     {
-        return File_Archive::removeFromSource($pred, null, $URL);
+        $source = null;
+        return File_Archive::removeFromSource($pred, $source, $URL);
     }
 
     /**

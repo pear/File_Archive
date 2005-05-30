@@ -331,11 +331,11 @@ class Test extends PHPUnit_TestCase
         $writer->writeData('MNOP');
         $writer->close();
 
-        File_Archive::remove(
+        File_Archive::removeFromSource(
+            File_Archive::predEreg('_to_remove'),
             $source = File_Archive::readSource(
                 File_Archive::readMemory($x, "test.$extension"),
-                "test.$extension/"),
-            File_Archive::predEreg('_to_remove')
+                "test.$extension/")
         );
         $this->assertEquals(
             "foo.txt\nbar.txt",

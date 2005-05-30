@@ -146,7 +146,7 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
     /**
      * @see File_Archive_Writer::writeData()
      */
-    function writeData(&$data)
+    function writeData($data)
     {
         if ($this->currentDataFile !== null) {
             $this->buffer .= file_get_contents($this->currentDataFile);
