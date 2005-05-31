@@ -47,7 +47,7 @@ class File_Archive_Reader
      */
     function next()
     {
-        return PEAR::raiseError("Reader abstract function call (next)");
+        return false;
     }
 
     /**
@@ -216,13 +216,9 @@ class File_Archive_Reader
     /**
      * Put back the reader in the state it was before the first call
      * to next()
-     *
-     * @param $recursive If true, close eventual inner writer even if
-     *                   it was given opened?
      */
-    function close($recursive = false)
+    function close()
     {
-        return PEAR::raiseError("Reader abstract function call (close)");
     }
 
     /**

@@ -671,6 +671,20 @@ class File_Archive
         return new File_Archive_Predicate_Eregi($ereg);
     }
     /**
+     * Evaluates to true only after a given number of evaluations
+     * This can be used to select files by index since the evaluation is done
+     * once per file
+     *
+     * @param array The indexes for which the returned predicate will return true
+     *        are the keys of the array
+     *        The predicate will return true if isset($indexes[$pos])
+     */
+    function predIndex($indexes)
+    {
+        require_once "File/Archive/Predicate/Index.php";
+        return new File_Archive_Predicate_Index($indexes);
+    }
+    /**
      * Custom predicate built by supplying a string expression
      *
      * Here are different ways to create a predicate that keeps only files

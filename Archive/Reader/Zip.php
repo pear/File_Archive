@@ -111,7 +111,8 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
 
             //Check the compression method
             if ($this->header['Method'] != 0 &&
-               $this->header['Method'] != 8) {
+                $this->header['Method'] != 8 &&
+                $this->header['Method'] != 12) {
                 return PEAR::raiseError("File_Archive_Reader_Zip doesn't ".
                         "handle compression method {$this->header['Method']}");
             }
@@ -249,6 +250,9 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         }
         if ($this->header['Method'] == 8) {
             $this->data = gzinflate($this->data);
+        }
+        if ($this->header['Method'] == 12) {
+            $this->data = bzdecompress($this->data);
         }
 
         if (crc32($this->data) != $this->header['CRC']) {
