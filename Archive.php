@@ -37,6 +37,8 @@
  */
 require_once "PEAR.php";
 
+$_File_Archive_Options = array();
+
 /**
  * Factory to access the most common File_Archive features
  * It uses lazy include, so you dont have to include the files from
@@ -44,6 +46,44 @@ require_once "PEAR.php";
  */
 class File_Archive
 {
+    /**
+     * Sets an option that will be used by default by all readers or writers
+     * Option names are case insensitive
+     * Currently, the following options are used:
+     *
+     * "cache"
+     *      Instance of a Cache_Lite object used to cache some compressed
+     *      data to speed up future compressions of files
+     *
+     * "zipCompressionLevel"
+     *      Value between 0 and 9 specifying the default compression level used
+     *      by Zip writers (0 no compression, 9 highest compression)
+     *
+     * "gzCompressionLevel"
+     *      Value between 0 and 9 specifying the default compression level used
+     *      by Gz writers (0 no compression, 9 highest compression)
+     */
+    function setOption($name, $value)
+    {
+        global $_File_Archive_Options;
+        $_File_Archive_Options[strtolower($name)] = $value;
+    }
+
+    /**
+     * Retrieve the value of an option, or a default value (null) if it has not
+     * been set
+     */
+    function getOption($name, $defaultValue = null)
+    {
+        global $_File_Archive_Options;
+        $name = strtolower($name);
+        if (isset($_File_Archive_Options[$name])) {
+            return = $_File_Archive_Options[$name];
+        } else {
+            return $defaultValue;
+        }
+    }
+
     /**
      * Create a reader to read the URL $URL.
      * If the URL is a directory, it will recursively read that directory.

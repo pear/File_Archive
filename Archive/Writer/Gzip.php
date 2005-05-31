@@ -67,6 +67,8 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer
         if ($this->filename == null) {
             $this->newFile(null);
         }
+
+        $compressionLevel = File_Archive::getOption('gzCompressionLevel', 9);
     }
 
     /**

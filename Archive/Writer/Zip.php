@@ -40,7 +40,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
      * @var int Compression level
      * @access private
      */
-    var $compressionLevel = 9;
+    var $compressionLevel;
 
     /**
      * @var int Current position in the writer
@@ -63,11 +63,12 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
     function File_Archive_Writer_Zip($filename, &$innerWriter,
                                      $stat=array(), $autoClose = true)
     {
+        global $_File_Archive_Options;
         parent::File_Archive_Writer_MemoryArchive(
                     $filename, $innerWriter, $stat, $autoClose
                 );
-        function_exists('gzcompress') or
-                die("GZ Compress function not available");
+
+        $compressionLevel = File_Archive::getOption('zipCompressionLevel', 9);
     }
 
     /**
@@ -141,15 +142,21 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
      * @see    File_Archive_Writer_MemoryArchive::appendFileData()
      * @access protected
      */
-    function appendFileData($filename, $stat, &$data)
+    function appendFileData($filename, $stat, $data)
     {
-        $filename = preg_replace("/^(\.{1,2}(\/|\\\))+/","",$filename);
-
-        $mtime = $this->getMTime(isset($stat[9]) ? $stat[9] : null);
         $crc32 = crc32($data);
         $normlength = strlen($data);
         $data = gzcompress($data,$this->compressionLevel);
         $data = substr($data,2,strlen($data)-6);
+
+        return $this->appendCompressedData($filename, $stat, $data, $crc32, $normlength);
+    }
+
+    function appendCompressedData($filename, $stat, $data, $crc32, $normlength)
+    {
+        $filename = preg_replace("/^(\.{1,2}(\/|\\\))+/","",$filename);
+        $mtime = $this->getMTime(isset($stat[9]) ? $stat[9] : null);
+
         $complength = strlen($data);
 
         $zipData = "\x50\x4b\x03\x04\x14\x00\x00\x00\x08\x00".
@@ -177,8 +184,43 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
                    $filename;
 
         $this->offset += strlen($zipData);
-
     }
+
+    function appendFile($filename, $dataFilename)
+    {
+        //Try to read from the cache
+        $cache = File_Archive::getOption('cache', null);
+        if ($cache !== null) {
+            $id = $dataFilename;
+            $group = 'File_Archive_Zip'.$this->compressionLevel;
+            if (($data = $cache->get($id, $group)) === true) {
+                $info = unpack('Vcrc/Vnlength', substr($data, 0, 8);
+                $data = substr($data, 8);
+            } else {
+                $info = array(
+                        'crc' => crc32($data),
+                        'nlength' => strlen($data)
+                       );
+
+                $data = gzcompress($data,$this->compressionLevel);
+                $data = substr($data,2,strlen($data)-6);
+                $data = pack('VV', $crc32, $normlength).$data;
+                $cache->save($data, $id, $group);
+            }
+            return $this->appendCompressedData(
+                                    $filename,
+                                    stat($dataFilename),
+                                    $data,
+                                    $info['crc'],
+                                    $info['nlength']
+                   );
+
+        }
+
+        //If no cache system, use the standard way
+        return parent::appendFile($filename, $dataFilename);
+    }
+
     /**
      * @see    File_Archive_Writer_MemoryArchive::sendFooter()
      * @access protected
