@@ -78,7 +78,7 @@ class File_Archive
         global $_File_Archive_Options;
         $name = strtolower($name);
         if (isset($_File_Archive_Options[$name])) {
-            return = $_File_Archive_Options[$name];
+            return $_File_Archive_Options[$name];
         } else {
             return $defaultValue;
         }

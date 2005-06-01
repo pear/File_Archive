@@ -68,7 +68,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
                     $filename, $innerWriter, $stat, $autoClose
                 );
 
-        $compressionLevel = File_Archive::getOption('zipCompressionLevel', 9);
+        $this->compressionLevel = File_Archive::getOption('zipCompressionLevel', 9);
     }
 
     /**
@@ -191,22 +191,34 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
         //Try to read from the cache
         $cache = File_Archive::getOption('cache', null);
         if ($cache !== null) {
-            $id = $dataFilename;
+            $id = realpath($dataFilename);
             $group = 'File_Archive_Zip'.$this->compressionLevel;
-            if (($data = $cache->get($id, $group)) === true) {
-                $info = unpack('Vcrc/Vnlength', substr($data, 0, 8);
-                $data = substr($data, 8);
-            } else {
+            $mtime = filemtime($dataFilename);
+
+            //Tries to read from cache
+            if (($data = $cache->get($id, $group)) !== false) {
+                $info = unpack('Vmtime/Vcrc/Vnlength', substr($data, 0, 12));
+                $data = substr($data, 12);
+            }
+
+            //If read failed or file modified since then
+            if ($data === false ||
+                $info['mtime'] != $mtime) {
+
+                $data = file_get_contents($dataFilename);
+
                 $info = array(
                         'crc' => crc32($data),
-                        'nlength' => strlen($data)
+                        'nlength' => strlen($data),
+                        'mtime' => $mtime
                        );
 
                 $data = gzcompress($data,$this->compressionLevel);
                 $data = substr($data,2,strlen($data)-6);
-                $data = pack('VV', $crc32, $normlength).$data;
+                $data = pack('VVV', $info['mtime'], $info['crc'], $info['nlength']).$data;
                 $cache->save($data, $id, $group);
             }
+
             return $this->appendCompressedData(
                                     $filename,
                                     stat($dataFilename),
