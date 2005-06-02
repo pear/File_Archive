@@ -34,8 +34,10 @@
      Available options are
      	- zipCompressionLevel: default compression level of zip archives (default is 9)
      	- gzCompressionLevel: default compression level of gz archives (default is 9)
+     	- tmpDirectory: directory where temporary files will be stored (default is .)
      	- cache: instance of Cache_Lite that may be used by any writer to cache data
      	         for future use. Currently used by Zip writer
+   + Add a rar reader
   </notes>
   <filelist>
    <dir name="File" role="php">

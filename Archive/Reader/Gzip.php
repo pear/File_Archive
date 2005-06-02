@@ -83,7 +83,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
             $this->tmpName = null;
             $this->gzfile = gzopen($dataFilename, 'r');
         } else {
-            $this->tmpName = tempnam('.', 'far');
+            $this->tmpName = tempnam(File_Archive::getOption('tmpDirectory'), 'far');
 
             //Generate the tmp data
             $dest = new File_Archive_Writer_Files();

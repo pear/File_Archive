@@ -37,7 +37,11 @@
  */
 require_once "PEAR.php";
 
-$_File_Archive_Options = array();
+$_File_Archive_Options = array(
+    'zipcompressionlevel' => 9,
+     'gzcompressionlevel' => 9,
+    'tmpdirectory' => '.'
+);
 
 /**
  * Factory to access the most common File_Archive features
@@ -73,15 +77,10 @@ class File_Archive
      * Retrieve the value of an option, or a default value (null) if it has not
      * been set
      */
-    function getOption($name, $defaultValue = null)
+    function getOption($name)
     {
         global $_File_Archive_Options;
-        $name = strtolower($name);
-        if (isset($_File_Archive_Options[$name])) {
-            return $_File_Archive_Options[$name];
-        } else {
-            return $defaultValue;
-        }
+        return $_File_Archive_Options[$name];
     }
 
     /**
@@ -939,6 +938,15 @@ class File_Archive
      * It is thus easier to use this function than $source->extract, since it reduces the number of
      * error checking and doesn't force you to define a variable $source
      *
+     * PHP5 only: you may use strings as source and dest. In that case the source is
+     *  automatically converted to a reader using File_Archive::read and the
+     *  dest is converted to a writer using File_Archive::appender
+     *  File_Archive::extract('archive.zip/', 'dir') will thus extract the archive to the shown
+     *  directory.
+     *
+     * PHP4 workaround: since PHP4 doesn't allow to pass 'archive.zip/' by ref, you cannot use the
+     *  previous feature. But you can do File_Archive::extract($a = 'archive.zip/', $b = 'dir');
+     *
      * @param File_Archive_Reader $source The source that will be read
      * @param File_Archive_Writer $dest Where to copy $source files
      * @param bool $autoClose if true (default), $dest will be closed after the extraction
@@ -948,8 +956,14 @@ class File_Archive
      */
     function extract(&$source, &$dest, $autoClose = true, $bufferSize = 8192)
     {
+        if (is_string($source)) {
+            $source = File_Archive::read($source);
+        }
         if (PEAR::isError($source)) {
             return $source;
+        }
+        if (is_string($dest)) {
+            $dest = File_Archive::appender($dest);
         }
         return $source->extract($dest, $autoClose, $bufferSize);
     }
@@ -1019,14 +1033,22 @@ class File_Archive
 
         //The source can't be found and has to be created
         $stat[9] = $stat['mtime'] = time();
+
         if (empty($baseDir)) {
-            return File_Archive::toArchive($reachable, $source, $type);
+            PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
+            $result = File_Archive::toArchive($reachable, $source, $type);
+            PEAR::popErrorHandling();
+
+            if (PEAR::isError($result)) {
+                $result = File_Archive::toFiles($reachable);
+            }
         } else {
-            return File_Archive::toArchive(
+            $result = File_Archive::toArchive(
                 $baseDir,
                 File_Archive::readSource($source, $reachable),
                 $type);
         }
+        return $result;
     }
 
     /**

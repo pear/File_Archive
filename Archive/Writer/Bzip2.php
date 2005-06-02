@@ -94,7 +94,7 @@ class File_Archive_Writer_Bzip2 extends File_Archive_Writer
         }
         $this->nbFiles++;
 
-        $this->tmpName = tempnam('.', 'far');
+        $this->tmpName = tempnam(File_Archive::getOption('tmpDirectory'), 'far');
         $this->bzfile = bzopen($this->tmpName, 'w'.$this->compressionLevel);
 
         return true;

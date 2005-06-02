@@ -63,7 +63,7 @@ class File_Archive_Reader_Rar extends File_Archive_Reader_Archive
                 $this->rarTmpName = null;
                 $this->rarFile = rar_open($dataFilename);
             } else {
-                $this->rarTmpName = tempnam('.', 'far');
+                $this->rarTmpName = tempnam(File_Archive::getOption('tmpDirectory'), 'far');
 
                 //Generate the tmp data
                 $dest = new File_Archive_Writer_Files();
@@ -131,7 +131,7 @@ class File_Archive_Reader_Rar extends File_Archive_Reader_Archive
             return;
         }
         if ($this->entryTmpName === null) {
-            $this->entryTmpName = tempnam('.', 'far');
+            $this->entryTmpName = tempnam(File_Archive::getOption('tmpDirectory'), 'far');
         }
         $this->rarEntry->extract(false, $this->entryTmpName);
         $this->fileReader = new File_Archive_Reader_File(

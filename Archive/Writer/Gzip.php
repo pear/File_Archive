@@ -96,7 +96,7 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer
         }
         $this->nbFiles++;
 
-        $this->tmpName = tempnam('.', 'far');
+        $this->tmpName = tempnam(File_Archive::getOption('tmpDirectory'), 'far');
         $this->gzfile = gzopen($this->tmpName, 'w'.$this->compressionLevel);
 
         return true;

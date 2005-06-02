@@ -79,7 +79,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
             $this->tmpName = null;
             $this->bzfile = bzopen($dataFilename, 'r');
         } else {
-            $this->tmpName = tempnam('.', 'far');
+            $this->tmpName = tempnam(File_Archive::getOption('tmpDirectory'), 'far');
 
             //Generate the tmp data
             $dest = new File_Archive_Writer_Files();
