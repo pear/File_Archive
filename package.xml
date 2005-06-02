@@ -85,6 +85,7 @@
       <file>Zip.php</file>
      </dir>
      <dir name="Writer" role="php">
+      <file>AddBaseName.php</file>
       <file>Ar.php</file>
       <file>Archive.php</file>
       <file>Bzip2.php</file>

@@ -938,11 +938,18 @@ class File_Archive
      * It is thus easier to use this function than $source->extract, since it reduces the number of
      * error checking and doesn't force you to define a variable $source
      *
-     * PHP5 only: you may use strings as source and dest. In that case the source is
-     *  automatically converted to a reader using File_Archive::read and the
-     *  dest is converted to a writer using File_Archive::appender
-     *  File_Archive::extract('archive.zip/', 'dir') will thus extract the archive to the shown
-     *  directory.
+     * You may use strings as source and dest. In that case the source is automatically
+     * converted to a reader using File_Archive::read and the dest is converted to a
+     * writer using File_Archive::appender
+     * Since PHP doesn't allow to pass literal strings by ref, you will have to use temporary
+     * variables.
+     * File_Archive::extract($src = 'archive.zip/', $dest = 'dir') will extract the archive to dir
+     * It is the same as
+     * File_Archive::extract(
+     *    File_Archive::read('archive.zip/'),
+     *    File_Archive::appender('dir')
+     * );
+     * You may use any variable in the extract function ($from/$to, $a/$b...).
      *
      * PHP4 workaround: since PHP4 doesn't allow to pass 'archive.zip/' by ref, you cannot use the
      *  previous feature. But you can do File_Archive::extract($a = 'archive.zip/', $b = 'dir');
@@ -1043,10 +1050,23 @@ class File_Archive
                 $result = File_Archive::toFiles($reachable);
             }
         } else {
-            $result = File_Archive::toArchive(
-                $baseDir,
-                File_Archive::readSource($source, $reachable),
-                $type);
+            $reachedSource = File_Archive::readSource($source, $reachable);
+            if (PEAR::isError($reachedSource)) {
+                return $reachedSource;
+            }
+
+            PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
+            $result = File_Archive::toArchive($baseDir, $reachedSource, $type);
+            PEAR::popErrorHandling();
+
+            if (PEAR::isError($result)) {
+                require_once "File/Archive/Writer/AddFolder.php";
+                $result = new File_Archive_Writer_AddFolder(
+                                       $baseDir, $reachedSource);
+                if (PEAR::isError($result)) {
+                    return $result;
+                }
+            }
         }
         return $result;
     }
