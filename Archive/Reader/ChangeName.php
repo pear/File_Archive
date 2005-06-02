@@ -52,14 +52,32 @@ class File_Archive_Reader_AddBaseName extends File_Archive_Reader_Relay
     }
 
     /**
+     * Modify the name by adding baseName to it
+     */
+    function modifyName($name)
+    {
+        return $this->baseName.
+               (empty($this->baseName) || empty($name) ? '': '/').
+               $name;
+    }
+
+    /**
      * @see File_Archive_Reader::getFilename()
      */
     function getFilename()
     {
-        $name = parent::getFilename();
-        return $this->baseName.
-               (empty($this->baseName) || empty($name) ? '': '/').
-               $name;
+        return $this->modifyName(parent::getFilename());
+    }
+    /**
+     * @see File_Archive_Reader::getFileList()
+     */
+    function getFileList()
+    {
+        $list = parent::getFileList();
+        $result = array();
+        foreach ($list as $name) {
+            $result[] = $this->modifyName($name);
+        }
     }
 }
 
@@ -94,12 +112,8 @@ class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
         }
     }
 
-    /**
-     * @see File_Archive_Reader::getFilename()
-     */
-    function getFilename()
+    function modifyName($name)
     {
-        $name = parent::getFilename();
         if (empty($this->oldBaseName) ||
           !strncmp($name, $this->oldBaseName.'/', strlen($this->oldBaseName)+1) ||
            strcmp($name, $this->oldBaseName) == 0) {
@@ -112,6 +126,25 @@ class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
                    substr($name, strlen($this->oldBaseName)+1);
         } else {
             return $name;
+        }
+    }
+
+    /**
+     * @see File_Archive_Reader::getFilename()
+     */
+    function getFilename()
+    {
+        return $this->modifyName(parent::getFilename());
+    }
+    /**
+     * @see File_Archive_Reader::getFileList()
+     */
+    function getFileList()
+    {
+        $list = parent::getFileList();
+        $result = array();
+        foreach ($list as $name) {
+            $result[] = $this->modifyName($name);
         }
     }
 }

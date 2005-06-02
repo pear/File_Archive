@@ -130,7 +130,7 @@ class File_Archive_Writer_Ar extends File_Archive_Writer_Archive
             $this->innerWriter->writeData("!<arch>\n");
             $this->_atStart = false;
         }
-        if ($this->_currentFilename != null) {
+        if ($this->_currentFilename !== null) {
             $this->_currentStat[7] = strlen($this->_buffer);
             if ($this->_useBuffer) {
                 $this->innerWriter->writeData(

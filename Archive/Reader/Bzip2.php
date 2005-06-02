@@ -47,9 +47,9 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
      */
     function close($innerClose = true)
     {
-        if ($this->bzfile != null)
+        if ($this->bzfile !== null)
             bzclose($this->bzfile);
-        if ($this->tmpName != null)
+        if ($this->tmpName !== null)
             unlink($this->tmpName);
 
         $this->bzfile = null;
@@ -74,7 +74,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
         }
 
         $dataFilename = $this->source->getDataFilename();
-        if ($dataFilename != null)
+        if ($dataFilename !== null)
         {
             $this->tmpName = null;
             $this->bzfile = bzopen($dataFilename, 'r');
@@ -147,7 +147,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
         $before = $this->filePos;
 
         bzclose($this->bzfile);
-        if ($this->tmpName == null) {
+        if ($this->tmpName === null) {
             $this->bzfile = bzopen($this->source->getDataFilename(), 'r');
         } else {
             $this->bzfile = bzopen($this->tmpName, 'r');
@@ -195,7 +195,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
 
         //Read the begining of the file
         while ($this->filePos < $expectedPos &&
-               ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) != null) {
+               ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) !== null) {
             fwrite($tmp, $data);
         }
 
@@ -204,7 +204,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
             if ($keep) {
                 $expectedPos = $this->filePos + $length;
                 while ($this->filePos < $expectedPos &&
-                       ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) != null) {
+                       ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) !== null) {
                     fwrite($tmp, $data);
                 }
             } else {
@@ -214,7 +214,7 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
         }
         if ($keep) {
             //Read the end of the file
-            while(($data = $this->getData(8192)) != null) {
+            while(($data = $this->getData(8192)) !== null) {
                 fwrite($tmp, $data);
             }
         }

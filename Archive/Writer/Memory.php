@@ -118,9 +118,9 @@ class File_Archive_Writer_Memory extends File_Archive_Writer
         require_once "File/Archive/Reader/Memory.php";
         return new File_Archive_Reader_Memory(
             $this->data,
-            $filename == null ? $this->filename : $filename,
-            $stat     == null ? $this->stat     : $stat,
-            $mime     == null ? $this->mime     : $mime);
+            $filename === null ? $this->filename : $filename,
+            $stat     === null ? $this->stat     : $stat,
+            $mime     === null ? $this->mime     : $mime);
     }
 }
 

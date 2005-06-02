@@ -96,7 +96,7 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
             $this->mime->setHTMLBody($htmlMessage);
         }
 
-        if ($mail == null)
+        if ($mail === null)
             $this->mail = Mail::factory("mail");
         else
             $this->mail =& $mail;
@@ -137,7 +137,7 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
      */
     function addCurrentData()
     {
-        if ($this->currentFilename == null) {
+        if ($this->currentFilename === null) {
             return;
         }
 

@@ -68,7 +68,7 @@ class File_Archive_Writer_Archive extends File_Archive_Writer
     {
         $this->innerWriter =& $innerWriter;
         $this->autoClose = $autoClose;
-        if ($filename != null) {
+        if ($filename !== null) {
             $this->innerWriter->newFile($filename, $stat, $this->getMime());
         }
     }

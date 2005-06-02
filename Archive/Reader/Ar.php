@@ -141,7 +141,7 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
         $size  = $this->source->getData(10);
         $delim = $this->source->getData(2);
 
-        if ($delim == null) {
+        if ($delim === null) {
             return false;
         }
 

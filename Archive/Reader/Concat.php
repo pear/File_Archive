@@ -116,7 +116,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
                 return $sourceData;
             }
 
-            if ($sourceData == null) {
+            if ($sourceData === null) {
                 $error = $this->source->next();
                 if (PEAR::isError($error)) {
                     return $error;

@@ -83,7 +83,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         }
 
         //Skip the data and the footer if they haven't been uncompressed
-        if ($this->header != null && $this->data == null) {
+        if ($this->header !== null && $this->data === null) {
             $toSkip = $this->header['CLen'];
             $error = $this->source->skip($toSkip);
             if (PEAR::isError($error)) {

@@ -47,10 +47,10 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
      */
     function close($innerClose = true)
     {
-        if ($this->gzfile != null) {
+        if ($this->gzfile !== null) {
             gzclose($this->gzfile);
         }
-        if ($this->tmpName != null) {
+        if ($this->tmpName !== null) {
             unlink($this->tmpName);
         }
 
@@ -78,7 +78,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         }
 
         $dataFilename = $this->source->getDataFilename();
-        if ($dataFilename != null)
+        if ($dataFilename !== null)
         {
             $this->tmpName = null;
             $this->gzfile = gzopen($dataFilename, 'r');
@@ -219,7 +219,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
 
         //Read the begining of the file
         while ($this->filePos < $expectedPos &&
-               ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) != null) {
+               ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) !== null) {
             fwrite($tmp, $data);
         }
 
@@ -228,7 +228,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
             if ($keep) {
                 $expectedPos = $this->filePos + $length;
                 while ($this->filePos < $expectedPos &&
-                       ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) != null) {
+                       ($data = $this->getData(min($expectedPos - $this->filePos, 8192))) !== null) {
                     fwrite($tmp, $data);
                 }
             } else {
@@ -238,7 +238,7 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
         }
         if ($keep) {
             //Read the end of the file
-            while(($data = $this->getData(8192)) != null) {
+            while(($data = $this->getData(8192)) !== null) {
                 fwrite($tmp, $data);
             }
         }

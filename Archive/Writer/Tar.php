@@ -133,7 +133,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_Archive
 
     function flush()
     {
-        if ($this->filename != null) {
+        if ($this->filename !== null) {
             if ($this->useBuffer) {
                 $this->stats[7] = strlen($this->buffer);
 

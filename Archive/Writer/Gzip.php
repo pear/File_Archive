@@ -64,7 +64,7 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer
         $this->filename = $filename;
         $this->stat = $stat;
 
-        if ($this->filename == null) {
+        if ($this->filename === null) {
             $this->newFile(null);
         }
 
@@ -112,7 +112,7 @@ class File_Archive_Writer_Gzip extends File_Archive_Writer
     function close()
     {
         gzclose($this->gzfile);
-        if ($this->filename == null) {
+        if ($this->filename === null) {
             //Assume innerWriter is already opened on a file...
             $this->innerWriter->writeFile($this->tmpName);
             unlink($this->tmpName);

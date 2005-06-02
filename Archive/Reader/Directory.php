@@ -92,7 +92,7 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
      */
     function next()
     {
-        if ($this->directoryHandle == null) {
+        if ($this->directoryHandle === null) {
             $this->directoryHandle = opendir($this->directory);
             if (!is_resource($this->directoryHandle)) {
                 return PEAR::raiseError(
@@ -101,10 +101,10 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
             }
         }
 
-        while ($this->source == null ||
+        while ($this->source === null ||
              !$this->source->next()) {
 
-            if ($this->source != null) {
+            if ($this->source !== null) {
                 $this->source->close();
             }
 
@@ -148,13 +148,13 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
         }
 
         while ($this->next()) {
-            if ($toUnlink != null &&
+            if ($toUnlink !== null &&
                 !@unlink($toUnlink)) {
                 return PEAR::raiseError("Unable to unlink $toUnlink");
             }
             $toUnlink = ($pred->isTrue($this) ? $this->getDataFilename() : null);
         }
-        if ($toUnlink != null &&
+        if ($toUnlink !== null &&
             !@unlink("Unable to unlink $toUnlink")) {
             return PEAR::raiseError($pred);
         }
@@ -204,7 +204,7 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
     {
         require_once "File/Archive/Writer/Files.php";
 
-        if ($this->source == null ||
+        if ($this->source === null ||
             is_a($this->source, 'File_Archive_Reader_File') ) {
             $writer = new File_Archive_Writer_Files($this->directory);
         } else {

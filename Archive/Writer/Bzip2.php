@@ -64,7 +64,7 @@ class File_Archive_Writer_Bzip2 extends File_Archive_Writer
         $this->filename = $filename;
         $this->stat = $stat;
 
-        if ($this->filename == null) {
+        if ($this->filename === null) {
             $this->newFile(null);
         }
     }
@@ -110,7 +110,7 @@ class File_Archive_Writer_Bzip2 extends File_Archive_Writer
     {
         bzclose($this->bzfile);
 
-        if ($this->filename == null) {
+        if ($this->filename === null) {
             //Assume innerWriter is already opened on a file...
             $this->innerWriter->writeFile($this->tmpName);
             unlink($this->tmpName);

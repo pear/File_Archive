@@ -67,7 +67,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
     function File_Archive_Reader_File($filename, $symbolic = null)
     {
         $this->filename = $filename;
-        if ($symbolic == null) {
+        if ($symbolic === null) {
             $this->symbolic = $this->getStandardURL($filename);
         } else {
             $this->symbolic = $this->getStandardURL($symbolic);
@@ -80,7 +80,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function close()
     {
-        if ($this->handle != null) {
+        if ($this->handle !== null) {
             fclose($this->handle);
             $this->handle = null;
         }
@@ -94,7 +94,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function next()
     {
-        if ($this->handle != null) {
+        if ($this->handle !== null) {
             return false;
         }
         $this->handle = @fopen($this->filename, "r");
@@ -122,7 +122,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function getStat()
     {
-        if ($this->stat == null) {
+        if ($this->stat === null) {
             $this->stat = @stat($this->filename);
 
             //If we can't use the stat function
@@ -218,7 +218,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
 
         $writer = new File_Archive_Writer_Files();
 
-        if ($this->handle != null) {
+        if ($this->handle !== null) {
             $file = $this->getDataFilename();
             $stat = $this->getStat();
             $pos = ftell($this->handle);

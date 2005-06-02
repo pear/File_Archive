@@ -230,7 +230,7 @@ class File_Archive
         $std = File_Archive_Reader::getStandardURL($URL);
 
         //Modify the symbolic name if necessary
-        if ($symbolic == null) {
+        if ($symbolic === null) {
             $slashPos = strrpos($std, '/');
             if ($slashPos === false) {
                 $realSymbolic = '';
@@ -242,7 +242,7 @@ class File_Archive
         }
 
         //If the URL can be interpreted as a directory, and we are reading from the file system
-        if ((empty($URL) || is_dir($URL)) && $source == null) {
+        if ((empty($URL) || is_dir($URL)) && $source === null) {
             require_once "File/Archive/Reader/Directory.php";
 
             $result = new File_Archive_Reader_Uncompress(
@@ -260,7 +260,7 @@ class File_Archive
                 $result =& $tmp;
             }
             if (!empty($realSymbolic)) {
-                if ($symbolic == null) {
+                if ($symbolic === null) {
                     $realSymbolic = '';
                 }
                 $tmp = new File_Archive_Reader_AddBaseName(
@@ -272,7 +272,7 @@ class File_Archive
             }
 
         //If the URL can be interpreted as a file, and we are reading from the file system
-        } else if (is_file($URL) && substr($URL, -1)!='/' && $source == null) {
+        } else if (is_file($URL) && substr($URL, -1)!='/' && $source === null) {
             require_once "File/Archive/Reader/File.php";
             return new File_Archive_Reader_File($URL, $realSymbolic);
 
@@ -308,7 +308,7 @@ class File_Archive
                  (is_dir($file) && $source==null)));
 
             //Build the URL back, with the new path to a file with an archive extension
-            // or to a file / directory is is_file / is_dir cant be used (HTTP, or $source != null)
+            // or to a file / directory is is_file / is_dir cant be used (HTTP, or $source !== null)
             $parsedURL['path'] = $file;
             $file = '';
 
@@ -339,7 +339,7 @@ class File_Archive
             $reachable = $file;
 
             //If we are reading from the file system
-            if ($source == null) {
+            if ($source === null) {
                 //Create a file reader
                 $result = new File_Archive_Reader_Uncompress(
                             new File_Archive_Reader_File($file),
@@ -420,7 +420,8 @@ class File_Archive
                $extension == 'bz2'   ||
                $extension == 'bzip2' ||
                $extension == 'ar'    ||
-               $extension == 'deb';
+               $extension == 'deb'   ||
+               $extension == 'rar';
     }
 
     /**
@@ -475,6 +476,11 @@ class File_Archive
         case 'ar':
             require_once "File/Archive/Reader/Ar.php";
             return new File_Archive_Reader_Ar($source, $sourceOpened);
+
+        case 'rar':
+            require_once "File/Archive/Reader/Rar.php";
+            return new File_Archive_Reader_Rar($source, $sourceOpened);
+
         default:
             return false;
         }
@@ -859,13 +865,13 @@ class File_Archive
         $shortcuts = array("tgz"   , "tbz"    );
         $reals     = array("tar.gz", "tar.bz2");
 
-        if ($type == null) {
+        if ($type === null) {
             $extensions = strtolower($filename);
         } else {
             $extensions = strtolower($type);
         }
         $extensions = explode('.', str_replace($shortcuts, $reals, $extensions));
-        if ($innerWriter != null) {
+        if ($innerWriter !== null) {
             $writer =& $innerWriter;
         } else {
             $writer = File_Archive::toFiles();

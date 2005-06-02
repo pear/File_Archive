@@ -159,7 +159,7 @@ class File_Archive_Writer_MemoryArchive extends File_Archive_Writer_Archive
      */
     function writeFile($filename)
     {
-        if ($this->currentDataFile == null && empty($this->buffer)) {
+        if ($this->currentDataFile === null && empty($this->buffer)) {
             $this->currentDataFile = $filename;
         } else {
             if ($this->currentDataFile !== null) {
