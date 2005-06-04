@@ -190,7 +190,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
     {
         //Try to read from the cache
         $cache = File_Archive::getOption('cache', null);
-        if ($cache !== null) {
+        if ($cache !== null && $this->compressionLevel > 0) {
             $id = realpath($dataFilename);
             $group = 'File_Archive_Zip'.$this->compressionLevel;
             $mtime = filemtime($dataFilename);

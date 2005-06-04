@@ -38,9 +38,10 @@
 require_once "PEAR.php";
 
 $_File_Archive_Options = array(
-    'zipcompressionlevel' => 9,
-     'gzcompressionlevel' => 9,
-    'tmpdirectory' => '.'
+    'zipCompressionLevel' => 9,
+     'gzCompressionLevel' => 9,
+    'tmpDirectory' => '.',
+    'cache' => null
 );
 
 /**
@@ -52,7 +53,7 @@ class File_Archive
 {
     /**
      * Sets an option that will be used by default by all readers or writers
-     * Option names are case insensitive
+     * Option names are case sensitive
      * Currently, the following options are used:
      *
      * "cache"
