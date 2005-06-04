@@ -104,7 +104,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     {
         if ($this->uncompressionLevel >= 0 &&
             $this->baseDirCompressionLevel !== null &&
-            count($this->readers) + $this->baseDirCompressionLevel > $this->uncompressionLevel
+            count($this->readers) >= $this->uncompressionLevel
            ) {
            return false;
         }

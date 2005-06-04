@@ -40,12 +40,11 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
      * @var File_Archive_Writer_Writer Data will be copied to these two writers
      * @access private
      */
-    var $a, $b;
+    var $writers;
 
-    function File_Archive_Writer_Multi(&$a, &$b)
+    function addWriter(&$writer)
     {
-        $this->a =& $a;
-        $this->b =& $b;
+        $this->writers[] =& $writer;
     }
 
     /**
@@ -53,14 +52,15 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
      */
     function newFile($filename, $stat = array(), $mime = "application/octet-stream")
     {
-        $errorA = $this->a->newFile($filename, $stat, $mime);
-        $errorB = $this->b->newFile($filename, $stat, $mime);
-
-        if (PEAR::isError($errorA)) {
-            return $errorA;
+        $globalError = null;
+        foreach($writers as $key => $foo) {
+            $error = $this->writers[$key]->newFile($filename, $stat, $mime);
+            if (PEAR::isError($error)) {
+                $globalError = $error;
+            }
         }
-        if (PEAR::isError($errorB)) {
-            return $errorB;
+        if (PEAR::isError($globalError)) {
+            return $globalError;
         }
     }
     /**
@@ -68,8 +68,12 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
      */
     function newFileNeedsMIME()
     {
-        return $this->a->newFileNeedsMIME() ||
-               $this->b->newFileNeedsMIME();
+        foreach($writers as $key => $foo) {
+            if ($this->writers[$key]->newFileNeedsMIME()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -77,14 +81,15 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
      */
     function writeData($data)
     {
-        $errorA = $this->a->writeData($data);
-        $errorB = $this->b->writeData($data);
-
-        if (PEAR::isError($errorA)) {
-            return $errorA;
+        $globalError = null;
+        foreach($writers as $key => $foo) {
+            $error = $this->writers[$key]->writeData($data);
+            if (PEAR::isError($error)) {
+                $globalError = $error;
+            }
         }
-        if (PEAR::isError($errorB)) {
-            return $errorB;
+        if (PEAR::isError($globalError)) {
+            return $globalError;
         }
     }
 
@@ -93,14 +98,15 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
      */
     function writeFile($filename)
     {
-        $errorA = $this->a->writeFile($filename);
-        $errorB = $this->b->writeFile($filename);
-
-        if (PEAR::isError($errorA)) {
-            return $errorA;
+        $globalError = null;
+        foreach($writers as $key => $foo) {
+            $error = $this->writers[$key]->writeFile($filename);
+            if (PEAR::isError($error)) {
+                $globalError = $error;
+            }
         }
-        if (PEAR::isError($errorB)) {
-            return $errorB;
+        if (PEAR::isError($globalError)) {
+            return $globalError;
         }
     }
 
@@ -109,14 +115,15 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
      */
     function close()
     {
-        $errorA = $this->a->close();
-        $errorB = $this->b->close();
-
-        if (PEAR::isError($errorA)) {
-            return $errorA;
+        $globalError = null;
+        foreach($writers as $key => $foo) {
+            $error = $this->writers[$key]->close();
+            if (PEAR::isError($error)) {
+                $globalError = $error;
+            }
         }
-        if (PEAR::isError($errorB)) {
-            return $errorB;
+        if (PEAR::isError($globalError)) {
+            return $globalError;
         }
     }
 }
