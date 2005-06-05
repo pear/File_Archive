@@ -39,7 +39,6 @@
      	         for future use. Currently used by Zip writer (default is null: no cache)
      	- appendRemoveDuplicates: specify if the appenders should remove the old files
      	         from an archive to avoid creating duplicates (default is false, which is faster)
-   + Add a rar reader
    + Add the possibility to use wildcards in read function
         File_Archive::read('dir/*.txt') will read all txt files from directory dir
         File_Archive::read('archive.zip/*.txt') will read all txt files from the zip archive
@@ -87,7 +86,6 @@
       <file>Memory.php</file>
       <file>MimeList.php</file>
       <file>Multi.php</file>
-      <file>Rar.php</file>
       <file>Relay.php</file>
       <file>Select.php</file>
       <file>Tar.php</file>

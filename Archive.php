@@ -514,8 +514,8 @@ class File_Archive
                $extension == 'bz2'   ||
                $extension == 'bzip2' ||
                $extension == 'ar'    ||
-               $extension == 'deb'   ||
-               $extension == 'rar';
+               $extension == 'deb'/*   ||
+               $extension == 'rar' */;
     }
 
     /**
@@ -572,9 +572,9 @@ class File_Archive
             require_once "File/Archive/Reader/Ar.php";
             return new File_Archive_Reader_Ar($source, $sourceOpened);
 
-        case 'rar':
+/*        case 'rar':
             require_once "File/Archive/Reader/Rar.php";
-            return new File_Archive_Reader_Rar($source, $sourceOpened);
+            return new File_Archive_Reader_Rar($source, $sourceOpened); */
 
         default:
             return false;
