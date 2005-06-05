@@ -53,7 +53,7 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
     function newFile($filename, $stat = array(), $mime = "application/octet-stream")
     {
         $globalError = null;
-        foreach($writers as $key => $foo) {
+        foreach($this->writers as $key => $foo) {
             $error = $this->writers[$key]->newFile($filename, $stat, $mime);
             if (PEAR::isError($error)) {
                 $globalError = $error;
@@ -68,7 +68,7 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
      */
     function newFileNeedsMIME()
     {
-        foreach($writers as $key => $foo) {
+        foreach($this->writers as $key => $foo) {
             if ($this->writers[$key]->newFileNeedsMIME()) {
                 return true;
             }
@@ -82,7 +82,7 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
     function writeData($data)
     {
         $globalError = null;
-        foreach($writers as $key => $foo) {
+        foreach($this->writers as $key => $foo) {
             $error = $this->writers[$key]->writeData($data);
             if (PEAR::isError($error)) {
                 $globalError = $error;
@@ -99,7 +99,7 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
     function writeFile($filename)
     {
         $globalError = null;
-        foreach($writers as $key => $foo) {
+        foreach($this->writers as $key => $foo) {
             $error = $this->writers[$key]->writeFile($filename);
             if (PEAR::isError($error)) {
                 $globalError = $error;
@@ -116,7 +116,7 @@ class File_Archive_Writer_Multi extends File_Archive_Writer
     function close()
     {
         $globalError = null;
-        foreach($writers as $key => $foo) {
+        foreach($this->writers as $key => $foo) {
             $error = $this->writers[$key]->close();
             if (PEAR::isError($error)) {
                 $globalError = $error;

@@ -919,7 +919,7 @@ class File_Archive
     function toMulti(&$aC, &$bC)
     {
         $a =& File_Archive::_convertToWriter($aC);
-        $b =& File_Archive::_convertToWriter($aC);
+        $b =& File_Archive::_convertToWriter($bC);
 
         if (PEAR::isError($a)) {
             return $a;

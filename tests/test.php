@@ -337,6 +337,7 @@ class Test extends PHPUnit_TestCase
                 File_Archive::readMemory($x, "test.$extension"),
                 "test.$extension/")
         );
+        //print_r($source);
         $this->assertEquals(
             "foo.txt\nbar.txt",
             implode("\n", $source->getFileList())

@@ -78,6 +78,7 @@ class File_Archive_Reader_AddBaseName extends File_Archive_Reader_Relay
         foreach ($list as $name) {
             $result[] = $this->modifyName($name);
         }
+        return $result;
     }
 }
 
@@ -146,6 +147,7 @@ class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
         foreach ($list as $name) {
             $result[] = $this->modifyName($name);
         }
+        return $result;
     }
 }
 
