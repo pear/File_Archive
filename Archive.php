@@ -277,14 +277,9 @@ class File_Archive
             strpos($lastFile, '?')!==false) {
             //We have to build a regexp here
             $regexp = str_replace(
-                array('.'),
-                array('\.'),
-                $lastFile
-            );
-            $regexp = str_replace(
-                array('*', '?'),
+                array('\*', '\?'),
                 array('.*', '.'),
-                $regexp
+                preg_quote($lastFile)
             );
             $result = File_Archive::_readSource($source, $baseFile,
                                                 $reachable, $baseDir, null, 0, -1);
