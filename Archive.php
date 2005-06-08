@@ -37,14 +37,6 @@
  */
 require_once "PEAR.php";
 
-$_File_Archive_Options = array(
-    'zipCompressionLevel' => 9,
-     'gzCompressionLevel' => 9,
-    'tmpDirectory' => '.',
-    'cache' => null,
-    'appendRemoveDuplicates' => false
-);
-
 /**
  * Factory to access the most common File_Archive features
  * It uses lazy include, so you dont have to include the files from
@@ -52,6 +44,17 @@ $_File_Archive_Options = array(
  */
 class File_Archive
 {
+    function& _option($name)
+    {
+        static $container = array(
+            'zipCompressionLevel' => 9,
+             'gzCompressionLevel' => 9,
+            'tmpDirectory' => '.',
+            'cache' => null,
+            'appendRemoveDuplicates' => false
+        );
+        return $container[$name];
+    }
     /**
      * Sets an option that will be used by default by all readers or writers
      * Option names are case sensitive
@@ -85,8 +88,8 @@ class File_Archive
      */
     function setOption($name, $value)
     {
-        global $_File_Archive_Options;
-        $_File_Archive_Options[$name] = $value;
+        $option =& File_Archive::_option($name);
+        $option = $value;
     }
 
     /**
@@ -95,8 +98,7 @@ class File_Archive
      */
     function getOption($name)
     {
-        global $_File_Archive_Options;
-        return $_File_Archive_Options[$name];
+        return File_Archive::_option($name);
     }
 
     /**
@@ -278,7 +280,7 @@ class File_Archive
             //We have to build a regexp here
             $regexp = str_replace(
                 array('\*', '\?'),
-                array('.*', '.'),
+                array('[^/]*', '[^/]'),
                 preg_quote($lastFile)
             );
             $result = File_Archive::_readSource($source, $baseFile,

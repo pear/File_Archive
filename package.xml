@@ -25,28 +25,11 @@
   </maintainer>
  </maintainers>
  <release>
-  <version>1.4.0</version>
-  <date></date>
+  <version>1.4.1</version>
+  <date>2005-06-08</date>
   <state>stable</state>
   <notes>
-   + Add the possibility to use Cache_Lite to cache intermediary output of Zip compression
-   + Add get and setOption method to change the default behavior of readers and writers
-     Available options are
-     	- zipCompressionLevel: default compression level of zip archives (default is 9)
-     	- gzCompressionLevel: default compression level of gz archives (default is 9)
-     	- tmpDirectory: directory where temporary files will be stored (default is '.')
-     	- cache: instance of Cache_Lite that may be used by any writer to cache data
-     	         for future use. Currently used by Zip writer (default is null: no cache)
-     	- appendRemoveDuplicates: specify if the appenders should remove the old files
-     	         from an archive to avoid creating duplicates (default is false, which is faster)
-   + Add the possibility to use wildcards in read function
-        File_Archive::read('dir/*.txt') will read all txt files from directory dir
-        File_Archive::read('archive.zip/*.txt') will read all txt files from the zip archive
-   	Note: The wildcards can only be used after the last '/'
-   + All the File_Archive functions that take a reader or a writer as an argument can now take
-   	a string or an array. For readers, strings are interpreted using File_Archive::read function
-   	and array using File_Archive::readMulti. For writers, strings are interpreted using File_Archive::appender
-   	function and array by creating a multi writer.
+   Bug #4548
   </notes>
   <filelist>
    <dir name="File" role="php">
@@ -129,6 +112,31 @@
  </release>
  
  <changelog>
+  <release>
+   <version>1.4.0</version>
+   <date>2005-06-06</date>
+   <state>stable</state>
+   <notes>
+    + Add the possibility to use Cache_Lite to cache intermediary output of Zip compression
+    + Add get and setOption method to change the default behavior of readers and writers
+      Available options are
+      	- zipCompressionLevel: default compression level of zip archives (default is 9)
+      	- gzCompressionLevel: default compression level of gz archives (default is 9)
+      	- tmpDirectory: directory where temporary files will be stored (default is '.')
+      	- cache: instance of Cache_Lite that may be used by any writer to cache data
+      	         for future use. Currently used by Zip writer (default is null: no cache)
+      	- appendRemoveDuplicates: specify if the appenders should remove the old files
+      	         from an archive to avoid creating duplicates (default is false, which is faster)
+    + Add the possibility to use wildcards in read function
+         File_Archive::read('dir/*.txt') will read all txt files from directory dir
+         File_Archive::read('archive.zip/*.txt') will read all txt files from the zip archive
+    	Note: The wildcards can only be used after the last '/'
+    + All the File_Archive functions that take a reader or a writer as an argument can now take
+    	a string or an array. For readers, strings are interpreted using File_Archive::read function
+    	and array using File_Archive::readMulti. For writers, strings are interpreted using File_Archive::appender
+    	function and array by creating a multi writer.
+   </notes>
+  </release>
   <release>
    <version>1.3.0</version>
    <date>2005-05-30</date>
