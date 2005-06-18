@@ -224,11 +224,15 @@ class File_Archive_Reader
     /**
      * Sends the current file to the Writer $writer
      * The data will be sent by chunks of at most $bufferSize bytes
+     * If $bufferSize <= 0 (default), the blocSize option is used
      */
-    function sendData(&$writer, $bufferSize = 102400)
+    function sendData(&$writer, $bufferSize = 0)
     {
         if (PEAR::isError($writer)) {
             return $writer;
+        }
+        if ($bufferSize <= 0) {
+            $bufferSize = File_Archive::getOption('blocSize');
         }
 
         $filename = $this->getDataFilename();
@@ -257,9 +261,9 @@ class File_Archive_Reader
      * @param bool $autoClose If true, close $writer at the end of the function.
      *        Default value is true
      * @param int $bufferSize Size of the chunks that will be sent to the writer
-     *        Default value is 100kB
+     *        If $bufferSize <= 0 (default value), the blocSize option is used
      */
-    function extract(&$writer, $autoClose = true, $bufferSize = 102400)
+    function extract(&$writer, $autoClose = true, $bufferSize = 0)
     {
         if (PEAR::isError($writer)) {
             $this->close();
@@ -302,10 +306,10 @@ class File_Archive_Reader
      * @param bool $autoClose If true, close $writer at the end of the function
      *        Default value is true
      * @param int $bufferSize Size of the chunks that will be sent to the writer
-     *        Default value is 100kB
+     *        If $bufferSize <= 0 (default value), the blocSize option is used
      */
     function extractFile($filename, &$writer,
-                         $autoClose = true, $bufferSize = 8192)
+                         $autoClose = true, $bufferSize = 0)
     {
         if (PEAR::isError($writer)) {
             return $writer;

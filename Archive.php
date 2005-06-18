@@ -51,7 +51,8 @@ class File_Archive
              'gzCompressionLevel' => 9,
             'tmpDirectory' => '.',
             'cache' => null,
-            'appendRemoveDuplicates' => false
+            'appendRemoveDuplicates' => false,
+            'blocSize' => 100 * 1024
         );
         return $container[$name];
     }
@@ -85,6 +86,12 @@ class File_Archive
      *      file present in the archive when adding a new one. This will slow the
      *      appending of files to archives
      *      Default: false
+     *
+     * "blocSize"
+     *      To transfer data from a reader to a writer, some chunks a read from the
+     *      source and written to the writer. This parameter controls the size of the
+     *      chunks
+     *      Default: 100kB
      */
     function setOption($name, $value)
     {
@@ -93,8 +100,7 @@ class File_Archive
     }
 
     /**
-     * Retrieve the value of an option, or a default value (null) if it has not
-     * been set
+     * Retrieve the value of an option
      */
     function getOption($name)
     {
@@ -1047,7 +1053,7 @@ class File_Archive
      * writer using File_Archive::appender
      * Since PHP doesn't allow to pass literal strings by ref, you will have to use temporary
      * variables.
-     * File_Archive::extract($src = 'archive.zip/', $dest = 'dir') will extract the archive to dir
+     * File_Archive::extract($src = 'archive.zip/', $dest = 'dir') will extract the archive to 'dir'
      * It is the same as
      * File_Archive::extract(
      *    File_Archive::read('archive.zip/'),
@@ -1055,17 +1061,15 @@ class File_Archive
      * );
      * You may use any variable in the extract function ($from/$to, $a/$b...).
      *
-     * PHP4 workaround: since PHP4 doesn't allow to pass 'archive.zip/' by ref, you cannot use the
-     *  previous feature. But you can do File_Archive::extract($a = 'archive.zip/', $b = 'dir');
-     *
      * @param File_Archive_Reader $source The source that will be read
      * @param File_Archive_Writer $dest Where to copy $source files
      * @param bool $autoClose if true (default), $dest will be closed after the extraction
      * @param int $bufferSize Size of the buffer to use to move data from the reader to the buffer
+     *        If $bufferSize <= 0 (default), the blocSize option is used
      *        You shouldn't need to change that
      * @return null or a PEAR error if an error occured
      */
-    function extract(&$sourceToConvert, &$destToConvert, $autoClose = true, $bufferSize = 8192)
+    function extract(&$sourceToConvert, &$destToConvert, $autoClose = true, $bufferSize = 0)
     {
         $source =& File_Archive::_convertToReader($sourceToConvert);
         if (PEAR::isError($source)) {

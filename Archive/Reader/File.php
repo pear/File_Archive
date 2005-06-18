@@ -220,12 +220,11 @@ class File_Archive_Reader_File extends File_Archive_Reader
 
         if ($this->handle !== null) {
             $file = $this->getDataFilename();
-            $stat = $this->getStat();
             $pos = ftell($this->handle);
 
             $this->close();
 
-            $writer->openFileRemoveBlock($file, $pos + $seek, $blocks, $stat);
+            $writer->openFileRemoveBlock($file, $pos + $seek, $blocks);
         }
 
         return $writer;

@@ -42,6 +42,8 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      */
     var $handle = null;
     var $basePath;
+    var $stat = array();
+    var $filename;
 
     function File_Archive_Writer_Files($base = '')
     {
@@ -99,13 +101,13 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      * @param int $pos the initial position in the file
      * @param $stat the stats of the file
      */
-    function openFile($filename, $pos = 0, $stat = array())
+    function openFile($filename, $pos = 0)
     {
-        if ($this->handle !== null) {
-            fclose($this->handle);
-        }
+        $this->close();
 
         $this->handle = fopen($filename, 'r+');
+        $this->stat = array();
+        $this->filename = $filename;
 
         if (!is_resource($this->handle)) {
             return PEAR::raiseError("Unable to open file $filename");
@@ -122,43 +124,46 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      * Open a file for appending after having removed a block of data from it
      * See File_Archive_Reader::makeWriterRemoveBlocks
      */
-    function openFileRemoveBlock($filename, $pos, $blocks, $stat = array())
+    function openFileRemoveBlock($filename, $pos, $blocks)
     {
-        $error = $this->openFile($filename, $pos, $stat);
+        $error = $this->openFile($filename, $pos);
         if (PEAR::isError($error)) {
             return $error;
         }
 
-        //This will be used to read the initial file
-        //The data, with the unusefull block removed will be written to $this->handle
-        $read = fopen($filename, 'r');
-        if ($pos > 0) {
-            if (fseek($this->handle, $pos) == -1) {
-                fread($this->handle, $pos);
-            }
-        }
-
-        $keep = false;
-        $data = '';
-        foreach ($blocks as $length) {
-            if ($keep) {
-                while ($length > 0 &&
-                       ($data = fread($read, min($length, 8192))) != '') {
-                    $length -= strlen($data);
-                    fwrite($this->handle, $data);
+        if (!empty($blocks)) {
+            //This will be used to read the initial file
+            //The data, with the unusefull block removed will be written to $this->handle
+            $read = fopen($filename, 'r');
+            if ($pos > 0) {
+                if (fseek($this->handle, $pos) == -1) {
+                    fread($this->handle, $pos);
                 }
-            } else {
-                fseek($read, $length, SEEK_CUR);
             }
-            $keep = !$keep;
-        }
-        if ($keep) {
-            while(!feof($this->handle)) {
-                fwrite($this->handle, fread($read, 8196));
+
+            $keep = false;
+            $data = '';
+            foreach ($blocks as $length) {
+                if ($keep) {
+                    while ($length > 0 &&
+                           ($data = fread($read, min($length, 8192))) != '') {
+                        $length -= strlen($data);
+                        fwrite($this->handle, $data);
+                    }
+                } else {
+                    fseek($read, $length, SEEK_CUR);
+                }
+                $keep = !$keep;
             }
+            if ($keep) {
+                while(!feof($this->handle)) {
+                    fwrite($this->handle, fread($read, 8196));
+                }
+            }
+
+            fclose($read);
         }
 
-        fclose($read);
         ftruncate($this->handle, ftell($this->handle));
     }
 
@@ -168,20 +173,18 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      */
     function newFile($filename, $stat = array(), $mime = "application/octet-stream")
     {
-        if ($this->handle !== null) {
-            fclose($this->handle);
-        }
+        $this->close();
+        $this->stat = $stat;
+        $this->filename = $this->getFilename($filename);
 
-        $filename = $this->getFilename($filename);
-
-        $pos = strrpos($filename, "/");
+        $pos = strrpos($this->filename, "/");
         if ($pos !== false) {
-            $error = $this->mkdirr(substr($filename, 0, $pos));
+            $error = $this->mkdirr(substr($this->filename, 0, $pos));
             if (PEAR::isError($error)) {
                 return $error;
             }
         }
-        $this->handle = @fopen($filename, "w");
+        $this->handle = @fopen($this->filename, "w");
         if (!is_resource($this->handle)) {
             return PEAR::raiseError("Unable to write to file $filename");
         }
@@ -195,6 +198,7 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      */
     function newFromTempFile($tmpfile, $filename, $stat = array(), $mime = "application/octet-stream")
     {
+        $this->filename = filename;
         $complete = $this->getFilename($filename);
         $pos = strrpos($complete, "/");
         if ($pos !== false) {
@@ -206,7 +210,7 @@ class File_Archive_Writer_Files extends File_Archive_Writer
 
         if ((file_exists($complete) && !@unlink($complete)) ||
             !@rename($tmpfile, $complete)) {
-            parent::newFromTempFile($tmpfile, $filename, $stat, $mime);
+            return parent::newFromTempFile($tmpfile, $filename, $stat, $mime);
         }
     }
 
@@ -218,8 +222,28 @@ class File_Archive_Writer_Files extends File_Archive_Writer
     {
         if ($this->handle !== null) {
             fclose($this->handle);
+            $this->handle = null;
+
+            if (isset($this->stat[9])) {
+                if (isset($this->stat[8])) {
+                    touch($this->filename, $this->stat[9], $this->stat[8]);
+                } else {
+                    touch($this->filename, $this->stat[9]);
+                }
+            } else if (isset($this->stat[8])) {
+                touch($this->filename, time(), $this->stat[8]);
+            }
+
+            if (isset($this->stat[2])) {
+                chmod($this->filename, $this->stat[2]);
+            }
+            if (isset($this->stat[5])) {
+                chgrp($this->filename, $this->stat[5]);
+            }
+            if (isset($this->stat[4])) {
+                chown($this->filename, $this->stat[4]);
+            }
         }
-        $this->handle = null;
     }
 }
 
