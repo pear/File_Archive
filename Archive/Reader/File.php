@@ -201,6 +201,15 @@ class File_Archive_Reader_File extends File_Archive_Reader
     }
 
     /**
+     * @see File_Archive_Reader::tell()
+     */
+    function tell()
+    {
+        return ftell($this->handle);
+    }
+
+
+    /**
      * @see File_Archive_Reader::makeWriterRemoveFiles()
      */
     function makeWriterRemoveFiles($pred)

@@ -158,6 +158,18 @@ class File_Archive_Reader_Rar extends File_Archive_Reader_Archive
     }
 
     /**
+     * @see File_Archive_Reader::tell()
+     */
+    function tell()
+    {
+        if ($this->fileReader === null) {
+            return 0;
+        } else {
+            return $this->fileReader->tell();
+        }
+    }
+
+    /**
      * @see File_Archive_Reader::getFilename()
      */
     function getFilename() { return $this->rarEntry->getName(); }

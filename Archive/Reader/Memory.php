@@ -165,6 +165,14 @@ class File_Archive_Reader_Memory extends File_Archive_Reader
     }
 
     /**
+     * @see File_Archive_Reader::tell()
+     */
+    function tell()
+    {
+        return $this->offset;
+    }
+
+    /**
      * @see File_Archive_Reader::close()
      */
     function close()

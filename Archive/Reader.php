@@ -214,6 +214,16 @@ class File_Archive_Reader
     }
 
     /**
+     * Returns the current offset in the current file
+     */
+    function tell()
+    {
+        $offset = $this->rewind();
+        $this->skip($offset);
+        return $offset;
+    }
+
+    /**
      * Put back the reader in the state it was before the first call
      * to next()
      */

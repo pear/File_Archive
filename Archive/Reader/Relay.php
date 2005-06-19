@@ -83,6 +83,10 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
      */
     function rewind($length = -1) { return $this->source->rewind($length); }
     /**
+     * @see File_Archive_Reader::tell()
+     */
+    function tell() { return $this->source->tell(); }
+    /**
      * @see File_Archive_Reader::close()
      */
     function close()

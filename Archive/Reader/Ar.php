@@ -244,6 +244,14 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
     }
 
     /**
+     * @see File_Archive_Reader::tell()
+     */
+    function tell()
+    {
+        return $this->_currentStat[7] - $this->_nbBytesLeft;
+    }
+
+    /**
      * @see File_Archive_Reader::makeWriterRemoveFiles()
      */
     function makeWriterRemoveFiles($pred)

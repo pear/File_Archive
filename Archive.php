@@ -37,6 +37,11 @@
  */
 require_once "PEAR.php";
 
+function File_Archive_Clear_Cache($file, $group)
+{
+
+}
+
 /**
  * Factory to access the most common File_Archive features
  * It uses lazy include, so you dont have to include the files from
@@ -52,7 +57,7 @@ class File_Archive
             'tmpDirectory' => '.',
             'cache' => null,
             'appendRemoveDuplicates' => false,
-            'blocSize' => 100 * 1024
+            'blocSize' => 102400
         );
         return $container[$name];
     }

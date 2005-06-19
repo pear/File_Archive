@@ -186,6 +186,14 @@ class File_Archive_Reader_Gzip extends File_Archive_Reader_Archive
     }
 
     /**
+     * @see File_Archive_Reader::tell()
+     */
+    function tell()
+    {
+        return $this->filePos;
+    }
+
+    /**
      * @see File_Archive_Reader::makeAppendWriter()
      */
     function makeAppendWriter()

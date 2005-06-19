@@ -45,6 +45,8 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
     var $files = array();
     var $seekToEnd = 0;
 
+    var $centralDirectory = null;
+
     /**
      * @see File_Archive_Reader::close()
      */
@@ -56,6 +58,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         $this->data = null;
         $this->seekToEnd = 0;
         $this->files = array();
+        $this->centralDirectory = null;
 
         return parent::close();
     }
@@ -121,8 +124,14 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
                         "handle encrypted files");
             }
             if ($this->header['Flag'] & 8) {
-                return PEAR::raiseError("File_Archive_Reader_Zip doesn't ".
-                        "handle bit flag 3 set");
+                if ($this->centralDirectory === null) {
+                    $this->readCentralDirectory();
+                }
+                $centralDirEntry = $this->centralDirectory[count($this->files)];
+
+                $this->header['CRC'] = $centralDirEntry['CRC'];
+                $this->header['CLen'] = $centralDirEntry['CLen'];
+                $this->header['NLen'] = $centralDirEntry['NLen'];
             }
             if ($this->header['Flag'] & 32) {
                 return PEAR::raiseError("File_Archive_Reader_Zip doesn't ".
@@ -238,6 +247,13 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
         }
         return $before - $this->offset;
     }
+    /**
+     * @see File_Archive_Reader::tell()
+     */
+    function tell()
+    {
+        return $this->offset;
+    }
 
     function uncompressData()
     {
@@ -277,9 +293,9 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             array_pop($this->files);
         }
 
-        while (($error = $this->next()) === true) {
+        while (($error = $this->nextWithFolders()) === true) {
             $size = 30 + $this->header['File'] + $this->header['Extra'] + $this->header['CLen'];
-            if ($pred->isTrue($this)) {
+            if (substr($this->getFilename(), -1) == '/' || $pred->isTrue($this)) {
                 array_pop($this->files);
                 if ($seek === null) {
                     $seek = $size;
@@ -393,6 +409,85 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
 
         $this->close();
         return $writer;
+    }
+
+    /**
+     * This function seeks to the start of the [end of central directory] field,
+     * just after the \x50\x4b\x05\x06 signature and returns the number of bytes
+     * skipped
+     *
+     * The stream must initially be positioned before the end of central directory
+     */
+    function seekToEndOfCentralDirectory()
+    {
+        $nbSkipped = $this->source->skip();
+
+        $nbSkipped -= $this->source->rewind(22) - 4;
+        if ($this->source->getData(4) == "\x50\x4b\x05\x06") {
+            return $nbSkipped;
+        }
+
+        while ($nbSkipped > 0) {
+
+            $nbRewind = $this->source->rewind(min(100, $nbSkipped));
+            while ($nbRewind >= -4) {
+                if ($nbRewind-- && $this->source->getData(1) == "\x50" &&
+                    $nbRewind-- && $this->source->getData(1) == "\x4b" &&
+                    $nbRewind-- && $this->source->getData(1) == "\x05" &&
+                    $nbRewind-- && $this->source->getData(1) == "\x06") {
+                    //We finally found it!
+                    return $nbSkipped - $nbRewind;
+                }
+            }
+            $nbSkipped -= $nbRewind;
+        }
+
+        return PEAR::raiseError('End of central directory not found. The file is probably not a zip archive');
+    }
+
+    /**
+     * This function will fill the central directory variable
+     * and seek back to where it was called
+     */
+    function readCentralDirectory()
+    {
+        $nbSkipped = $this->seekToEndOfCentralDirectory();
+        if (PEAR::isError($nbSkipped)) {
+            return $nbSkipped;
+        }
+
+        $this->source->skip(12);
+        $offset = $this->source->getData(4);
+        $nbSkipped += 16;
+        if (PEAR::isError($offset)) {
+            return $offset;
+        }
+
+        $offset = unpack("Vvalue", $offset);
+        $offset = $offset['value'];
+
+        $current = $this->source->tell();
+        $nbSkipped -= $this->source->rewind($current - $offset);
+
+        //Now we are the right pos to read the central directory
+        $this->centralDirectory = array();
+        while ($this->source->getData(4) == "\x50\x4b\x01\x02") {
+            $this->source->skip(12);
+            $header = $this->source->getData(16);
+            $nbSkipped += 32;
+
+            if (PEAR::isError($header)) {
+                return $header;
+            }
+
+            $header = unpack('VCRC/VCLen/VNLen/vFileLength/vExtraLength', $header);
+            $this->centralDirectory[] = array('CRC'  => $header['CRC'],
+                                              'CLen' => $header['CLen'],
+                                              'NLen' => $header['NLen']);
+            $nbSkipped += $this->source->skip(14 + $header['FileLength'] + $header['ExtraLength']);
+        }
+
+        $this->source->rewind($nbSkipped+4);
     }
 }
 ?>

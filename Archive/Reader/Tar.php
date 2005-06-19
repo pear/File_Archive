@@ -101,6 +101,14 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
     }
 
     /**
+     * @see File_Archive_Reader::tell()
+     */
+    function tell()
+    {
+        return $this->currentStat[7] - $this->leftLength;
+    }
+
+    /**
      * @see File_Archive_Reader::close()
      */
     function close()

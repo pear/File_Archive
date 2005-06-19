@@ -42,6 +42,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
     var $stat;
     var $mime;
     var $opened = false;
+    var $filePos = 0;
 
     function File_Archive_Reader_Concat(&$source, $filename,
                                         $stat=array(), $mime=null)
@@ -128,6 +129,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
                 $result .= $sourceData;
             }
         }
+        $filePos += strlen($result);
         return $result == '' ? null : $result;
     }
     /**
@@ -142,6 +144,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
                 return $skipped;
             }
             $skipped += $sourceSkipped;
+            $filePos += $sourceSkipped;
         }
         return $skipped;
     }
@@ -153,12 +156,22 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
         //TODO: implement rewind
         return parent::rewind($length);
     }
+
+    /**
+     * @see File_Archive_Reader::tell()
+     */
+    function tell()
+    {
+        return $this->filePos;
+    }
+
     /**
      * @see File_Archive_Reader::close()
      */
     function close()
     {
         $this->opened = false;
+        $this->filePos = 0;
         return $this->source->close();
     }
 
