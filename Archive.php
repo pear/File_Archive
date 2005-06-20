@@ -39,7 +39,20 @@ require_once "PEAR.php";
 
 function File_Archive_Clear_Cache($file, $group)
 {
+    $file = split('_', $file);
+    if (count($file) != 3) {
+        return false; //not a File_Archive file, keep it
+    }
 
+    $name = $file[2];
+    $name = str_replace('+', '_', $name);
+    $name = urldecode($name);
+
+    $group = $file[1];
+
+    //clean the cache only for files in File_Archive groups
+    return substr($group, 0, 11) == 'FileArchive')) &&
+           !file_exists($name); //and only if the related file no longer exists
 }
 
 /**
@@ -102,6 +115,10 @@ class File_Archive
     {
         $option =& File_Archive::_option($name);
         $option = $value;
+        if ($option == 'cache' && $value !== null) {
+            //TODO: ask to Cache_Lite to allow that
+            $value->_fileNameProtection = false;
+        }
     }
 
     /**

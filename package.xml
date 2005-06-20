@@ -25,12 +25,12 @@
   </maintainer>
  </maintainers>
  <release>
-  <version>1.4.1</version>
-  <date>2005-06-08</date>
+  <version>1.4.2</version>
+  <date></date>
   <state>stable</state>
   <notes>
-   Bug #4548
-  </notes>
+   Improved zip reader (File_Archive_Zip_Reader implements more options of the PKZip standard)
+  </notes>  
   <filelist>
    <dir name="File" role="php">
     <file>Archive.php</file>
@@ -112,6 +112,14 @@
  </release>
  
  <changelog>
+  <release>
+   <version>1.4.1</version>
+   <date>2005-06-08</date>
+   <state>stable</state>
+   <notes>
+    Bug #4548
+   </notes>
+  </release>
   <release>
    <version>1.4.0</version>
    <date>2005-06-06</date>
