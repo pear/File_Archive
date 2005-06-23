@@ -193,7 +193,7 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
         if ($cache !== null && $this->compressionLevel > 0) {
             $id = realpath($dataFilename);
             $id = urlencode($id);
-            $id = str_replace('_', '+', $id);
+            $id = str_replace('_', '%5F', $id);
 
             $group = 'FileArchiveZip'.$this->compressionLevel;
             $mtime = filemtime($dataFilename);
