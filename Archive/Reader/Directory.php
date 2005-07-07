@@ -102,7 +102,7 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
         }
 
         while ($this->source === null ||
-             !$this->source->next()) {
+              ($error = $this->source->next()) !== true) {
 
             if ($this->source !== null) {
                 $this->source->close();
@@ -128,7 +128,7 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
             }
         }
 
-        return true;
+        return $error;
     }
 
     /**

@@ -54,10 +54,20 @@ class File_Archive_Reader_File extends File_Archive_Reader
     var $symbolic;
     /**
      * @var array Stats of the file
-     *            Will only be set after a call to $this->getStat()
+     *      Will only be set after a call to $this->getStat()
      * @access private
      */
     var $stat = null;
+    /**
+     * @var string Mime type of the file
+     *      Will only be set after a call to $this->getMime()
+     */
+    var $mime = null;
+    /**
+     * @var boolean Has the file already been read
+     * @access private
+     */
+    var $alreadyRead = false;
 
     /**
      * $filename is the physical file to read
@@ -80,6 +90,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function close()
     {
+        $this->alreadyRead = false;
         if ($this->handle !== null) {
             fclose($this->handle);
             $this->handle = null;
@@ -94,16 +105,10 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function next()
     {
-        if ($this->handle !== null) {
+        if ($this->alreadyRead) {
             return false;
-        }
-        $this->handle = @fopen($this->filename, "r");
-        if (!is_resource($this->handle)) {
-            return PEAR::raiseError("Can't open {$this->filename} for reading");
-        }
-        if ($this->handle === false) {
-            return PEAR::raiseError("File {$this->filename} not found");
         } else {
+            $this->alreadyRead = true;
             return true;
         }
     }
@@ -138,14 +143,34 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function getMime()
     {
-        PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
-        $result = MIME_Type::autoDetect($this->getDataFilename());
-        PEAR::popErrorHandling();
+        if ($this->mime === null) {
+            PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
+            $this->mime = MIME_Type::autoDetect($this->getDataFilename());
+            PEAR::popErrorHandling();
 
-        if (PEAR::isError($result)) {
-            return parent::getMime();
-        } else {
-            return $result;
+            if (PEAR::isError($this->mime)) {
+                this->mime = parent::getMime();
+            }
+        }
+        return $this->mime;
+    }
+
+    /**
+     * Opens the file if it was not already opened
+     */
+    function _ensureFileOpened()
+    {
+        if ($this->handle === null) {
+            $this->handle = @fopen($this->filename, "r");
+
+            if (!is_resource($this->handle)) {
+                $this->handle = null;
+                return PEAR::raiseError("Can't open {$this->filename} for reading");
+            }
+            if ($this->handle === false) {
+                $this->handle = null;
+                return PEAR::raiseError("File {$this->filename} not found");
+            }
         }
     }
 
@@ -154,13 +179,19 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function getData($length = -1)
     {
+        $error = $this->_ensureFileOpened();
+        if (PEAR::isError($error)) {
+            return $error;
+        }
+
         if (feof($this->handle)) {
             return null;
         }
         if ($length == -1) {
             $contents = '';
+            $blockSize = File_Archive::getOption('blockSize');
             while (!feof($this->handle)) {
-                $contents .= fread($this->handle, 8192);
+                $contents .= fread($this->handle, $blockSize);
             }
             return $contents;
         } else {
@@ -177,6 +208,11 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function skip($length = -1)
     {
+        $error = $this->_ensureFileOpened();
+        if (PEAR::isError($error)) {
+            return $error;
+        }
+
         $before = ftell($this->handle);
         if (($length == -1 && @fseek($this->handle, 0, SEEK_END) === -1) ||
             ($length >= 0  && @fseek($this->handle, $length, SEEK_CUR) === -1)) {
@@ -191,6 +227,10 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function rewind($length = -1)
     {
+        if ($this->handle === null) {
+            return 0;
+        }
+
         $before = ftell($this->handle);
         if (($length == -1 && @fseek($this->handle, 0, SEEK_SET) === -1) ||
             ($length >= 0  && @fseek($this->handle, -$length, SEEK_CUR) === -1)) {
@@ -205,7 +245,11 @@ class File_Archive_Reader_File extends File_Archive_Reader
      */
     function tell()
     {
-        return ftell($this->handle);
+        if ($this->handle === null) {
+            return 0;
+        } else {
+            return ftell($this->handle);
+        }
     }
 
 
@@ -227,14 +271,11 @@ class File_Archive_Reader_File extends File_Archive_Reader
 
         $writer = new File_Archive_Writer_Files();
 
-        if ($this->handle !== null) {
-            $file = $this->getDataFilename();
-            $pos = ftell($this->handle);
+        $file = $this->getDataFilename();
+        $pos = $this->tell();
+        $this->close();
 
-            $this->close();
-
-            $writer->openFileRemoveBlock($file, $pos + $seek, $blocks);
-        }
+        $writer->openFileRemoveBlock($file, $pos + $seek, $blocks);
 
         return $writer;
     }

@@ -69,7 +69,7 @@ class File_Archive
             'tmpDirectory' => '.',
             'cache' => null,
             'appendRemoveDuplicates' => false,
-            'blocSize' => 65536
+            'blockSize' => 65536
         );
         return $container[$name];
     }
@@ -104,11 +104,11 @@ class File_Archive
      *      appending of files to archives
      *      Default: false
      *
-     * "blocSize"
+     * "blockSize"
      *      To transfer data from a reader to a writer, some chunks a read from the
      *      source and written to the writer. This parameter controls the size of the
      *      chunks
-     *      Default: 100kB
+     *      Default: 64kB
      */
     function setOption($name, $value)
     {
@@ -476,6 +476,17 @@ class File_Archive
     {
         $source = null;
         return File_Archive::readSource($source, $URL, $symbolic, $uncompression, $directoryDepth);
+    }
+
+    function cache(&$toConvert)
+    {
+        $source =& File_Archive::_convertToReader($toConvert);
+        if (PEAR::isError($source)) {
+            return $source;
+        }
+
+        require_once 'File/Archive/Reader/Cache.php';
+        return new File_Archive_Reader_Cache($source);
     }
 
     /**
@@ -1086,7 +1097,7 @@ class File_Archive
      * @param File_Archive_Writer $dest Where to copy $source files
      * @param bool $autoClose if true (default), $dest will be closed after the extraction
      * @param int $bufferSize Size of the buffer to use to move data from the reader to the buffer
-     *        If $bufferSize <= 0 (default), the blocSize option is used
+     *        If $bufferSize <= 0 (default), the blockSize option is used
      *        You shouldn't need to change that
      * @return null or a PEAR error if an error occured
      */
