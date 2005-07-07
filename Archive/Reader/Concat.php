@@ -129,7 +129,7 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
                 $result .= $sourceData;
             }
         }
-        $filePos += strlen($result);
+        $this->filePos += strlen($result);
         return $result == '' ? null : $result;
     }
     /**

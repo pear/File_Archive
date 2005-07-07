@@ -149,7 +149,7 @@ class File_Archive_Reader_File extends File_Archive_Reader
             PEAR::popErrorHandling();
 
             if (PEAR::isError($this->mime)) {
-                this->mime = parent::getMime();
+                $this->mime = parent::getMime();
             }
         }
         return $this->mime;
