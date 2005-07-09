@@ -86,6 +86,7 @@ class File_Archive_Reader_Relay extends File_Archive_Reader
      * @see File_Archive_Reader::tell()
      */
     function tell() { return $this->source->tell(); }
+
     /**
      * @see File_Archive_Reader::close()
      */

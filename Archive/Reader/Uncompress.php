@@ -65,10 +65,11 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
     var $uncompressionLevel;
 
     /**
-     * @var String Only files starting with $baseDir will be reported
+     * @var array Only files starting with $baseDir will be reported
+     *      This array contains explode('/', $directoryName)
      * @access private
      */
-    var $baseDir = "";
+    var $baseDir = '';
 
     /**
      * @var int Compression level required to go to reach the baseDir
@@ -76,6 +77,11 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
      * @access private
      */
     var $baseDirCompressionLevel = null;
+
+    /**
+     * @var int We are selecting substr($baseDir, 0, $baseDirProgression)
+     */
+    var $baseDirProgression = 0;
 
     /**
      * @var boolean Flag set to indicate that the current file has not been
@@ -148,49 +154,54 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
             $this->currentFileNotDisplayed = false;
             return true;
         }
+
         do {
-            //Remove the readers we have completly read from the stack
             do {
-                while (($error = $this->source->next()) === false) {
-                    if (empty($this->readers) ||
-                        count($this->readers)+1 == $this->baseDirCompressionLevel) {
-                        return false;
-                    }
-                    $this->source->close();
-                    $this->source =& $this->readers[count($this->readers)-1];
-                    unset($this->readers[count($this->readers)-1]);
+                $selection = substr($this->baseDir, 0, $this->baseDirProgression);
+                if ($selection === false) {
+                    $selection = '';
                 }
+
+                $error = $this->source->select($selection, false);
                 if (PEAR::isError($error)) {
                     return $error;
                 }
-                $currentFilename = $this->source->getFilename();
-
-                if (strlen($currentFilename) < strlen($this->baseDir)) {
-                    $goodFile =
-                        (strncmp($this->baseDir, $currentFilename,
-                                 strlen($currentFilename)) == 0 &&
-                         $this->baseDir{strlen($currentFilename)} == '/');
-                } else if (strlen($currentFilename) > strlen($this->baseDir)) {
-                    $goodFile = empty($this->baseDir) ||
-                       (strncmp($this->baseDir, $currentFilename,
-                                strlen($this->baseDir)) == 0 &&
-                        (substr($this->baseDir,-1) == '/' ||
-                         $currentFilename{strlen($this->baseDir)} == '/')
-                       );
-                } else {
-                    $goodFile = (strcmp($this->baseDir, $currentFilename) == 0);
+                if (!$error) {
+                    if (empty($this->readers)) {
+                        return false;
+                    }
+                    $this->source->close();
+                    unset($this->source);
+                    $this->source =& $this->readers[count($this->readers)-1];
+                    unset($this->readers[count($this->readers)-1]);
                 }
-            } while (!$goodFile);
+            } while (!$error);
 
-            if ($this->baseDirCompressionLevel === null &&
-               strlen($currentFilename) >= strlen($this->baseDir)) {
-                $this->baseDirCompressionLevel = count($this->readers);
-                $this->toClose = $this->readers;
-                $this->readers = array();
+            $filename = $this->source->getFilename();
+            if (strlen($filename) < strlen($this->baseDir)) {
+                $goodFile = (strncmp($filename, $this->baseDir, strlen($filename)) == 0 &&
+                             $this->baseDir{strlen($filename)} == '/');
+                if ($goodFile) {
+                    if (strlen($filename) + 2 < strlen($this->baseDirProgression)) {
+                        $this->baseDirProgression = strpos($this->baseDir, '/', strlen($filename)+2);
+                        if ($this->baseDirProgression === false) {
+                            $this->baseDirProgression = strlen($this->baseDir);
+                        }
+                    } else {
+                        $this->baseDirProgression = strlen($this->baseDir);
+                    }
+                }
+            } else {
+                $goodFile = (strncmp($filename, $this->baseDir, strlen($this->baseDir)) == 0);
+                if ($goodFile) {
+                    $this->baseDirProgression = strlen($this->baseDir);
+                }
             }
-        } while ($this->push());
+        } while ($goodFile && $this->push());
+
         return true;
     }
+
     /**
      * Efficiently filter out the files which URL does not start with $baseDir
      * Throws an error if the $baseDir can't be found
@@ -198,8 +209,11 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
      */
     function setBaseDir($baseDir)
     {
-        $this->baseDirCompressionLevel = null;
         $this->baseDir = $baseDir;
+        $this->baseDirProgression = strpos($baseDir, '/');
+        if ($this->baseDirProgression === false) {
+            $this->baseDirProgression = strlen($baseDir);
+        }
 
         $error = $this->next();
         if ($error === false) {
@@ -216,30 +230,25 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
      */
     function select($filename, $close = true)
     {
-        $std = $this->getStandardURL($filename);
-
         if ($close) {
             $error = $this->close();
-            if (PEAR::isError($error)) {
+            if (PEAR::isError($close)) {
                 return $error;
             }
         }
 
-        while (($error = $this->source->next()) === true) {
-            $currentFilename = $this->source->getFilename().'/';
-            $compLength = min(strlen($currentFilename), strlen($filename));
-            if ( strncmp($currentFilename, $std, $compLength) == 0 ) {
-                if (strlen($std) < strlen($currentFilename)) {
-                    return true;
-                } else if (! $this->push()) {
-                    return false;
-                }
-            }
-        }
-        if (PEAR::isError($error)) {
-            return $error;
-        }
-        return false;
+        $oldBaseDir = $this->baseDir;
+        $oldProgression = $this->baseDirProgression;
+
+        $this->baseDir = $filename;
+        $this->baseDirProgression = 0;
+
+        $res = $this->next();
+
+        $this->baseDir = $oldBaseDir;
+        $this->baseDirProgression = $oldProgression;
+
+        return $res;
     }
 
     /**
@@ -261,6 +270,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         $this->toClose = array();
         $error = parent::close();
         $this->baseDirCompressionLevel = null;
+        $this->baseDirProgression = 0;
 
         unset($this->source);
         $this->source =& $this->startReader;

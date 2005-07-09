@@ -549,7 +549,8 @@ class File_Archive
                $extension == 'bz2'   ||
                $extension == 'bzip2' ||
                $extension == 'ar'    ||
-               $extension == 'deb'/*   ||
+               $extension == 'deb'   ||
+               $extension == 'cab'  /*   ||
                $extension == 'rar' */;
     }
 
@@ -585,27 +586,32 @@ class File_Archive
                     File_Archive::readArchive('bz2', $source, $sourceOpened)
                     );
         case 'tar':
-            require_once "File/Archive/Reader/Tar.php";
+            require_once 'File/Archive/Reader/Tar.php';
             return new File_Archive_Reader_Tar($source, $sourceOpened);
 
         case 'gz':
         case 'gzip':
-            require_once "File/Archive/Reader/Gzip.php";
+            require_once 'File/Archive/Reader/Gzip.php';
             return new File_Archive_Reader_Gzip($source, $sourceOpened);
 
         case 'zip':
-            require_once "File/Archive/Reader/Zip.php";
+            require_once 'File/Archive/Reader/Zip.php';
             return new File_Archive_Reader_Zip($source, $sourceOpened);
 
         case 'bz2':
         case 'bzip2':
-            require_once "File/Archive/Reader/Bzip2.php";
+            require_once 'File/Archive/Reader/Bzip2.php';
             return new File_Archive_Reader_Bzip2($source, $sourceOpened);
 
         case 'deb':
         case 'ar':
-            require_once "File/Archive/Reader/Ar.php";
+            require_once 'File/Archive/Reader/Ar.php';
             return new File_Archive_Reader_Ar($source, $sourceOpened);
+
+        case 'cab':
+            require_once 'File/Archive/Reader/Cab.php';
+            return new File_Archive_Reader_Cab($source, $sourceOpened);
+
 
 /*        case 'rar':
             require_once "File/Archive/Reader/Rar.php";

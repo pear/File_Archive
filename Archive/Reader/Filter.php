@@ -64,6 +64,27 @@ class File_Archive_Reader_Filter extends File_Archive_Reader_Relay
         } while (!$this->predicate->isTrue($this->source));
         return true;
     }
+
+    /**
+     * @see File_Archive_Reader::select()
+     */
+    function select($filename, $close = true)
+    {
+        if ($close) {
+            $error = $this->close();
+            if (PEAR::isError($error)) {
+                return $error;
+            }
+        }
+
+        do {
+            $error = $this->source->select($filename, false);
+            if ($error !== true) {
+                return $error;
+            }
+        } while (!$this->predicate->isTrue($this->source));
+        return true;
+    }
 }
 
 ?>

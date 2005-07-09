@@ -62,6 +62,28 @@ class File_Archive_Reader_AddBaseName extends File_Archive_Reader_Relay
     }
 
     /**
+     * Remove baseName from the name
+     * Return false if the name doesn't start with baseName
+     */
+    function unmodifyName($name)
+    {
+        if (strncmp($name, $this->baseName.'/', strlen($this->baseName)+1) == 0) {
+            $res = substr($name, strlen($this->baseName)+1);
+            if ($res === false) {
+                return '';
+            } else {
+                return $res;
+            }
+        } else if (empty($this->baseName)) {
+            return $name;
+        } else if ($name == $this->baseName) {
+            return '';
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * @see File_Archive_Reader::getFilename()
      */
     function getFilename()
@@ -79,6 +101,18 @@ class File_Archive_Reader_AddBaseName extends File_Archive_Reader_Relay
             $result[] = $this->modifyName($name);
         }
         return $result;
+    }
+    /**
+     * @see File_Archive_Reader::select()
+     */
+    function select($filename, $close = true)
+    {
+        $name = $this->unmodifyName($filename);
+        if ($name === false) {
+            return false;
+        } else {
+            return $this->source->select($name, $close);
+        }
     }
 }
 
@@ -129,6 +163,22 @@ class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
             return $name;
         }
     }
+    function unmodifyName($name)
+    {
+        if (empty($this->newBaseName) ||
+          !strncmp($name, $this->newBaseName.'/', strlen($this->newBaseName)+1) ||
+           strcmp($name, $this->newBaseName) == 0) {
+            return $this->oldBaseName.
+                   (
+                    empty($this->oldBaseName) ||
+                    strlen($name)<=strlen($this->newBaseName)+1 ?
+                    '' : '/'
+                   ).
+                   substr($name, strlen($this->newBaseName)+1);
+        } else {
+            return $name;
+        }
+    }
 
     /**
      * @see File_Archive_Reader::getFilename()
@@ -149,6 +199,14 @@ class File_Archive_Reader_ChangeBaseName extends File_Archive_Reader_Relay
         }
         return $result;
     }
+    /**
+     * @see File_Archive_Reader::select()
+     */
+    function select($filename, $close = true)
+    {
+        return $this->source->select($this->unmodifyName($filename));
+    }
+
 }
 
 ?>
