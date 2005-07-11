@@ -200,7 +200,14 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
             return null;
         } else {
             $this->_nbBytesLeft -= $length;
-            return $this->source->getData($length);
+            $data = $this->source->getData($length);
+            if (PEAR::isError($data)) {
+                return $data;
+            }
+            if (strlen($data) != $length) {
+                return PEAR::raiseError('Unexpected end of Ar archive');
+            }
+            return $data;
         }
     }
 
@@ -218,7 +225,14 @@ class File_Archive_Reader_Ar extends File_Archive_Reader_Archive
             return 0;
         } else {
             $this->_nbBytesLeft -= $length;
-            return $this->source->skip($length);
+            $skipped = $this->source->skip($length);
+            if (PEAR::isError($skipped)) {
+                return $skipped;
+            }
+            if ($skipped != $length) {
+                return PEAR::raiseError('Unexpected end of Ar archive');
+            }
+            return $skipped;
         }
     }
 

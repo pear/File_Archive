@@ -74,9 +74,10 @@ class File_Archive_Reader_File extends File_Archive_Reader
      * $symbolic is the name declared by the reader
      * If $symbolic is not specified, $filename is assumed
      */
-    function File_Archive_Reader_File($filename, $symbolic = null)
+    function File_Archive_Reader_File($filename, $symbolic = null, $mime = null)
     {
         $this->filename = $filename;
+        $this->mime = $mime;
         if ($symbolic === null) {
             $this->symbolic = $this->getStandardURL($filename);
         } else {

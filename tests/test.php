@@ -255,10 +255,8 @@ class Test extends PHPUnit_TestCase
     function testTar() { $this->_testArchive('tar'); }
     function testZip() { $this->_testArchive('zip'); }
     function testAr()  { $this->_testArchive('ar');  }
-    function _testGzip() { $this->_testArchive('gz'); }
     function testTgz() { $this->_testArchive('tgz'); }
     function testTbz() { $this->_testArchive('tbz'); }
-    function _testBZ2() { $this->_testArchive('bz2'); }
     function _testWriteGZip2()
     {
         //Build the writer
@@ -348,6 +346,8 @@ class Test extends PHPUnit_TestCase
     function testRemoveAr() { return $this->_testRemove('ar'); }
     function testRemoveZip() { return $this->_testRemove('zip'); }
 }
+
+PEAR::setErrorHandling(PEAR_ERROR_PRINT);
 
 $test = new PHPUnit_TestSuite("Test");
 $result = PHPUnit::run($test);

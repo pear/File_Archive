@@ -224,6 +224,9 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
             return null;
         } else {
             $data = $this->source->getData($actualLength);
+            if (strlen($data) != $actualLength) {
+                return PEAR::raiseError('Unexpected end of tar archive');
+            }
             $this->leftLength -= $actualLength;
             return $data;
         }

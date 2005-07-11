@@ -1,3 +1,5 @@
+
+
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
@@ -69,7 +71,8 @@ class File_Archive
             'tmpDirectory' => '.',
             'cache' => null,
             'appendRemoveDuplicates' => false,
-            'blockSize' => 65536
+            'blockSize' => 65536,
+            'cacheCondition' => false
         );
         return $container[$name];
     }
@@ -109,6 +112,19 @@ class File_Archive
      *      source and written to the writer. This parameter controls the size of the
      *      chunks
      *      Default: 64kB
+     *
+     * "cacheCondition"
+     *      This parameter specifies when a cache should be used. When the cache is
+     *      used, the data of the reader is saved in a temporary file for future access.
+     *      The cached reader will be read only once, even if you read it several times.
+     *      This can be usefull to read compressed files or downloaded files (from http or ftp)
+     *      The possible values for this option are
+     *       - false: never use cache
+     *       - a regexp: A cache will be used if the specified URL matches the regexp
+     *         preg_match is used
+     *      Default: false
+     *      Example: '/^(http|ftp):\/\//' will cache all files downloaded via http or ftp
+     *
      */
     function setOption($name, $value)
     {
@@ -269,10 +285,7 @@ class File_Archive
             return File_Archive::readMulti($converted);
         }
 
-        require_once "File/Archive/Reader/Uncompress.php";
-        require_once "File/Archive/Reader/ChangeName.php";
-
-        //No need to un compress more than $directoryDepth
+        //No need to uncompress more than $directoryDepth
         //That's not perfect, and some archives will still be uncompressed just
         //to be filtered out :(
         if ($directoryDepth >= 0) {
@@ -321,16 +334,23 @@ class File_Archive
         //If the URL can be interpreted as a directory, and we are reading from the file system
         if ((empty($URL) || is_dir($URL)) && $source === null) {
             require_once "File/Archive/Reader/Directory.php";
+            require_once "File/Archive/Reader/ChangeName.php";
 
-            $result = new File_Archive_Reader_Uncompress(
-                new File_Archive_Reader_Directory($std, '', $directoryDepth),
-                $uncompressionLevel
-            );
+            if ($uncompressionLevel != 0) {
+                require_once "File/Archive/Reader/Uncompress.php";
+                $result = new File_Archive_Reader_Uncompress(
+                    new File_Archive_Reader_Directory($std, '', $directoryDepth),
+                    $uncompressionLevel
+                );
+            } else {
+                $result = new File_Archive_Reader_Directory($std, '', $directoryDepth);
+            }
+
             if ($directoryDepth >= 0) {
-                require_once "File/Archive/Reader/Filter.php";
-                require_once "File/Archive/Predicate/MaxDepth.php";
+                require_once 'File/Archive/Reader/Filter.php';
+                require_once 'File/Archive/Predicate/MaxDepth.php';
 
-                $tmp = File_Archive::filter(
+                $tmp =& File_Archive::filter(
                     new File_Archive_Predicate_MaxDepth($directoryDepth),
                     $result
                 );
@@ -341,7 +361,7 @@ class File_Archive
                 if ($symbolic === null) {
                     $realSymbolic = '';
                 }
-                $tmp = new File_Archive_Reader_AddBaseName(
+                $tmp =& new File_Archive_Reader_AddBaseName(
                     $realSymbolic,
                     $result
                 );
@@ -419,20 +439,19 @@ class File_Archive
             //If we are reading from the file system
             if ($source === null) {
                 //Create a file reader
-                $result = new File_Archive_Reader_Uncompress(
-                            new File_Archive_Reader_File($file),
-                            $uncompressionLevel
-                          );
+                $result = new File_Archive_Reader_File($file);
             } else {
                 //Select in the source the file $file
 
                 require_once "File/Archive/Reader/Select.php";
-
-                $result = new File_Archive_Reader_Uncompress(
-                            new File_Archive_Reader_Select($file, $source),
-                            $uncompressionLevel
-                          );
+                $result = new File_Archive_Reader_Select($file, $source);
             }
+
+            require_once "File/Archive/Reader/Uncompress.php";
+            $tmp = new File_Archive_Reader_Uncompress($result, $uncompressionLevel);
+            unset($result);
+            $result = $tmp;
+
             //Select the requested folder in the uncompress reader
             $isDir = $result->setBaseDir($std);
             if (PEAR::isError($isDir)) {
@@ -459,6 +478,8 @@ class File_Archive
             }
 
             if ($std != $realSymbolic) {
+                require_once "File/Archive/Reader/ChangeName.php";
+
                 //Change the base name to the symbolic one if necessary
                 $tmp = new File_Archive_Reader_ChangeBaseName(
                     $std,
@@ -469,6 +490,15 @@ class File_Archive
                 $result =& $tmp;
             }
         }
+
+        $cacheCondition = File_Archive::getOption('cacheCondition');
+        if ($cacheCondition !== false &&
+            preg_match($cacheCondition, $URL)) {
+            $tmp =& File_Archive::cache($result);
+            unset($result);
+            $result =& $tmp;
+        }
+
         return $result;
     }
     function read($URL, $symbolic = null,
@@ -478,6 +508,74 @@ class File_Archive
         return File_Archive::readSource($source, $URL, $symbolic, $uncompression, $directoryDepth);
     }
 
+    /**
+     * Create a file reader on an uploaded file. The reader will read
+     * $_FILES[$name]['tmp_name'] and will have $_FILES[$name]['name']
+     * as a symbolic filename.
+     *
+     * A PEAR error is returned if one of the following happen
+     *  - $_FILES[$name] is not set
+     *  - $_FILES[$name]['error'] is not 0
+     *  - is_uploaded_file returns false
+     *
+     * @param string $name Index of the file in the $_FILES array
+     * @return File_Archive_Reader File reader on the uploaded file
+     */
+    function readUploadedFile($name)
+    {
+        if (!isset($_FILES[$name])) {
+            return PEAR::raiseError("File $name has not been uploaded");
+        }
+        switch ($_FILES[$name]['error']) {
+        case 0:
+            //No error
+            break;
+        case 1:
+            return PEAR::raiseError(
+                        "The upload size limit didn't allow to upload file ".
+                        $_FILES[$name]['name']
+                    );
+        case 2:
+            return PEAR::raiseError(
+                        "The form size limit didn't allow to upload file ".
+                        $_FILES[$name]['name']
+                   );
+        case 3:
+            return PEAR::raiseError(
+                        "The file was not entirely uploaded"
+                   );
+        case 4:
+            return PEAR::raiseError(
+                        "The uploaded file is empty"
+                   );
+        default:
+            return PEAR::raiseError(
+                        "Unknown error ".$_FILES[$name]['error']." in file upload. ".
+                        "Please, report a bug"
+                   );
+        }
+        if (!is_uploaded_file($_FILES[$name]['tmp_name'])) {
+            return PEAR::raiseError("The file is not an uploaded file");
+        }
+
+        require_once "File/Archive/Reader/File.php";
+        return new File_Archive_Reader_File(
+                    $_FILES[$name]['tmp_name'],
+                    $_FILES[$name]['name'],
+                    $_FILES[$name]['type']
+               );
+    }
+
+    /**
+     * Adds a cache layer above the specified reader
+     * The data of the reader is saved in a temporary file for future access.
+     * The cached reader will be read only once, even if you read it several times.
+     * This can be usefull to read compressed files or downloaded files (from http or ftp)
+     *
+     * @param mixed $toConvert The reader to cache
+     *        It can be a File_Archive_Reader or a string, which will be converted using the
+     *        read function
+     */
     function cache(&$toConvert)
     {
         $source =& File_Archive::_convertToReader($toConvert);
@@ -499,7 +597,13 @@ class File_Archive
     function &_convertToReader(&$source)
     {
         if (is_string($source)) {
-            return File_Archive::read($source);
+            $cacheCondition = File_Archive::getOption('cacheCondition');
+            if ($cacheCondition !== false &&
+                preg_match($cacheCondition, $source)) {
+                return File_Archive::cache(File_Archive::read($source));
+            } else {
+                return File_Archive::read($source);
+            }
         } else if (is_array($source)) {
             return File_Archive::readMulti($source);
         } else {
