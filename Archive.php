@@ -653,8 +653,8 @@ class File_Archive
                $extension == 'bz2'   ||
                $extension == 'bzip2' ||
                $extension == 'ar'    ||
-               $extension == 'deb'   ||
-               /* $extension == 'cab'   ||
+               $extension == 'deb'   /* ||
+               $extension == 'cab'   ||
                $extension == 'rar' */;
     }
 
