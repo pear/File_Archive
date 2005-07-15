@@ -640,8 +640,8 @@ class File_Archive
      *
      * @param string $extension the checked extension
      * @return bool whether this file can be understood reading its extension
-     *         Currently, supported extensions are tar, zip, gz, tgz, tbz, bz2
-     *         and bzip2
+     *         Currently, supported extensions are tar, zip, gz, tgz, tbz, bz2,
+     *         bzip2, ar, deb
      */
     function isKnownExtension($extension)
     {
@@ -654,7 +654,7 @@ class File_Archive
                $extension == 'bzip2' ||
                $extension == 'ar'    ||
                $extension == 'deb'   ||
-               $extension == 'cab'  /*   ||
+               /* $extension == 'cab'   ||
                $extension == 'rar' */;
     }
 
@@ -712,12 +712,12 @@ class File_Archive
             require_once 'File/Archive/Reader/Ar.php';
             return new File_Archive_Reader_Ar($source, $sourceOpened);
 
-        case 'cab':
+/*        case 'cab':
             require_once 'File/Archive/Reader/Cab.php';
             return new File_Archive_Reader_Cab($source, $sourceOpened);
 
 
-/*        case 'rar':
+        case 'rar':
             require_once "File/Archive/Reader/Rar.php";
             return new File_Archive_Reader_Rar($source, $sourceOpened); */
 
