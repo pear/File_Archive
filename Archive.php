@@ -294,6 +294,7 @@ class File_Archive
             $uncompressionLevel = $uncompression;
         }
 
+        require_once 'File/Archive/Reader.php';
         $std = File_Archive_Reader::getStandardURL($URL);
 
         //Modify the symbolic name if necessary

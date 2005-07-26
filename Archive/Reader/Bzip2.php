@@ -77,7 +77,10 @@ class File_Archive_Reader_Bzip2 extends File_Archive_Reader_Archive
         if ($dataFilename !== null)
         {
             $this->tmpName = null;
-            $this->bzfile = bzopen($dataFilename, 'r');
+            $this->bzfile = @bzopen($dataFilename, 'r');
+            if ($this->bzfile === false) {
+                return PEAR::raiseError("bzopen failed to open $dataFilename");
+            }
         } else {
             $this->tmpName = tempnam(File_Archive::getOption('tmpDirectory'), 'far');
 
