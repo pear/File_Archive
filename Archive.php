@@ -1,5 +1,3 @@
-
-
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
@@ -1293,8 +1291,13 @@ class File_Archive
         $stat[9] = $stat['mtime'] = time();
 
         if (empty($baseDir)) {
+            $writer =& $source->makeWriter();
+            if (PEAR::isError($writer)) {
+                return $writer;
+            }
+
             PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
-            $result = File_Archive::toArchive($reachable, $source, $type);
+            $result = File_Archive::toArchive($reachable, $writer, $type);
             PEAR::popErrorHandling();
 
             if (PEAR::isError($result)) {
@@ -1305,15 +1308,19 @@ class File_Archive
             if (PEAR::isError($reachedSource)) {
                 return $reachedSource;
             }
+            $writer = $reachedSource->makeWriter();
+            if (PEAR::isError($writer)) {
+                return $writer;
+            }
 
             PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
-            $result = File_Archive::toArchive($baseDir, $reachedSource, $type);
+            $result = File_Archive::toArchive($baseDir, $writer, $type);
             PEAR::popErrorHandling();
 
             if (PEAR::isError($result)) {
-                require_once "File/Archive/Writer/AddFolder.php";
-                $result = new File_Archive_Writer_AddFolder(
-                                       $baseDir, $reachedSource);
+                require_once "File/Archive/Writer/AddBaseName.php";
+                $result = new File_Archive_Writer_AddBaseName(
+                                       $baseDir, $writer);
                 if (PEAR::isError($result)) {
                     return $result;
                 }

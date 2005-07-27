@@ -25,11 +25,11 @@
   </maintainer>
  </maintainers>
  <release>
-  <version>1.5.1</version>
-  <date>2005-07-26</date>
+  <version>1.5.2</version>
+  <date>2005-07-27</date>
   <state>stable</state>
   <notes>
-   Bug #4916
+   Bug #4921, #4925
   </notes>  
   <filelist>
    <dir name="File" role="php">
@@ -60,6 +60,7 @@
       <file>Ar.php</file>
       <file>Archive.php</file>
       <file>Bzip2.php</file>
+      <file>Cache.php</file>
       <file>ChangeName.php</file>
       <file>Concat.php</file>
       <file>Directory.php</file>
@@ -112,6 +113,14 @@
  </release>
  
  <changelog>
+  <release>
+   <version>1.5.1</version>
+   <date>2005-07-26</date>
+   <state>stable</state>
+   <notes>
+    Bug #4916
+   </notes>
+  </release>
   <release>
    <version>1.5.0</version>
    <date>2005-07-15</date>
