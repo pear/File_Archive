@@ -377,8 +377,9 @@ class File_Archive
         } else {
             require_once "File/Archive/Reader/File.php";
 
-            $parsedURL = parse_url($std);
-            $realPath = isset($parsedURL['path']) ? $parsedURL['path'] : '';
+//            $parsedURL = parse_url($std);
+//            $realPath = isset($parsedURL['path']) ? $parsedURL['path'] : '';
+            $realPath = $std;
 
             // Try to find a file with a known extension in the path (
             // (to manage URLs like archive.tar/directory/file)
@@ -406,7 +407,7 @@ class File_Archive
 
             //Build the URL back, with the new path to a file with an archive extension
             // or to a file / directory is is_file / is_dir cant be used (HTTP, or $source !== null)
-            $parsedURL['path'] = $file;
+/*            $parsedURL['path'] = $file;
             $file = '';
 
             //Rebuild the real URL with the smaller path
@@ -432,7 +433,7 @@ class File_Archive
             }
             if (isset($parsedURL['fragment'])) {
                 $file .= '#'.$parsedURL['fragment'];
-            }
+            } */
             $reachable = $file;
 
             //If we are reading from the file system

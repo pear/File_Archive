@@ -93,7 +93,6 @@ class File_Archive_Writer_Zip extends File_Archive_Writer_MemoryArchive
     function getMTime($time)
     {
         $mtime = ($time !== null ? getdate($time) : getdate());
-        $mtime = getdate(mktime(0, 0, 0, 12, 32, 1997));
         $mtime = preg_replace(
                      "/(..){1}(..){1}(..){1}(..){1}/",
                      "\\x\\4\\x\\3\\x\\2\\x\\1",
