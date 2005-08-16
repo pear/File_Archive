@@ -1261,7 +1261,11 @@ class File_Archive
         $stat[9] = $stat['mtime'] = time();
 
         if (empty($baseDir)) {
-            $writer =& $source->makeWriter();
+            if ($source !== null) {
+                $writer =& $source->makeWriter();
+            } else {
+                $writer =& File_Archive::toFiles();
+            }
             if (PEAR::isError($writer)) {
                 return $writer;
             }
