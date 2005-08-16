@@ -25,11 +25,13 @@
   </maintainer>
  </maintainers>
  <release>
-  <version>1.5.2</version>
-  <date>2005-07-27</date>
+  <version>1.5.3</version>
+  <date>2005-08-16</date>
   <state>stable</state>
   <notes>
-   Bug #4921, #4925
+   Bug #4953 (absolute windows path)
+   Bug #5095 (date of files when creating a zip archive)
+   Fix a bug when using File_Archive::appender on non existing archives
   </notes>  
   <filelist>
    <dir name="File" role="php">
@@ -113,6 +115,14 @@
  </release>
  
  <changelog>
+  <release>
+   <version>1.5.2</version>
+   <date>2005-07-27</date>
+   <state>stable</state>
+   <notes>
+    Bug #4921, #4925
+   </notes>  
+  </release>
   <release>
    <version>1.5.1</version>
    <date>2005-07-26</date>
