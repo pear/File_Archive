@@ -597,6 +597,7 @@ class File_Archive
             foreach($dest as $key => $foo) {
                 $writer->addWriter($dest[$key]);
             }
+            return $writer;
         } else {
             return $dest;
         }
