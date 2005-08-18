@@ -198,7 +198,7 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      */
     function newFromTempFile($tmpfile, $filename, $stat = array(), $mime = "application/octet-stream")
     {
-        $this->filename = filename;
+        $this->filename = $filename;
         $complete = $this->getFilename($filename);
         $pos = strrpos($complete, "/");
         if ($pos !== false) {
