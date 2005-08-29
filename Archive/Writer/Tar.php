@@ -151,7 +151,7 @@ class File_Archive_Writer_Tar extends File_Archive_Writer_Archive
         $this->buffer = "";
     }
 
-    function newFile($filename, $stats = array(),
+    function _newFile($filename, $stats = array(),
                      $mime = "application/octet-stream")
     {
         $this->flush();
