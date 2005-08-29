@@ -112,7 +112,6 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
             $sourceData = $this->source->getData(
                 $length==-1 ? -1 : $length - strlen($result)
             );
-
             if (PEAR::isError($sourceData)) {
                 return $sourceData;
             }
@@ -145,6 +144,15 @@ class File_Archive_Reader_Concat extends File_Archive_Reader
             }
             $skipped += $sourceSkipped;
             $filePos += $sourceSkipped;
+            if ($sourceSkipped < $length) {
+                $error = $this->source->next();
+                if (PEAR::isError($error)) {
+                    return $error;
+                }
+                if (!$error) {
+                    return $skipped;
+                }
+            }
         }
         return $skipped;
     }

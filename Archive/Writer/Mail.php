@@ -146,7 +146,7 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
                         $this->currentMime,
                         $this->currentFilename,
                         false);
-        $this->currentData = "";
+        $this->currentData = '';
         return $error;
     }
     /**
@@ -159,8 +159,12 @@ class File_Archive_Writer_Mail extends File_Archive_Writer
             return $error;
         }
 
-        $this->currentFilename = $filename;
-        $this->currentMime = $mime;
+        if (substr($filename, -1) == '/') {
+            $this->currentFilename = null;
+        } else {
+            $this->currentFilename = $filename;
+            $this->currentMime = $mime;
+        }
     }
     /**
      * @see File_Archive_Writer::newFileNeedsMIME()

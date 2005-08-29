@@ -99,6 +99,10 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
                     "Directory {$this->directory} not found"
                 );
             }
+            $this->source = null;
+
+            if (!empty($this->symbolic))
+                return true;
         }
 
         while ($this->source === null ||
@@ -123,6 +127,7 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
                         $current, $file.'/', $this->maxRecurs-1
                     );
                 }
+
             } else {
                 $this->source = new File_Archive_Reader_File($current, $file);
             }
@@ -134,7 +139,91 @@ class File_Archive_Reader_Directory extends File_Archive_Reader_Relay
     /**
      * @see File_Archive_Reader::getFilename()
      */
-    function getFilename() { return $this->symbolic . parent::getFilename(); }
+    function getFilename()
+    {
+        if ($this->source === null) {
+            return $this->symbolic;
+        } else {
+            return $this->symbolic . parent::getFilename();
+        }
+    }
+    /**
+     * @see File_Archive_Reader::getStat()
+     */
+    function getStat()
+    {
+        if ($this->source === null) {
+            return stat($this->directory);
+        } else {
+            return parent::getStat();
+        }
+    }
+    /**
+     * @see File_Archive_Reader::getMime()
+     */
+    function getMime()
+    {
+        if ($this->source === null) {
+            return '';
+        } else {
+            return parent::getMime();
+        }
+    }
+    /**
+     * @see File_Archive_Reader::getDataFilename()
+     */
+    function getDataFilename()
+    {
+        if ($this->source === null) {
+            return null;
+        } else {
+            return parent::getDataFilename();
+        }
+    }
+    /**
+     * @see File_Archive_Reader::getData()
+     */
+    function getData($length = -1)
+    {
+        if ($this->source === null) {
+            return null;
+        } else {
+            return parent::getData($length);
+        }
+    }
+    /**
+     * @see File_Archive_Reader::skip()
+     */
+    function skip($length = -1)
+    {
+        if ($this->source === null) {
+            return 0;
+        } else {
+            return parent::skip($length);
+        }
+    }
+    /**
+     * @see File_Archive_Reader::rewind()
+     */
+    function rewind($length = -1)
+    {
+        if ($this->source === null) {
+            return 0;
+        } else {
+            return parent::rewind($length);
+        }
+    }
+    /**
+     * @see File_Archive_Reader::tell()
+     */
+    function tell()
+    {
+        if ($this->source === null) {
+            return 0;
+        } else {
+            return parent::tell();
+        }
+    }
 
     /**
      * @see File_Archive_Reader::makeWriterRemoveFiles()

@@ -177,16 +177,23 @@ class File_Archive_Writer_Files extends File_Archive_Writer
         $this->stat = $stat;
         $this->filename = $this->getFilename($filename);
 
-        $pos = strrpos($this->filename, "/");
-        if ($pos !== false) {
-            $error = $this->mkdirr(substr($this->filename, 0, $pos));
+        if (substr($this->filename, -1) == '/') {
+            $error = $this->mkdirr(substr($this->filename, 0, -1));
             if (PEAR::isError($error)) {
                 return $error;
             }
-        }
-        $this->handle = @fopen($this->filename, "w");
-        if (!is_resource($this->handle)) {
-            return PEAR::raiseError("Unable to write to file $filename");
+        } else {
+            $pos = strrpos($this->filename, "/");
+            if ($pos !== false) {
+                $error = $this->mkdirr(substr($this->filename, 0, $pos));
+                if (PEAR::isError($error)) {
+                    return $error;
+                }
+            }
+            $this->handle = @fopen($this->filename, "w");
+            if (!is_resource($this->handle)) {
+                return PEAR::raiseError("Unable to write to file $filename");
+            }
         }
     }
     /**

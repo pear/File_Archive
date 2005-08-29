@@ -74,12 +74,10 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
 
     /**
      * Go to next entry in ZIP archive
-     * This function may stop on a folder, so it does not comply to the
-     * File_Archive_Reader::next specs
      *
      * @see File_Archive_Reader::next()
      */
-    function nextWithFolders()
+    function next()
     {
         if ($this->seekToEnd > 0) {
             return false;
@@ -168,7 +166,6 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
                             'CRC' => $this->header['CRC'],
                             'CLen' => $this->header['CLen']
                            );
-
             return true;
         } else {
             //Begining of central area
@@ -176,26 +173,6 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             $this->currentFilename = null;
             return false;
         }
-    }
-    /**
-     * Go to next file entry in ZIP archive
-     * This function will not stop on a folder entry
-     * @see File_Archive_Reader::next()
-     */
-    function next()
-    {
-        if (!parent::next()) {
-            return false;
-        }
-
-        do {
-            $result = $this->nextWithFolders();
-            if ($result !== true) {
-                return $result;
-            }
-        } while (substr($this->getFilename(), -1) == '/');
-
-        return true;
     }
 
     /**
@@ -293,7 +270,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             array_pop($this->files);
         }
 
-        while (($error = $this->nextWithFolders()) === true) {
+        while (($error = $this->next()) === true) {
             $size = 30 + $this->header['File'] + $this->header['Extra'] + $this->header['CLen'];
             if (substr($this->getFilename(), -1) == '/' || $pred->isTrue($this)) {
                 array_pop($this->files);

@@ -30,7 +30,7 @@
  */
 
 require_once "File/Archive/Reader.php";
-require_once "File/Archive/Reader/ChangeName.php";
+require_once "File/Archive/Reader/ChangeName/AddDirectory.php";
 
 /**
  * Recursively uncompress every file it finds
@@ -108,6 +108,13 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
      */
     function push()
     {
+        $filename  = $this->source->getFilename();
+
+        if (substr($filename, -1) == '/') { //it's a directory
+            echo "OK (directory)\n";
+            return false;
+        }
+
         if ($this->uncompressionLevel >= 0 &&
             $this->baseDirCompressionLevel !== null &&
             count($this->readers) >= $this->uncompressionLevel
@@ -116,8 +123,6 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         }
 
         // Check the extension of the file (maybe we need to uncompress it?)
-        $filename  = $this->source->getFilename();
-
         $extensions = explode('.', strtolower($filename));
 
         $reader =& $this->source;
@@ -139,7 +144,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         } else {
             $this->readers[count($this->readers)] =& $this->source;
             unset($this->source);
-            $this->source = new File_Archive_Reader_AddBaseName(
+            $this->source = new File_Archive_Reader_ChangeName_AddDirectory(
                 $filename, $reader
             );
             return true;
@@ -197,7 +202,7 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
                     $this->baseDirProgression = strlen($this->baseDir);
                 }
             }
-        } while ($goodFile && $this->push());
+        } while (($goodFile && $this->push()) || !$goodFile);
 
         return true;
     }

@@ -333,7 +333,6 @@ class File_Archive
         //If the URL can be interpreted as a directory, and we are reading from the file system
         if ((empty($URL) || is_dir($URL)) && $source === null) {
             require_once "File/Archive/Reader/Directory.php";
-            require_once "File/Archive/Reader/ChangeName.php";
 
             if ($uncompressionLevel != 0) {
                 require_once "File/Archive/Reader/Uncompress.php";
@@ -360,7 +359,8 @@ class File_Archive
                 if ($symbolic === null) {
                     $realSymbolic = '';
                 }
-                $tmp =& new File_Archive_Reader_AddBaseName(
+                require_once "File/Archive/Reader/ChangeName/AddDirectory.php";
+                $tmp =& new File_Archive_Reader_ChangeName_AddDirectory(
                     $realSymbolic,
                     $result
                 );
@@ -447,10 +447,10 @@ class File_Archive
             }
 
             if ($std != $realSymbolic) {
-                require_once "File/Archive/Reader/ChangeName.php";
+                require_once "File/Archive/Reader/ChangeName/Directory.php";
 
                 //Change the base name to the symbolic one if necessary
-                $tmp = new File_Archive_Reader_ChangeBaseName(
+                $tmp = new File_Archive_Reader_ChangeName_Directory(
                     $std,
                     $realSymbolic,
                     $result
@@ -741,7 +741,7 @@ class File_Archive
      * Make the files of a source appear as one large file whose content is the
      * concatenation of the content of all the files
      *
-     * @param File_Archive_Reader $source The source whose files must be
+     * @param File_Archive_Reader $toConvert The source whose files must be
      *        concatened
      * @param string $filename name of the only file of the created reader
      * @param array $stat statistics of the file. Index 7 (size) will be
@@ -759,6 +759,30 @@ class File_Archive
 
         require_once "File/Archive/Reader/Concat.php";
         return new File_Archive_Reader_Concat($source, $filename, $stat, $mime);
+    }
+
+    /**
+     * Changes the name of each file in a reader by applying a custom function
+     * The function must return false if the file is to be discarded, or the new
+     * name of the file else
+     *
+     * @param Callable $function Function called to modify the name of the file
+     *        $function takes the name of the file as a parameter and returns the
+     *        new name, or false if the file must be discarded
+     * @param File_Archive_Reader $toConvert The files of this source will be
+     *        modified
+     * @return File_Archive_Reader a new reader that contains the same files
+     *        as $toConvert but with a different name
+     */
+    function changeName($function, &$toConvert)
+    {
+        $source =& File_Archive::_convertToReader($toConvert);
+        if (PEAR::isError($source)) {
+            return $source;
+        }
+
+        require_once "File/Archive/Reader/ChangeName.php";
+        return new File_Archive_Reader_RemoveDirectory($source);
     }
 
     /**

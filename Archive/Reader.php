@@ -41,7 +41,7 @@ require_once "PEAR.php";
 class File_Archive_Reader
 {
     /**
-     * Move to the next file in the reader
+     * Move to the next file or folder in the reader
      *
      * @return bool false iif no more files are available
      */
@@ -61,6 +61,9 @@ class File_Archive_Reader
     function select($filename, $close = true)
     {
         $std = $this->getStandardURL($filename);
+        if (substr($std, -1)=='/') {
+            $std = substr($std, 0, -1);
+        }
 
         if ($close) {
             $error = $this->close();
@@ -77,7 +80,8 @@ class File_Archive_Reader
                   $std == $sourceName ||
 
                 //$std is a directory
-                strncmp($std.'/', $sourceName, strlen($std)+1) == 0
+                  (strncmp($std.'/', $sourceName, strlen($std)+1) == 0 &&
+                   strlen($sourceName) > strlen($std)+1)
                ) {
                 return true;
             }
