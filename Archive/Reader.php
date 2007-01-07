@@ -105,6 +105,12 @@ class File_Archive_Reader
         while ($std != ($std = preg_replace("/[^\/:?]+\/\.\.\//", "", $std))) ;
         $std = str_replace("/./", "", $std);
         if (strncmp($std, "./", 2) == 0) {
+            /**
+             * If return value is going to be / (root on POSIX) 
+             */
+            if (substr($std, 2) === '/') {
+                return $std;
+            }
             return substr($std, 2);
         } else {
             return $std;
