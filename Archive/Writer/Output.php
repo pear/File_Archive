@@ -69,7 +69,7 @@ class File_Archive_Writer_Output extends File_Archive_Writer
             }
 
             header("Content-type: $mime");
-            header("Content-disposition: attachment; filename=$filename");
+            header("Content-disposition: attachment; filename=\"$filename\"");
             $this->sendHeaders = false;
         }
     }
