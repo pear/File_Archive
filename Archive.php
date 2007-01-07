@@ -569,9 +569,11 @@ class File_Archive
             $cacheCondition = File_Archive::getOption('cacheCondition');
             if ($cacheCondition !== false &&
                 preg_match($cacheCondition, $source)) {
-                return File_Archive::cache(File_Archive::read($source));
+                $obj = File_Archive::cache(File_Archive::read($source));
+                return $obj;
             } else {
-                return File_Archive::read($source);
+                $obj = File_Archive::read($source);
+                return $obj;
             }
         } else if (is_array($source)) {
             return File_Archive::readMulti($source);
@@ -590,7 +592,8 @@ class File_Archive
     function &_convertToWriter(&$dest)
     {
         if (is_string($dest)) {
-            return File_Archive::appender($dest);
+            $obj =& File_Archive::appender($dest);
+            return $obj;
         } else if (is_array($dest)) {
             require_once 'File/Archive/Writer/Multi.php';
             $writer = new File_Archive_Writer_Multi();
