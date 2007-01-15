@@ -296,6 +296,7 @@ class File_Archive_Reader
             } else {
                 $mime = null;
             }
+           
             $error = $writer->newFile(
                 $this->getFilename(),
                 $this->getStat(),

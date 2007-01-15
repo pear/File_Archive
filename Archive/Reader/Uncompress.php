@@ -111,9 +111,9 @@ class File_Archive_Reader_Uncompress extends File_Archive_Reader_Relay
         $filename  = $this->source->getFilename();
 
         if (substr($filename, -1) == '/') { //it's a directory
-            echo "OK (directory)\n";
             return false;
-        }
+        } 
+
 
         if ($this->uncompressionLevel >= 0 &&
             $this->baseDirCompressionLevel !== null &&
