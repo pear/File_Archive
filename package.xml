@@ -26,7 +26,7 @@
  </maintainers>
  <release>
   <version>1.5.4</version>
-  <date></date>
+  <date>2007-05-20</date>
   <state>stable</state>
   <notes>
    + Bug #5145 (a $ was missing in Writer/Files.php)
