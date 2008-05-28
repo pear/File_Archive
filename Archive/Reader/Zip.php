@@ -97,6 +97,18 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
 
         //Read the header
         $header = $this->source->getData(4);
+        // Handle PK00PK archives
+        if ($header == "\x50\x4b\x30\x30") { //PK00
+            $header = $this->source->getData(4);
+        }
+        // Sometimes this header is used to tag the data descriptor section
+        if($header == "\x50\x4b\x07\x08") { 
+            // Read out the data descriptor (always 12 bytes)
+            $this->source->getData(12);
+
+            // Get a new header from the file
+            $header = $this->source->getData(4);
+        }
         if (PEAR::isError($header)) {
             return $header;
         }
@@ -248,7 +260,7 @@ class File_Archive_Reader_Zip extends File_Archive_Reader_Archive
             $this->data = bzdecompress($this->data);
         }
 
-        if (crc32($this->data) != $this->header['CRC']) {
+        if (crc32($this->data) != ($this->header['CRC'] & 0xFFFFFFFF)) {
             return PEAR::raiseError("Zip archive: CRC fails on entry ".
                                     $this->currentFilename);
         }
