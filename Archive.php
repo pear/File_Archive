@@ -433,6 +433,7 @@ class File_Archive
 
             if ($directoryDepth >= 0) {
                 //Limit the maximum depth if necessary
+                require_once "File/Archive/Reader/Filter.php";
                 require_once "File/Archive/Predicate/MaxDepth.php";
 
                 $tmp = new File_Archive_Reader_Filter(
