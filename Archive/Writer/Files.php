@@ -245,10 +245,12 @@ class File_Archive_Writer_Files extends File_Archive_Writer
                 chmod($this->filename, $this->stat[2]);
             }
             if (isset($this->stat[5])) {
-                chgrp($this->filename, $this->stat[5]);
+                // I will try, but if I dont have permissions, it will fail
+                @chgrp($this->filename, $this->stat[5]);
             }
             if (isset($this->stat[4])) {
-                chown($this->filename, $this->stat[4]);
+                // I will try, but if I dont have permissions, it will fail
+                @chown($this->filename, $this->stat[4]);
             }
         }
     }
