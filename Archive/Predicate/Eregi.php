@@ -54,7 +54,7 @@ class File_Archive_Predicate_Eregi extends File_Archive_Predicate
      */
     function isTrue(&$source)
     {
-        return eregi($this->ereg, $source->getFilename());
+        return (bool)eregi($this->ereg, $source->getFilename());
     }
 }
 

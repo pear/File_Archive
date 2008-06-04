@@ -81,7 +81,7 @@ class File_Archive_Predicate_Custom extends File_Archive_Predicate
         if ($this->useMIME) {
             $mime = $source->getMIME();
         }
-        return eval($this->expression);
+        return (bool)eval($this->expression);
     }
 }
 
