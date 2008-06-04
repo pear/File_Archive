@@ -180,7 +180,8 @@ class File_Archive_Reader_Tar extends File_Archive_Reader_Archive
 			//Other than the above we only care about regular files.
 			//NOTE: Any non-numeric type codes will == 0
 			//We handle 'L' above, I don't know what others are out there.
-			if ($header['type'] == 0) {
+            //5 == directory
+			if ($header['type'] == 0 || $header['type'] == 5) {
                 break;
             }
 		}
