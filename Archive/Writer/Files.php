@@ -227,7 +227,7 @@ class File_Archive_Writer_Files extends File_Archive_Writer
      */
     function close()
     {
-        if ($this->handle !== null) {
+        if (is_resource($this->handle)) {
             fclose($this->handle);
             $this->handle = null;
 

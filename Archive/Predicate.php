@@ -46,7 +46,7 @@ class File_Archive_Predicate
      * Indicates whether the current file from the reader should be kept
      *
      * @param File_Archive_Reader $source Reader which will be filtered
-     * @return bool False iif the current file must be filtered out
+     * @return bool False if the current file must be filtered out
      */
     function isTrue(&$source)
     {

@@ -1,7 +1,7 @@
 <?php
 
 require_once 'File/Archive.php';
-require_once 'PHPUnit.php';
+require_once 'PHPUnit/Framework.php';
 
 function var_dumped($x) { var_dump($x); return $x; }
 
@@ -9,7 +9,7 @@ function var_dumped($x) { var_dump($x); return $x; }
  * Actually more to check that the syntax is OK
  * than the actual functionnality
  */
-class Test extends PHPUnit_TestCase
+class Test extends PHPUnit_Framework_TestCase
 {
     function testMemoryReader()
     {
@@ -347,9 +347,9 @@ class Test extends PHPUnit_TestCase
     function testRemoveZip() { return $this->_testRemove('zip'); }
 }
 
-PEAR::setErrorHandling(PEAR_ERROR_PRINT);
+//PEAR::setErrorHandling(PEAR_ERROR_PRINT);
 
-$test = new PHPUnit_TestSuite("Test");
-$result = PHPUnit::run($test);
-echo $result->toHTML();
+//$test = new PHPUnit_TestSuite("Test");
+//$result = PHPUnit::run($test);
+//echo $result->toHTML();
 ?>

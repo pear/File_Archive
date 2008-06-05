@@ -90,7 +90,10 @@ class File_Archive_Writer_Archive extends File_Archive_Writer
                 $current .= $folder.'/';
                 unset($this->emptyFolders[$current]);
             }
-            $this->_newFile($filename, $stat, $mime);
+            $err = $this->_newFile($filename, $stat, $mime);
+            if (PEAR::isError($err)) {
+                return $err;
+            }
         }
     }
 //MUST REWRITE FUNCTIONS
@@ -107,7 +110,10 @@ class File_Archive_Writer_Archive extends File_Archive_Writer
     function close()
     {
         foreach ($this->emptyFolders as $folder => $info) {
-            $this->_newFile($folder, $info[0], $info[1]);
+            $err = $this->_newFile($folder, $info[0], $info[1]);
+            if (PEAR::isError($err)) {
+                return $err;
+            }
         }
 
         if ($this->autoClose) {
