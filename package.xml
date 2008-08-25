@@ -1,37 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.4.9" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
-http://pear.php.net/dtd/tasks-1.0.xsd
-http://pear.php.net/dtd/package-2.0
-http://pear.php.net/dtd/package-2.0.xsd">
+<package packagerversion="1.7.2" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>File_Archive</name>
  <channel>pear.php.net</channel>
  <summary>File_Archive will let you manipulate easily the tar, gz, tgz, bz2, tbz, zip, ar (or deb) files</summary>
  <description>This library is strongly object oriented. It makes it very easy to use, writing simple code, yet the library is very powerfull.
 It lets you easily read or generate tar, gz, tgz, bz2, tbz, zip, ar (or deb) archives to files, memory, mail or standard output.
-See http://poocl.la-grotte.org for a tutorial
- </description>
+See http://poocl.la-grotte.org for a tutorial</description>
+ <lead>
+  <name>Vincent Lascaux</name>
+  <user>vincentlascaux</user>
+  <email>vincent.lascaux@centraliens.net</email>
+  <active>no</active>
+ </lead>
  <lead>
   <name>Charles Brunet</name>
   <user>cbrunet</user>
   <email>charles.fmj@gmail.com</email>
   <active>yes</active>
  </lead>
- <lead>
-  <name>Vincent Lascaux</name>
-  <user>VincentLascaux</user>
-  <email>vincent.lascaux@centraliens.net</email>
-  <active>no</active>
- </lead>
  <developer>
   <name>Pablo Fischer</name>
-  <user>PFischer</user>
-  <email>pfischer@php.net</email>
+  <user>pfischer</user>
+  <email>pablo@pablo.com.mx</email>
   <active>yes</active>
  </developer>
- <date>2008-06-05</date>
- <time>17:22:35</time>
+ <date>2008-08-25</date>
+ <time>08:49:15</time>
  <version>
-  <release>1.5.4</release>
+  <release>1.5.5</release>
   <api>1.5.4</api>
  </version>
  <stability>
@@ -40,107 +36,81 @@ See http://poocl.la-grotte.org for a tutorial
  </stability>
  <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
  <notes>
-+ Bug #4159, #4204, #4548, #7650 (PHP4 compatibility)
-+ Bug #4194, #4925 (short opening tags, whitespaces at beginning of file)
-+ Bug #4916, #4921, #12175 (missing or wrong require_once)
-+ Bug #4953 (absolute paths on Windows)
-+ Bug #5095 (removed some debug code)
-+ Bug #5145, #6646 (missing $)
-+ Bug #5566 (support extraction of JAR files)
-+ Bug #5792, #12450 (some PEAR::Error weren't returned back to caller)
-+ Bug #5991 (reading of long filenames in TAR files)
-+ Bug #6387 (reading of PK00PK ZIP files)
-+ Bug #6570 (corrected headers in Output functions)
-+ Bug #6743 (reading of uppercase filenames)
-+ Bug #8187 (. mangled in paths)
-+ Bug #8647 (typo)
-+ Bug #9676 (reading of ZIP files with special signature)
-+ Bug #10247 (CS stuff)
-+ Bug #11084 (package2.xml file)
-+ Bug #12448 (empty dirs removed on tar archives)
-+ Bug #13311 (extracting of ZIP files on 64 bits systems)
-+ Bug #13516 (removing of PHP warnings)
-+ Bug #13904 (bzip2 doesn't support compression level)
-+ Add File_Archive::removeDirectoryStructure to create a reader that discard
-  the directory information of another reader
-+ Readers now report the directories as file ending with a / (warning: this
-  may be a backward compatibility problem if you read directly from the reader,
-  but not if you exclusively use File_Archive::extract)
-+ 
+ * Made bzip2 extension optional.
  </notes>
  <contents>
-  <dir name="/" baseinstalldir="File">
-    <dir name="Archive">
-     <dir name="Predicate">
-      <file name="And.php" role="php" />
-      <file name="Current.php" role="php" />
-      <file name="Custom.php" role="php" />
-      <file name="Duplicate.php" role="php" />
-      <file name="Ereg.php" role="php" />
-      <file name="Eregi.php" role="php" />
-      <file name="Extension.php" role="php" />
-      <file name="False.php" role="php" />
-      <file name="Index.php" role="php" />
-      <file name="MaxDepth.php" role="php" />
-      <file name="MIME.php" role="php" />
-      <file name="MinSize.php" role="php" />
-      <file name="MinTime.php" role="php" />
-      <file name="Not.php" role="php" />
-      <file name="Or.php" role="php" />
-      <file name="True.php" role="php" />
-     </dir> <!-- //File/Archive/Predicate -->
-     <dir name="Reader">
-      <dir name="ChangeName">
-       <file name="AddDirectory.php" role="php" />
-       <file name="Callback.php" role="php" />
-       <file name="Directory.php" role="php" />
-      </dir> <!-- //File/Archive/Reader/ChangeName -->
-      <file name="Ar.php" role="php" />
-      <file name="Archive.php" role="php" />
-      <file name="Bzip2.php" role="php" />
-      <file name="Cache.php" role="php" />
-      <file name="ChangeName.php" role="php" />
-      <file name="Concat.php" role="php" />
-      <file name="Directory.php" role="php" />
-      <file name="File.php" role="php" />
-      <file name="Filter.php" role="php" />
-      <file name="Gzip.php" role="php" />
-      <file name="Memory.php" role="php" />
-      <file name="MimeList.php" role="php" />
-      <file name="Multi.php" role="php" />
-      <file name="Relay.php" role="php" />
-      <file name="Select.php" role="php" />
-      <file name="Tar.php" role="php" />
-      <file name="Uncompress.php" role="php" />
-      <file name="Zip.php" role="php" />
-     </dir> <!-- //File/Archive/Reader -->
-     <dir name="Writer">
-      <file name="AddBaseName.php" role="php" />
-      <file name="Ar.php" role="php" />
-      <file name="Archive.php" role="php" />
-      <file name="Bzip2.php" role="php" />
-      <file name="Files.php" role="php" />
-      <file name="Gzip.php" role="php" />
-      <file name="Mail.php" role="php" />
-      <file name="Memory.php" role="php" />
-      <file name="MemoryArchive.php" role="php" />
-      <file name="Multi.php" role="php" />
-      <file name="Output.php" role="php" />
-      <file name="Tar.php" role="php" />
-      <file name="UniqueAppender.php" role="php" />
-      <file name="Zip.php" role="php" />
-     </dir> <!-- //File/Archive/Writer -->
-     <file name="Predicate.php" role="php" />
-     <file name="Reader.php" role="php" />
-     <file name="Writer.php" role="php" />
-    </dir> <!-- //File/Archive -->
-    <dir name="doc">
-     <file name="readme.txt" role="doc" />
-    </dir> <!-- //File/doc -->
-    <dir name="tests">
-     <file name="test.php" role="test" />
-    </dir> <!-- //File/tests -->
-    <file name="Archive.php" role="php" />
+  <dir baseinstalldir="File" name="/">
+   <dir name="Archive">
+    <dir name="Predicate">
+     <file baseinstalldir="File" name="And.php" role="php" />
+     <file baseinstalldir="File" name="Current.php" role="php" />
+     <file baseinstalldir="File" name="Custom.php" role="php" />
+     <file baseinstalldir="File" name="Duplicate.php" role="php" />
+     <file baseinstalldir="File" name="Ereg.php" role="php" />
+     <file baseinstalldir="File" name="Eregi.php" role="php" />
+     <file baseinstalldir="File" name="Extension.php" role="php" />
+     <file baseinstalldir="File" name="False.php" role="php" />
+     <file baseinstalldir="File" name="Index.php" role="php" />
+     <file baseinstalldir="File" name="MaxDepth.php" role="php" />
+     <file baseinstalldir="File" name="MIME.php" role="php" />
+     <file baseinstalldir="File" name="MinSize.php" role="php" />
+     <file baseinstalldir="File" name="MinTime.php" role="php" />
+     <file baseinstalldir="File" name="Not.php" role="php" />
+     <file baseinstalldir="File" name="Or.php" role="php" />
+     <file baseinstalldir="File" name="True.php" role="php" />
+    </dir> <!-- /Archive/Predicate -->
+    <dir name="Reader">
+     <dir name="ChangeName">
+      <file baseinstalldir="File" name="AddDirectory.php" role="php" />
+      <file baseinstalldir="File" name="Callback.php" role="php" />
+      <file baseinstalldir="File" name="Directory.php" role="php" />
+     </dir> <!-- /Archive/Reader/ChangeName -->
+     <file baseinstalldir="File" name="Ar.php" role="php" />
+     <file baseinstalldir="File" name="Archive.php" role="php" />
+     <file baseinstalldir="File" name="Bzip2.php" role="php" />
+     <file baseinstalldir="File" name="Cache.php" role="php" />
+     <file baseinstalldir="File" name="ChangeName.php" role="php" />
+     <file baseinstalldir="File" name="Concat.php" role="php" />
+     <file baseinstalldir="File" name="Directory.php" role="php" />
+     <file baseinstalldir="File" name="File.php" role="php" />
+     <file baseinstalldir="File" name="Filter.php" role="php" />
+     <file baseinstalldir="File" name="Gzip.php" role="php" />
+     <file baseinstalldir="File" name="Memory.php" role="php" />
+     <file baseinstalldir="File" name="MimeList.php" role="php" />
+     <file baseinstalldir="File" name="Multi.php" role="php" />
+     <file baseinstalldir="File" name="Relay.php" role="php" />
+     <file baseinstalldir="File" name="Select.php" role="php" />
+     <file baseinstalldir="File" name="Tar.php" role="php" />
+     <file baseinstalldir="File" name="Uncompress.php" role="php" />
+     <file baseinstalldir="File" name="Zip.php" role="php" />
+    </dir> <!-- /Archive/Reader -->
+    <dir name="Writer">
+     <file baseinstalldir="File" name="AddBaseName.php" role="php" />
+     <file baseinstalldir="File" name="Ar.php" role="php" />
+     <file baseinstalldir="File" name="Archive.php" role="php" />
+     <file baseinstalldir="File" name="Bzip2.php" role="php" />
+     <file baseinstalldir="File" name="Files.php" role="php" />
+     <file baseinstalldir="File" name="Gzip.php" role="php" />
+     <file baseinstalldir="File" name="Mail.php" role="php" />
+     <file baseinstalldir="File" name="Memory.php" role="php" />
+     <file baseinstalldir="File" name="MemoryArchive.php" role="php" />
+     <file baseinstalldir="File" name="Multi.php" role="php" />
+     <file baseinstalldir="File" name="Output.php" role="php" />
+     <file baseinstalldir="File" name="Tar.php" role="php" />
+     <file baseinstalldir="File" name="UniqueAppender.php" role="php" />
+     <file baseinstalldir="File" name="Zip.php" role="php" />
+    </dir> <!-- /Archive/Writer -->
+    <file baseinstalldir="File" name="Predicate.php" role="php" />
+    <file baseinstalldir="File" name="Reader.php" role="php" />
+    <file baseinstalldir="File" name="Writer.php" role="php" />
+   </dir> <!-- /Archive -->
+   <dir name="doc">
+    <file baseinstalldir="File" name="readme.txt" role="doc" />
+   </dir> <!-- /doc -->
+   <dir name="tests">
+    <file baseinstalldir="File" name="test.php" role="test" />
+   </dir> <!-- /tests -->
+   <file baseinstalldir="File" name="Archive.php" role="php" />
   </dir> <!-- / -->
  </contents>
  <dependencies>
@@ -156,14 +126,11 @@ See http://poocl.la-grotte.org for a tutorial
     <channel>pear.php.net</channel>
    </package>
    <extension>
-    <name>bz2</name>
-   </extension>   
-   <extension>
     <name>pcre</name>
-   </extension>   
+   </extension>
    <extension>
     <name>zlib</name>
-   </extension>   
+   </extension>
   </required>
   <optional>
    <package>
@@ -179,10 +146,52 @@ See http://poocl.la-grotte.org for a tutorial
     <channel>pear.php.net</channel>
     <min>1.5.0</min>
    </package>
+   <extension>
+    <name>bz2</name>
+   </extension>
   </optional>
  </dependencies>
  <phprelease />
  <changelog>
+  <release>
+   <version>
+    <release>1.5.5</release>
+    <api>1.5.4</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2008-06-05</date>
+   <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+   <notes>+ Bug #4159, #4204, #4548, #7650 (PHP4 compatibility)
++ Bug #4194, #4925 (short opening tags, whitespaces at beginning of file)
++ Bug #4916, #4921, #12175 (missing or wrong require_once)
++ Bug #4953 (absolute paths on Windows)
++ Bug #5095 (removed some debug code)
++ Bug #5145, #6646 (missing $)
++ Bug #5566 (support extraction of JAR files)
++ Bug #5792, #12450 (some PEAR::Error weren&apos;t returned back to caller)
++ Bug #5991 (reading of long filenames in TAR files)
++ Bug #6387 (reading of PK00PK ZIP files)
++ Bug #6570 (corrected headers in Output functions)
++ Bug #6743 (reading of uppercase filenames)
++ Bug #8187 (. mangled in paths)
++ Bug #8647 (typo)
++ Bug #9676 (reading of ZIP files with special signature)
++ Bug #10247 (CS stuff)
++ Bug #11084 (package2.xml file)
++ Bug #12448Â (empty dirs removed on tar archives)
++ Bug #13311 (extracting of ZIP files on 64 bits systems)
++ Bug #13516 (removing of PHP warnings)
++ Bug #13904 (bzip2 doesn&apos;t support compression level)
++ Add File_Archive::removeDirectoryStructure to create a reader that discard
+  the directory information of another reader
++ Readers now report the directories as file ending with a / (warning: this
+  may be a backward compatibility problem if you read directly from the reader,
+  but not if you exclusively use File_Archive::extract)
++</notes>
+  </release>
   <release>
    <version>
     <release>1.5.3</release>
@@ -196,8 +205,7 @@ See http://poocl.la-grotte.org for a tutorial
    <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
    <notes>Bug #4953 (absolute windows path)
 Bug #5095 (date of files when creating a zip archive)
-Fix a bug when using File_Archive::appender on non existing archives
-   </notes>
+Fix a bug when using File_Archive::appender on non existing archives</notes>
   </release>
   <release>
    <version>
@@ -210,8 +218,7 @@ Fix a bug when using File_Archive::appender on non existing archives
    </stability>
    <date>2005-07-27</date>
    <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
-   <notes>Bug #4921, #4925
-   </notes>
+   <notes>Bug #4921, #4925</notes>
   </release>
   <release>
    <version>
@@ -224,8 +231,7 @@ Fix a bug when using File_Archive::appender on non existing archives
    </stability>
    <date>2005-07-26</date>
    <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
-   <notes>Bug #4916
-   </notes>
+   <notes>Bug #4916</notes>
   </release>
   <release>
    <version>
@@ -255,8 +261,7 @@ Fix a bug when using File_Archive::appender on non existing archives
 + &apos;cacheCondition&apos; option. With this option, you can specify you want to cache all the http
   transfer for example. Caching an http transfer ensure that the file won&apos;t be downloaded several times
  
-+ File_Archive::readUploadedFile creates a reader on an uploaded file
-   </notes>
++ File_Archive::readUploadedFile creates a reader on an uploaded file</notes>
   </release>
   <release>
    <version>
@@ -269,8 +274,7 @@ Fix a bug when using File_Archive::appender on non existing archives
    </stability>
    <date>2005-06-08</date>
    <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
-   <notes>Bug #4548
-   </notes>
+   <notes>Bug #4548</notes>
   </release>
   <release>
    <version>
@@ -300,8 +304,7 @@ Fix a bug when using File_Archive::appender on non existing archives
 + All the File_Archive functions that take a reader or a writer as an argument can now take
 	a string or an array. For readers, strings are interpreted using File_Archive::read function
 	and array using File_Archive::readMulti. For writers, strings are interpreted using File_Archive::appender
-	function and array by creating a multi writer.
-   </notes>
+	function and array by creating a multi writer.</notes>
   </release>
   <release>
    <version>
@@ -320,8 +323,7 @@ Fix a bug when using File_Archive::appender on non existing archives
     an existing archive
   
   These functions allow to modify archives or even nested archives
-  See http://poocl.la-grotte.org for more detailed examples
-   </notes>
+  See http://poocl.la-grotte.org for more detailed examples</notes>
   </release>
   <release>
    <version>
@@ -338,8 +340,7 @@ Fix a bug when using File_Archive::appender on non existing archives
 + Add a getFileList() on any reader to quickly retrieve file list
 + File_Archive::readArchive properly handles tgz and tbz extensions
 + Better error handling
-+ Various bug fixes
-   </notes>
++ Various bug fixes</notes>
   </release>
   <release>
    <version>
@@ -355,8 +356,7 @@ Fix a bug when using File_Archive::appender on non existing archives
    <notes>+ Bug 4192 (&lt;? instead of &lt;?php in some source files)
 + Functions File_Archive::isKnownExtension and File_Archive:;readArchive
   added. They allow to specify the type of an archive. This is usefull is the extension
-  of the file doesn&apos;t reflect its real type.
-   </notes>
+  of the file doesn&apos;t reflect its real type.</notes>
   </release>
   <release>
    <version>
@@ -386,8 +386,7 @@ Fix a bug when using File_Archive::appender on non existing archives
   
   The temporary files are created in the current directory. Their name start with
   far, their extension is tmp. They are automatically deleted when the reader / writer
-  is closed.
-   </notes>
+  is closed.</notes>
   </release>
   <release>
    <version>
@@ -406,8 +405,7 @@ Fix a bug when using File_Archive::appender on non existing archives
 + The mail parameter in File_Archive::toMail is now mandatory, but giving a null variable will
   result in using Mail::factory(&quot;mail&quot;)
 + The File_Archive::toMemory function does no longer take a variable argument
-  A File_Archive::toVariable function has been created for that
-   </notes>
+  A File_Archive::toVariable function has been created for that</notes>
   </release>
   <release>
    <version>
@@ -422,8 +420,7 @@ Fix a bug when using File_Archive::appender on non existing archives
    <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
    <notes>+ Add a MIME predicate
 + Change the toArchive function to detect the compression format using the extension of the file
-  (Warning: this is not backward compatible since the order of the arguments have changed)
-   </notes>
+  (Warning: this is not backward compatible since the order of the arguments have changed)</notes>
   </release>
   <release>
    <version>
@@ -436,8 +433,7 @@ Fix a bug when using File_Archive::appender on non existing archives
    </stability>
    <date>2005-02-20</date>
    <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
-   <notes>First release
-   </notes>
+   <notes>First release</notes>
   </release>
  </changelog>
 </package>
