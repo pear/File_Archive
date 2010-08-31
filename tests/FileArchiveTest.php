@@ -9,7 +9,7 @@ function var_dumped($x) { var_dump($x); return $x; }
  * Actually more to check that the syntax is OK
  * than the actual functionnality
  */
-class Test extends PHPUnit_Framework_TestCase
+class FileArchiveTest extends PHPUnit_Framework_TestCase
 {
     function testMemoryReader()
     {
