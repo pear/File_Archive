@@ -240,17 +240,18 @@ class FileArchiveTest extends PHPUnit_Framework_TestCase
                         $compressed = File_Archive::toMemory()
                     )
                 )
-            ) &&
-            !PEAR::isError(
-                File_Archive::extract(
+            ));
+
+        $result = File_Archive::extract(
                     File_Archive::readSource(
-                        $compressed->makeReader(), "$filename/test.php"
+                        $compressed->makeReader(), "$filename/" . basename(__FILE__)
                     ),
                     File_Archive::toVariable($uncompressed)
-                )
-            ) &&
-            $uncompressed == file_get_contents(__FILE__)
-        );
+                );
+
+        $this->assertTrue(!PEAR::isError($result));
+
+        $this->assertSame($uncompressed, file_get_contents(__FILE__));
     }
     function testTar() { $this->_testArchive('tar'); }
     function testZip() { $this->_testArchive('zip'); }
