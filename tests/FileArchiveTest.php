@@ -30,10 +30,10 @@ class FileArchiveTest extends PHPUnit_Framework_TestCase
     {
         $this->assertTrue(
             !PEAR::isError(
-                $reader = File_Archive::read('test.php', 'test.php')
+                $reader = File_Archive::read(__FILE__, __FILE__)
             ) &&
             $reader->next() &&
-            $reader->getData() == file_get_contents('test.php') &&
+            $reader->getData() == file_get_contents(__FILE__) &&
             $reader->next() == false
         );
 
@@ -54,11 +54,11 @@ class FileArchiveTest extends PHPUnit_Framework_TestCase
     {
         $reader = File_Archive::readMulti();
 
-        $reader->addSource(File_Archive::read("test.php", "test.php"));
+        $reader->addSource(File_Archive::read(__FILE__, __FILE__));
         $reader->addSource(File_Archive::readMemory("A", "A.txt"));
 
         $this->assertTrue($reader->next());
-        $this->assertEquals("test.php", $reader->getFilename());
+        $this->assertEquals(__FILE__, $reader->getFilename());
         $this->assertTrue($reader->next());
         $this->assertEquals("A.txt", $reader->getFilename());
         $this->assertFalse($reader->next());
@@ -147,11 +147,11 @@ class FileArchiveTest extends PHPUnit_Framework_TestCase
     }
     function testMinTime()
     {
-        $source = File_Archive::read('test.php');  $source->next();
-        $predicate = File_Archive::predMinTime(filemtime('test.php')-1);
+        $source = File_Archive::read(__FILE__);  $source->next();
+        $predicate = File_Archive::predMinTime(filemtime(__FILE__)-1);
         $this->assertTrue($predicate->isTrue($source));
 
-        $predicate = File_Archive::predMinTime(filemtime('test.php')+1);
+        $predicate = File_Archive::predMinTime(filemtime(__FILE__)+1);
         $this->assertFalse($predicate->isTrue($source));
     }
     function testMaxDepth()
@@ -166,7 +166,7 @@ class FileArchiveTest extends PHPUnit_Framework_TestCase
     }
     function testExtension()
     {
-        $source = File_Archive::read('test.php');  $source->next();
+        $source = File_Archive::read(__FILE__);  $source->next();
         $predicate = File_Archive::predExtension(array('php', 'txt'));
         $this->assertTrue($predicate->isTrue($source));
 
@@ -220,11 +220,11 @@ class FileArchiveTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(
             !PEAR::isError(
                 File_Archive::extract(
-                    File_Archive::read('test.php'),
+                    File_Archive::read(__FILE__),
                     $dest = File_Archive::toMemory()
                 )
             ) &&
-            file_get_contents('test.php') == $dest->getData()
+            file_get_contents(__FILE__) == $dest->getData()
         );
     }
     function _testArchive($extension)
@@ -234,7 +234,7 @@ class FileArchiveTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(
             !PEAR::isError(
                 File_Archive::extract(
-                    File_Archive::read('test.php'),
+                    File_Archive::read(__FILE__),
                     File_Archive::toArchive(
                         $filename,
                         $compressed = File_Archive::toMemory()
@@ -249,7 +249,7 @@ class FileArchiveTest extends PHPUnit_Framework_TestCase
                     File_Archive::toVariable($uncompressed)
                 )
             ) &&
-            $uncompressed == file_get_contents('test.php')
+            $uncompressed == file_get_contents(__FILE__)
         );
     }
     function testTar() { $this->_testArchive('tar'); }
