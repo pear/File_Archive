@@ -1,7 +1,7 @@
 <?php
 
 require_once 'File/Archive.php';
-require_once 'PHPUnit/Framework.php';
+require_once 'PHPUnit/Framework/TestCase.php';
 
 function var_dumped($x) { var_dump($x); return $x; }
 
