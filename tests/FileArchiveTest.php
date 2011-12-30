@@ -11,6 +11,14 @@ function var_dumped($x) { var_dump($x); return $x; }
  */
 class FileArchiveTest extends PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        if (! $fp = @fopen('MIME/Type.php', 'r', true)) {
+            $this->markTestSkipped('Test requires the MIME_Type package');
+        }
+        fclose($fp);
+    }
+
     function testMemoryReader()
     {
         $this->assertTrue(
